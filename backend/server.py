@@ -486,8 +486,13 @@ async def get_dashboard_stats(current_user: User = Depends(get_current_user)):
     if current_user.role == UserRole.ORGANIZER:
         events_count = await db.events.count_documents({"organizer_id": current_user.id})
         published_events = await db.events.count_documents({"organizer_id": current_user.id, "is_published": True})
+        
+        # Get all event IDs for this organizer
+        organizer_events = await db.events.find({"organizer_id": current_user.id}, {"id": 1}).to_list(1000)
+        event_ids = [event["id"] for event in organizer_events]
+        
         total_registrations = await db.registrations.count_documents({
-            "event_id": {"$in": [event["id"] async for event in db.events.find({"organizer_id": current_user.id})]}
+            "event_id": {"$in": event_ids}
         })
         
         stats = {
@@ -511,8 +516,13 @@ async def get_dashboard_stats(current_user: User = Depends(get_current_user)):
     
     elif current_user.role == UserRole.VENUE_OWNER:
         my_venues = await db.venues.count_documents({"owner_id": current_user.id})
+        
+        # Get all venue IDs for this owner
+        owner_venues = await db.venues.find({"owner_id": current_user.id}, {"id": 1}).to_list(1000)
+        venue_ids = [venue["id"] for venue in owner_venues]
+        
         bookings = await db.venue_bookings.count_documents({
-            "venue_id": {"$in": [venue["id"] async for venue in db.venues.find({"owner_id": current_user.id})]}
+            "venue_id": {"$in": venue_ids}
         })
         
         stats = {
