@@ -311,8 +311,13 @@ async def check_venue_availability(venue_id: str, start_date: str, end_date: str
     
     return {"available": len(conflicts) == 0, "conflicts": len(conflicts)}
 
+class VenueBookingRequest(BaseModel):
+    start_time: datetime
+    end_time: datetime
+    event_id: str
+
 @api_router.post("/venues/{venue_id}/book")
-async def book_venue(venue_id: str, start_time: datetime, end_time: datetime, event_id: str, current_user: User = Depends(get_current_user)):
+async def book_venue(venue_id: str, booking_request: VenueBookingRequest, current_user: User = Depends(get_current_user)):
     if current_user.role not in [UserRole.ORGANIZER, UserRole.ADMIN]:
         raise HTTPException(status_code=403, detail="Insufficient permissions")
     
@@ -320,7 +325,7 @@ async def book_venue(venue_id: str, start_time: datetime, end_time: datetime, ev
     conflicts = await db.venue_bookings.find({
         "venue_id": venue_id,
         "$or": [
-            {"start_time": {"$lte": end_time}, "end_time": {"$gte": start_time}}
+            {"start_time": {"$lte": booking_request.end_time}, "end_time": {"$gte": booking_request.start_time}}
         ]
     }).to_list(1000)
     
@@ -332,14 +337,14 @@ async def book_venue(venue_id: str, start_time: datetime, end_time: datetime, ev
     if not venue:
         raise HTTPException(status_code=404, detail="Venue not found")
     
-    duration_hours = (end_time - start_time).total_seconds() / 3600
+    duration_hours = (booking_request.end_time - booking_request.start_time).total_seconds() / 3600
     total_cost = duration_hours * venue["price_per_hour"]
     
     booking = VenueBooking(
         venue_id=venue_id,
-        event_id=event_id,
-        start_time=start_time,
-        end_time=end_time,
+        event_id=booking_request.event_id,
+        start_time=booking_request.start_time,
+        end_time=booking_request.end_time,
         total_cost=total_cost
     )
     
