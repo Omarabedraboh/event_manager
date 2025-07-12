@@ -419,8 +419,18 @@ async def get_my_registrations(current_user: User = Depends(get_current_user)):
     result = []
     
     for reg in registrations:
+        # Convert ObjectId to string if needed
+        if "_id" in reg:
+            del reg["_id"]
+            
         event = await db.events.find_one({"id": reg["event_id"]})
+        if event and "_id" in event:
+            del event["_id"]
+            
         ticket = await db.tickets.find_one({"id": reg["ticket_id"]})
+        if ticket and "_id" in ticket:
+            del ticket["_id"]
+            
         result.append({
             **reg,
             "event": event,
