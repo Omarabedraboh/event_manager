@@ -244,6 +244,8 @@ export const translations = {
       settings: "Settings",
       profile: "Profile",
       logout: "Logout",
+      switchToDark: "Switch to dark mode",
+      switchToLight: "Switch to light mode",
       accessDenied: "Access Denied",
       accessDeniedMessage: "You don't have permission to access this page.",
       notFound: "Not Found",
