@@ -280,22 +280,22 @@
   @apply bg-purple-100 text-purple-800;
 }
 
-/* QR Code display */
+/* QR Code display with dark mode */
 .qr-code-container {
-  @apply flex flex-col items-center p-6 bg-white rounded-lg shadow-lg;
+  @apply flex flex-col items-center p-6 bg-white dark:bg-gray-800 rounded-lg shadow-lg transition-colors duration-200;
 }
 
 .qr-code-image {
-  @apply mb-4 border border-gray-300 rounded-lg;
+  @apply mb-4 border border-gray-300 dark:border-gray-600 rounded-lg;
 }
 
-/* Phase 2 banner styles */
+/* Phase 2 banner styles with dark mode */
 .phase2-banner {
-  @apply min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100;
+  @apply min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 transition-colors duration-200;
 }
 
 .phase2-content {
-  @apply text-center p-8 bg-white rounded-xl shadow-lg max-w-md mx-auto;
+  @apply text-center p-8 bg-white dark:bg-gray-800 rounded-xl shadow-lg max-w-md mx-auto transition-colors duration-200;
 }
 
 /* Responsive design helpers */
