@@ -89,8 +89,9 @@ const Navigation = () => {
             ))}
           </div>
 
-          {/* User menu and language switcher */}
+          {/* User menu, theme toggle and language switcher */}
           <div className="flex items-center space-x-4 rtl:space-x-reverse">
+            <ThemeToggle />
             <LanguageSwitcher />
             
             <div className="relative">
