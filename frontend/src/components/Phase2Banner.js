@@ -1,9 +1,38 @@
 import React from 'react';
 import { useLanguage } from '../contexts/LanguageContext';
 
-const Phase2Banner = () => {
+const Phase2Banner = ({ feature, description }) => {
   const { t, isRTL } = useLanguage();
 
+  // If feature and description are provided, show feature-specific content
+  if (feature && description) {
+    return (
+      <div className={`bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-700 dark:to-purple-700 text-white py-16 transition-colors duration-200 ${isRTL ? 'font-arabic' : ''}`}>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className={`text-center ${isRTL ? 'flex-row-reverse' : ''}`}>
+            <div className="flex items-center justify-center mb-4">
+              <div className="p-3 bg-white/10 rounded-full">
+                <svg className="w-8 h-8" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clipRule="evenodd" />
+                </svg>
+              </div>
+            </div>
+            <h1 className="text-3xl font-bold mb-4">
+              {t('common.banner.phase2')}: {feature}
+            </h1>
+            <p className="text-lg opacity-90 mb-6">
+              {description}
+            </p>
+            <p className="text-sm opacity-75">
+              {t('common.banner.moreFeatures')}
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Default brand banner
   return (
     <div className={`bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-700 dark:to-purple-700 text-white py-4 transition-colors duration-200 ${isRTL ? 'font-arabic' : ''}`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
