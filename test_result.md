@@ -297,7 +297,7 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Comprehensive Dark Theme Implementation"
+    - "EventSphere Brand Deployment"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
