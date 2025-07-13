@@ -334,15 +334,15 @@
   @apply transform transition-all duration-200 hover:scale-105 hover:shadow-lg;
 }
 
-/* Navigation breadcrumbs */
+/* Navigation breadcrumbs with dark mode */
 .breadcrumb {
-  @apply flex items-center space-x-2 text-sm text-gray-600 mb-4;
+  @apply flex items-center space-x-2 text-sm text-gray-600 dark:text-gray-400 mb-4;
 }
 
 .breadcrumb-item {
-  @apply hover:text-gray-900;
+  @apply hover:text-gray-900 dark:hover:text-gray-200 transition-colors duration-200;
 }
 
 .breadcrumb-separator {
-  @apply text-gray-400;
+  @apply text-gray-400 dark:text-gray-500;
 }
