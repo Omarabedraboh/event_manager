@@ -333,7 +333,7 @@ const EventWizard = () => {
             <h4 className={`font-medium text-gray-900 dark:text-gray-100 transition-colors duration-200 ${isRTL ? 'text-right' : ''}`}>
               {t('events.eventSchedule')}
             </h4>
-            <p className={`text-gray-600 ${isRTL ? 'text-right' : ''}`}>
+            <p className={`text-gray-600 dark:text-gray-400 transition-colors duration-200 ${isRTL ? 'text-right' : ''}`}>
               {new Date(eventData.start_date).toLocaleString()} - {new Date(eventData.end_date).toLocaleString()}
             </p>
           </div>
