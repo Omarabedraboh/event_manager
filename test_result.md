@@ -277,17 +277,17 @@ frontend:
         agent: "main"
         comment: "Implemented comprehensive dark theme system with ThemeContext, ThemeToggle component, and dark mode CSS variants for all components. Optional toggle system allows users to switch between light and dark themes."
 
-  - task: "Theme Toggle Component"
+  - task: "Fix Venues Access Denied Issue"
     implemented: true
     working: true
-    file: "frontend/src/components/ThemeToggle.js"
+    file: "frontend/src/App.js"
     stuck_count: 0
-    priority: "medium"
+    priority: "high"
     needs_retesting: true
     status_history:
       - working: true
         agent: "main"
-        comment: "Created theme toggle button with sun/moon icons, integrated with Navigation component. Supports Arabic RTL and includes accessibility features."
+        comment: "FIXED: Added 'organizer' role to venues route protection. Issue was that Navigation component showed venues link to organizers, but ProtectedRoute only allowed venue_owner and admin. VenueManager component is designed for organizers to view and book venues. Updated route protection from ['venue_owner', 'admin'] to ['organizer', 'venue_owner', 'admin']."
 
 metadata:
   created_by: "main_agent"
