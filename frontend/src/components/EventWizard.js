@@ -271,7 +271,7 @@ const EventWizard = () => {
               <h4 className="font-medium text-gray-900 dark:text-gray-100 mb-4 transition-colors duration-200">{t('events.eventDetails')}</h4>
               <div className="space-y-3 text-sm">
                 <div>
-                  <span className="font-medium text-gray-700 dark:text-gray-300 transition-colors duration-200">{t('events.title')}:</span>
+                  <span className="font-medium text-gray-600 dark:text-gray-400 transition-colors duration-200">{t('events.title')}:</span>
                   <span className="ml-2 text-gray-900 dark:text-gray-100 transition-colors duration-200">{eventData.title}</span>
                 </div>
                 <div>
