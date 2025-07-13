@@ -69,8 +69,8 @@ const Navigation = () => {
         <div className="flex justify-between h-16">
           {/* Logo and brand */}
           <div className="flex items-center">
-            <Link to="/" className={`navbar-brand text-xl font-bold text-blue-600 ${isRTL ? 'font-arabic' : ''}`}>
-              {t('nav.brand')}
+            <Link to="/" className={`flex items-center ${isRTL ? 'font-arabic' : ''}`}>
+              <Logo size="md" showText={true} />
             </Link>
           </div>
 
