@@ -13,38 +13,30 @@ const RegistrationPage = () => {
   const { user } = useAuth();
   const { t, isRTL } = useLanguage();
   const navigate = useNavigate();
-  
   const [event, setEvent] = useState(null);
   const [tickets, setTickets] = useState([]);
-  const [venue, setVenue] = useState(null);
-  const [selectedTicket, setSelectedTicket] = useState(null);
-  const [isRegistered, setIsRegistered] = useState(false);
-  const [registrationData, setRegistrationData] = useState(null);
+  const [selectedTickets, setSelectedTickets] = useState({});
   const [loading, setLoading] = useState(true);
   const [registering, setRegistering] = useState(false);
   const [error, setError] = useState('');
+  const [success, setSuccess] = useState(false);
+  const [qrCode, setQrCode] = useState('');
 
   useEffect(() => {
-    fetchEventData();
-    checkExistingRegistration();
+    if (eventId) {
+      fetchEventData();
+    }
   }, [eventId]);
 
   const fetchEventData = async () => {
     try {
       const [eventRes, ticketsRes] = await Promise.all([
         axios.get(`${API}/events/${eventId}`),
-        axios.get(`${API}/events/${eventId}/tickets`)
+        axios.get(`${API}/tickets?event_id=${eventId}`)
       ]);
 
       setEvent(eventRes.data);
       setTickets(ticketsRes.data);
-
-      // Fetch venue details if event has a venue
-      if (eventRes.data.venue_id) {
-        const venuesRes = await axios.get(`${API}/venues`);
-        const eventVenue = venuesRes.data.find(v => v.id === eventRes.data.venue_id);
-        setVenue(eventVenue);
-      }
     } catch (error) {
       setError('Failed to fetch event data');
       console.error(error);
@@ -52,22 +44,28 @@ const RegistrationPage = () => {
     setLoading(false);
   };
 
-  const checkExistingRegistration = async () => {
-    try {
-      const response = await axios.get(`${API}/my-registrations`);
-      const existingRegistration = response.data.find(reg => reg.event_id === eventId);
-      if (existingRegistration) {
-        setIsRegistered(true);
-        setRegistrationData(existingRegistration);
-      }
-    } catch (error) {
-      console.error('Failed to check existing registration:', error);
-    }
+  const handleTicketQuantityChange = (ticketId, quantity) => {
+    setSelectedTickets(prev => ({
+      ...prev,
+      [ticketId]: Math.max(0, quantity)
+    }));
+  };
+
+  const calculateTotal = () => {
+    return tickets.reduce((total, ticket) => {
+      const quantity = selectedTickets[ticket.id] || 0;
+      return total + (ticket.price * quantity);
+    }, 0);
+  };
+
+  const getTotalTickets = () => {
+    return Object.values(selectedTickets).reduce((sum, quantity) => sum + quantity, 0);
   };
 
   const handleRegister = async () => {
-    if (!selectedTicket) {
-      setError(t('registration.selectTicket'));
+    const totalTickets = getTotalTickets();
+    if (totalTickets === 0) {
+      setError(t('registration.selectTickets'));
       return;
     }
 
@@ -75,133 +73,47 @@ const RegistrationPage = () => {
     setError('');
 
     try {
-      const response = await axios.post(`${API}/register`, {
-        event_id: eventId,
-        ticket_id: selectedTicket
-      });
+      // Register for each selected ticket
+      const registrations = [];
+      for (const [ticketId, quantity] of Object.entries(selectedTickets)) {
+        if (quantity > 0) {
+          for (let i = 0; i < quantity; i++) {
+            const registrationData = {
+              event_id: eventId,
+              ticket_id: ticketId,
+              attendee_name: user.name,
+              attendee_email: user.email
+            };
+            
+            const response = await axios.post(`${API}/register`, registrationData);
+            registrations.push(response.data);
+          }
+        }
+      }
 
-      setIsRegistered(true);
-      setRegistrationData(response.data);
-      
-      // Refresh tickets to update availability
-      const ticketsRes = await axios.get(`${API}/events/${eventId}/tickets`);
-      setTickets(ticketsRes.data);
+      // Generate QR code for the first registration
+      if (registrations.length > 0) {
+        const qrData = {
+          registration_id: registrations[0].id,
+          event_id: eventId,
+          attendee_name: user.name,
+          attendee_email: user.email
+        };
+        
+        // Simple QR code simulation (in real app, use a QR library)
+        setQrCode(`QR_${registrations[0].id}_${eventId}`);
+      }
+
+      setSuccess(true);
     } catch (error) {
-      setError(error.response?.data?.detail || 'Registration failed');
+      setError('Failed to register for event');
+      console.error(error);
     }
     setRegistering(false);
   };
 
-  const downloadQRCode = () => {
-    if (registrationData?.qr_code) {
-      const newWindow = window.open();
-      newWindow.document.write(`
-        <html>
-          <head>
-            <title>Event Ticket - ${event?.title}</title>
-            <style>
-              body { 
-                font-family: Arial, sans-serif; 
-                text-align: center; 
-                padding: 20px; 
-                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-                min-height: 100vh;
-                margin: 0;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-              }
-              .ticket {
-                background: white;
-                border-radius: 15px;
-                padding: 30px;
-                box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-                max-width: 400px;
-                margin: 0 auto;
-              }
-              .ticket-header {
-                border-bottom: 2px dashed #ccc;
-                padding-bottom: 20px;
-                margin-bottom: 20px;
-              }
-              .qr-code {
-                border: 3px solid #667eea;
-                border-radius: 10px;
-                padding: 10px;
-                margin: 20px 0;
-              }
-              .event-title {
-                color: #667eea;
-                font-size: 24px;
-                font-weight: bold;
-                margin-bottom: 10px;
-              }
-              .ticket-info {
-                color: #666;
-                margin: 10px 0;
-              }
-              .important {
-                background: #f0f9ff;
-                border: 1px solid #0ea5e9;
-                border-radius: 8px;
-                padding: 15px;
-                margin-top: 20px;
-                color: #0c4a6e;
-              }
-              @media print {
-                body { background: white; }
-                .ticket { box-shadow: none; }
-              }
-            </style>
-          </head>
-          <body>
-            <div class="ticket">
-              <div class="ticket-header">
-                <div class="event-title">${event?.title}</div>
-                <div class="ticket-info">
-                  <strong>Date:</strong> ${new Date(event?.start_date).toLocaleDateString('en-US', {
-                    weekday: 'long',
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric',
-                    hour: '2-digit',
-                    minute: '2-digit'
-                  })}
-                </div>
-                ${venue ? `<div class="ticket-info"><strong>Venue:</strong> ${venue.name}</div>` : ''}
-                ${event?.virtual_link ? `<div class="ticket-info"><strong>Virtual Link:</strong> Available in registration confirmation</div>` : ''}
-              </div>
-              
-              <div class="qr-code-container">
-                <img src="${registrationData.qr_code}" alt="QR Code" class="qr-code" />
-                <div class="ticket-info">
-                  <strong>Attendee:</strong> ${user?.name}<br>
-                  <strong>Ticket Type:</strong> ${tickets.find(t => t.id === registrationData.ticket_id)?.ticket_type?.replace('_', ' ') || 'Standard'}
-                </div>
-              </div>
-              
-              <div class="important">
-                <strong>Important:</strong> Present this QR code at the event entrance. Screenshot or print this ticket for your records.
-              </div>
-            </div>
-            
-            <script>
-              // Auto-print on load
-              window.onload = function() {
-                setTimeout(function() {
-                  window.print();
-                }, 500);
-              }
-            </script>
-          </body>
-        </html>
-      `);
-    }
-  };
-
   const formatDate = (dateString) => {
     return new Date(dateString).toLocaleDateString('en-US', {
-      weekday: 'long',
       year: 'numeric',
       month: 'long',
       day: 'numeric',
@@ -210,50 +122,114 @@ const RegistrationPage = () => {
     });
   };
 
-  const getEventTypeClass = (type) => {
-    switch (type) {
-      case 'physical': return 'event-type-physical';
-      case 'virtual': return 'event-type-virtual';
-      case 'hybrid': return 'event-type-hybrid';
-      default: return 'badge-primary';
-    }
-  };
-
-  const getTicketTypeIcon = (type) => {
-    switch (type) {
-      case 'early_bird':
-        return <svg className="w-5 h-5 text-green-500" fill="currentColor" viewBox="0 0 20 20">
-          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-        </svg>;
-      case 'vip':
-        return <svg className="w-5 h-5 text-yellow-500" fill="currentColor" viewBox="0 0 20 20">
-          <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-        </svg>;
-      default:
-        return <svg className="w-5 h-5 text-blue-500" fill="currentColor" viewBox="0 0 20 20">
-          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clipRule="evenodd" />
-        </svg>;
-    }
-  };
-
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-500"></div>
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 transition-colors duration-200">
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-500 dark:border-blue-400"></div>
       </div>
     );
   }
 
   if (!event) {
     return (
-      <div className={`min-h-screen bg-gray-50 ${isRTL ? 'font-arabic' : ''}`}>
+      <div className={`min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-200 ${isRTL ? 'font-arabic' : ''}`}>
         <Navigation />
-        <div className="max-w-4xl mx-auto py-6 px-4">
-          <div className={`text-center ${isRTL ? 'text-right' : ''}`}>
-            <h1 className="text-2xl font-bold text-red-600">{t('events.eventNotFound')}</h1>
-            <button onClick={() => navigate('/')} className="btn-primary mt-4">
-              {t('events.backToDashboard')}
-            </button>
+        <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+          <div className="text-center">
+            <h1 className="text-2xl font-bold text-red-600 dark:text-red-400 transition-colors duration-200">{t('common.eventNotFound')}</h1>
+            <p className="text-gray-600 dark:text-gray-400 transition-colors duration-200">{t('common.eventNotFoundMessage')}</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (success) {
+    return (
+      <div className={`min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-200 ${isRTL ? 'font-arabic' : ''}`}>
+        <Navigation />
+        <div className="max-w-2xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+          <div className="text-center">
+            <div className="mb-8">
+              <div className="p-6 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg transition-colors duration-200">
+                <div className="flex justify-center mb-4">
+                  <div className="p-3 bg-green-100 dark:bg-green-900/30 rounded-full transition-colors duration-200">
+                    <svg className="w-8 h-8 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
+                    </svg>
+                  </div>
+                </div>
+                <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-4 transition-colors duration-200">
+                  {t('registration.success')}
+                </h1>
+                <p className="text-gray-600 dark:text-gray-400 mb-6 transition-colors duration-200">
+                  {t('registration.successMessage')}
+                </p>
+              </div>
+            </div>
+
+            {/* Event Details */}
+            <div className="card mb-8">
+              <div className="card-body">
+                <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-4 transition-colors duration-200">
+                  {event.title}
+                </h2>
+                <div className="space-y-2 text-sm text-gray-600 dark:text-gray-400 transition-colors duration-200">
+                  <p><strong className="text-gray-900 dark:text-gray-100 transition-colors duration-200">{t('registration.when')}:</strong> {formatDate(event.start_date)}</p>
+                  <p><strong className="text-gray-900 dark:text-gray-100 transition-colors duration-200">{t('registration.type')}:</strong> {t(`events.types.${event.event_type}`)}</p>
+                  {event.venue_id && (
+                    <p><strong className="text-gray-900 dark:text-gray-100 transition-colors duration-200">{t('registration.venue')}:</strong> {event.venue_id}</p>
+                  )}
+                  {event.virtual_link && (
+                    <p>
+                      <strong className="text-gray-900 dark:text-gray-100 transition-colors duration-200">{t('registration.joinLink')}:</strong>
+                      <a href={event.virtual_link} target="_blank" rel="noopener noreferrer" className="ml-2 text-blue-600 dark:text-blue-400 hover:underline transition-colors duration-200">
+                        {t('registration.joinEvent')}
+                      </a>
+                    </p>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* QR Code */}
+            {qrCode && (
+              <div className="card mb-8">
+                <div className="card-body">
+                  <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-4 transition-colors duration-200">
+                    {t('registration.yourTicket')}
+                  </h3>
+                  <div className="flex justify-center mb-4">
+                    <div className="p-4 bg-gray-100 dark:bg-gray-700 rounded-lg transition-colors duration-200">
+                      <div className="w-32 h-32 bg-white dark:bg-gray-200 border-2 border-gray-300 dark:border-gray-600 rounded flex items-center justify-center transition-colors duration-200">
+                        <span className="text-xs text-gray-500 dark:text-gray-600 text-center p-2 transition-colors duration-200">
+                          QR Code<br/>{qrCode}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                  <p className="text-sm text-gray-600 dark:text-gray-400 transition-colors duration-200">
+                    {t('registration.qrCodeInfo')}
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {/* Action Buttons */}
+            <div className="space-y-4">
+              <button
+                onClick={() => navigate('/')}
+                className="btn-primary w-full"
+              >
+                {t('registration.backToDashboard')}
+              </button>
+              <button
+                onClick={() => window.print()}
+                className="btn-secondary w-full"
+              >
+                {t('registration.printTicket')}
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -261,264 +237,191 @@ const RegistrationPage = () => {
   }
 
   return (
-    <div className={`min-h-screen bg-gray-50 ${isRTL ? 'font-arabic' : ''}`}>
+    <div className={`min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-200 ${isRTL ? 'font-arabic' : ''}`}>
       <Navigation />
       
       <div className="max-w-4xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-        {/* Success Registration */}
-        {isRegistered && registrationData ? (
-          <div className={`text-center ${isRTL ? 'text-right' : ''}`}>
-            <div className="qr-code-container mx-auto mb-8">
-              <div className={`text-center mb-6 ${isRTL ? 'text-right' : ''}`}>
-                <div className="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-green-100 mb-4">
-                  <svg className="h-8 w-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
-                  </svg>
-                </div>
-                <h1 className="text-3xl font-bold text-green-600">
-                  {t('registration.registrationSuccessful')}
-                </h1>
-                <p className="text-gray-600 mt-2">
-                  You're all set for {event.title}
-                </p>
-              </div>
+        {/* Header */}
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100 transition-colors duration-200">
+            {t('registration.registerFor')} {event.title}
+          </h1>
+          <p className="text-gray-600 dark:text-gray-400 transition-colors duration-200">
+            {event.description}
+          </p>
+        </div>
 
-              {registrationData.qr_code && (
-                <div className="bg-white p-6 rounded-lg shadow-lg max-w-md mx-auto">
-                  <h3 className={`text-lg font-medium text-gray-900 mb-4 ${isRTL ? 'text-right' : ''}`}>
-                    Your Event Ticket
-                  </h3>
-                  <img
-                    src={registrationData.qr_code}
-                    alt="QR Code"
-                    className="qr-code-image mx-auto"
-                  />
-                  <p className={`text-sm text-gray-600 mb-4 ${isRTL ? 'text-right' : ''}`}>
-                    Present this QR code at the event entrance
-                  </p>
-                  <button
-                    onClick={downloadQRCode}
-                    className="btn-primary w-full"
-                  >
-                    {t('registration.downloadTicket')} & Print Ticket
-                  </button>
-                </div>
-              )}
-            </div>
+        {error && (
+          <div className="alert alert-error mb-6">
+            {error}
+          </div>
+        )}
 
-            <div className="card max-w-2xl mx-auto">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Event Details */}
+          <div className="lg:col-span-2">
+            <div className="card mb-8">
               <div className="card-header">
-                <h3 className={`text-lg font-medium text-gray-900 ${isRTL ? 'text-right' : ''}`}>
-                  {t('events.eventDetails')}
-                </h3>
+                <h2 className="text-lg font-medium text-gray-900 dark:text-gray-100 transition-colors duration-200">
+                  {t('registration.eventDetails')}
+                </h2>
               </div>
-              <div className={`card-body text-left ${isRTL ? 'text-right' : ''}`}>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="card-body">
+                <div className="space-y-4">
                   <div>
-                    <h4 className="font-medium text-gray-900">{t('events.title')}</h4>
-                    <p className="text-gray-600">{event.title}</p>
+                    <span className="font-medium text-gray-700 dark:text-gray-300 transition-colors duration-200">{t('registration.when')}:</span>
+                    <p className="text-gray-900 dark:text-gray-100 transition-colors duration-200">
+                      {formatDate(event.start_date)} - {formatDate(event.end_date)}
+                    </p>
                   </div>
+                  
                   <div>
-                    <h4 className="font-medium text-gray-900">{t('common.date')} & {t('common.time')}</h4>
-                    <p className="text-gray-600">{formatDate(event.start_date)}</p>
+                    <span className="font-medium text-gray-700 dark:text-gray-300 transition-colors duration-200">{t('registration.type')}:</span>
+                    <p className="text-gray-900 dark:text-gray-100 transition-colors duration-200">
+                      {t(`events.types.${event.event_type}`)}
+                    </p>
                   </div>
-                  {venue && (
+
+                  {event.venue_id && (
                     <div>
-                      <h4 className="font-medium text-gray-900">{t('events.venue')}</h4>
-                      <p className="text-gray-600">{venue.name}</p>
-                      <p className="text-sm text-gray-500">{venue.address}</p>
+                      <span className="font-medium text-gray-700 dark:text-gray-300 transition-colors duration-200">{t('registration.venue')}:</span>
+                      <p className="text-gray-900 dark:text-gray-100 transition-colors duration-200">{event.venue_id}</p>
                     </div>
                   )}
+
                   {event.virtual_link && (
                     <div>
-                      <h4 className="font-medium text-gray-900">Virtual Access</h4>
-                      <a href={event.virtual_link} target="_blank" rel="noopener noreferrer" className={`text-blue-600 hover:text-blue-800 break-all ${isRTL ? 'text-right' : ''}`}>
+                      <span className="font-medium text-gray-700 dark:text-gray-300 transition-colors duration-200">{t('registration.joinLink')}:</span>
+                      <a href={event.virtual_link} target="_blank" rel="noopener noreferrer" className="text-blue-600 dark:text-blue-400 hover:underline transition-colors duration-200">
                         {event.virtual_link}
                       </a>
                     </div>
                   )}
-                </div>
-              </div>
-            </div>
 
-            <div className={`mt-8 ${isRTL ? 'space-x-reverse flex-row-reverse' : ''}`}>
-              <button onClick={() => navigate('/')} className={`btn-secondary ${isRTL ? 'ml-4' : 'mr-4'}`}>
-                {t('events.backToDashboard')}
-              </button>
-              <button onClick={downloadQRCode} className="btn-primary">
-                {t('registration.downloadTicket')} Again
-              </button>
-            </div>
-          </div>
-        ) : (
-          /* Registration Form */
-          <div>
-            {/* Event Header */}
-            <div className="card mb-8">
-              <div className="card-body">
-                <div className={`flex items-start justify-between ${isRTL ? 'flex-row-reverse' : ''}`}>
-                  <div className="flex-1">
-                    <h1 className={`text-3xl font-bold text-gray-900 mb-2 ${isRTL ? 'text-right' : ''}`}>
-                      {event.title}
-                    </h1>
-                    <p className={`text-gray-600 mb-4 ${isRTL ? 'text-right' : ''}`}>
-                      {event.description}
-                    </p>
-                    
-                    <div className={`flex items-center space-x-4 rtl:space-x-reverse mb-4 ${isRTL ? 'flex-row-reverse' : ''}`}>
-                      <span className={`badge ${getEventTypeClass(event.event_type)}`}>
-                        {t(`events.${event.event_type}`)}
-                      </span>
-                      <span className="text-gray-600">
-                        <svg className="w-4 h-4 inline mr-1 rtl:mr-0 rtl:ml-1" fill="currentColor" viewBox="0 0 20 20">
-                          <path fillRule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zM4 7h12v9H4V7z" clipRule="evenodd" />
-                        </svg>
-                        {formatDate(event.start_date)}
-                      </span>
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      {venue && (
-                        <div>
-                          <h4 className={`font-medium text-gray-900 ${isRTL ? 'text-right' : ''}`}>
-                            {t('events.venue')}
-                          </h4>
-                          <p className={`text-gray-600 ${isRTL ? 'text-right' : ''}`}>{venue.name}</p>
-                          <p className={`text-sm text-gray-500 ${isRTL ? 'text-right' : ''}`}>{venue.address}</p>
-                        </div>
-                      )}
-                      {event.virtual_link && (
-                        <div>
-                          <h4 className={`font-medium text-gray-900 ${isRTL ? 'text-right' : ''}`}>
-                            Virtual Access
-                          </h4>
-                          <p className={`text-gray-600 ${isRTL ? 'text-right' : ''}`}>
-                            Link will be provided after registration
-                          </p>
-                        </div>
-                      )}
-                    </div>
+                  <div>
+                    <span className="font-medium text-gray-700 dark:text-gray-300 transition-colors duration-200">{t('registration.maxAttendees')}:</span>
+                    <p className="text-gray-900 dark:text-gray-100 transition-colors duration-200">{event.max_attendees}</p>
                   </div>
                 </div>
               </div>
             </div>
 
-            {/* Error Alert */}
-            {error && (
-              <div className="alert alert-error mb-6">
-                {error}
-              </div>
-            )}
-
             {/* Ticket Selection */}
-            <div className="card mb-8">
+            <div className="card">
               <div className="card-header">
-                <h3 className={`text-lg font-medium text-gray-900 ${isRTL ? 'text-right' : ''}`}>
-                  {t('registration.selectTicket')}
-                </h3>
+                <h2 className="text-lg font-medium text-gray-900 dark:text-gray-100 transition-colors duration-200">
+                  {t('registration.selectTickets')}
+                </h2>
               </div>
               <div className="card-body">
                 {tickets.length > 0 ? (
                   <div className="space-y-4">
-                    {tickets.map(ticket => {
-                      const isAvailable = ticket.quantity_sold < ticket.quantity_available;
-                      return (
-                        <div
-                          key={ticket.id}
-                          className={`border rounded-lg p-4 cursor-pointer transition-all ${
-                            selectedTicket === ticket.id
-                              ? 'border-blue-500 bg-blue-50'
-                              : isAvailable
-                              ? 'border-gray-300 hover:border-gray-400'
-                              : 'border-gray-200 bg-gray-50 cursor-not-allowed'
-                          }`}
-                          onClick={() => isAvailable && setSelectedTicket(ticket.id)}
-                        >
-                          <div className={`flex items-center justify-between ${isRTL ? 'flex-row-reverse' : ''}`}>
-                            <div className={`flex items-center space-x-3 ${isRTL ? 'space-x-reverse flex-row-reverse' : ''}`}>
-                              <input
-                                type="radio"
-                                name="ticket"
-                                value={ticket.id}
-                                checked={selectedTicket === ticket.id}
-                                onChange={() => setSelectedTicket(ticket.id)}
-                                disabled={!isAvailable}
-                                className="text-blue-600"
-                              />
-                              <div className={`flex items-center space-x-2 ${isRTL ? 'space-x-reverse flex-row-reverse' : ''}`}>
-                                {getTicketTypeIcon(ticket.ticket_type)}
-                                <div className={isRTL ? 'text-right' : ''}>
-                                  <h4 className={`font-medium capitalize ${isAvailable ? 'text-gray-900' : 'text-gray-500'}`}>
-                                    {t(`tickets.${ticket.ticket_type}`)}
-                                  </h4>
-                                  <p className={`text-sm ${isAvailable ? 'text-gray-600' : 'text-gray-400'}`}>
-                                    {ticket.quantity_available - ticket.quantity_sold} of {ticket.quantity_available} available
-                                  </p>
-                                </div>
-                              </div>
-                            </div>
-                            <div className={`text-right ${isRTL ? 'text-left' : ''}`}>
-                              <p className={`text-2xl font-bold ${isAvailable ? 'text-gray-900' : 'text-gray-500'}`}>
-                                ${ticket.price}
-                              </p>
-                              {!isAvailable && (
-                                <span className="badge badge-danger text-xs">{t('registration.ticketSoldOut')}</span>
-                              )}
-                            </div>
+                    {tickets.map((ticket) => (
+                      <div key={ticket.id} className="p-4 border border-gray-200 dark:border-gray-700 rounded-lg transition-colors duration-200">
+                        <div className={`flex justify-between items-start mb-2 ${isRTL ? 'flex-row-reverse' : ''}`}>
+                          <div>
+                            <h3 className="font-medium text-gray-900 dark:text-gray-100 transition-colors duration-200">{ticket.name}</h3>
+                            <p className="text-sm text-gray-600 dark:text-gray-400 transition-colors duration-200">{ticket.description}</p>
+                          </div>
+                          <span className="text-lg font-bold text-gray-900 dark:text-gray-100 transition-colors duration-200">
+                            ${ticket.price}
+                          </span>
+                        </div>
+                        
+                        <div className={`flex items-center justify-between mt-4 ${isRTL ? 'flex-row-reverse' : ''}`}>
+                          <div className="text-sm text-gray-600 dark:text-gray-400 transition-colors duration-200">
+                            {ticket.quantity} {t('registration.available')}
+                          </div>
+                          
+                          <div className={`flex items-center space-x-2 ${isRTL ? 'flex-row-reverse space-x-reverse' : ''}`}>
+                            <button
+                              onClick={() => handleTicketQuantityChange(ticket.id, (selectedTickets[ticket.id] || 0) - 1)}
+                              disabled={(selectedTickets[ticket.id] || 0) === 0}
+                              className="w-8 h-8 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
+                            >
+                              -
+                            </button>
+                            
+                            <span className="w-8 text-center text-gray-900 dark:text-gray-100 transition-colors duration-200">
+                              {selectedTickets[ticket.id] || 0}
+                            </span>
+                            
+                            <button
+                              onClick={() => handleTicketQuantityChange(ticket.id, (selectedTickets[ticket.id] || 0) + 1)}
+                              disabled={(selectedTickets[ticket.id] || 0) >= ticket.quantity}
+                              className="w-8 h-8 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
+                            >
+                              +
+                            </button>
                           </div>
                         </div>
-                      );
-                    })}
+                      </div>
+                    ))}
                   </div>
                 ) : (
-                  <p className={`text-gray-500 text-center py-8 ${isRTL ? 'text-right' : ''}`}>
-                    No tickets available for this event
-                  </p>
+                  <div className="text-center py-8">
+                    <p className="text-gray-600 dark:text-gray-400 transition-colors duration-200">{t('registration.noTicketsAvailable')}</p>
+                  </div>
                 )}
               </div>
             </div>
+          </div>
 
-            {/* Registration Action */}
-            {tickets.length > 0 && (
-              <div className="card">
-                <div className="card-body">
-                  <div className={`flex items-center justify-between ${isRTL ? 'flex-row-reverse' : ''}`}>
-                    <div className={isRTL ? 'text-right' : ''}>
-                      <h3 className="text-lg font-medium text-gray-900">
-                        {t('registration.confirmRegistration')}
-                      </h3>
-                      <p className="text-gray-600">
-                        {selectedTicket ? 'Proceed with payment to secure your spot' : 'Select a ticket type to continue'}
-                      </p>
-                    </div>
-                    <button
-                      onClick={handleRegister}
-                      disabled={!selectedTicket || registering}
-                      className="btn-primary"
-                    >
-                      {registering ? (
-                        <>
-                          <span className={`loading-spinner ${isRTL ? 'ml-2' : 'mr-2'}`}></span>
-                          Processing...
-                        </>
-                      ) : (
-                        t('registration.confirmRegistration')
-                      )}
-                    </button>
-                  </div>
+          {/* Registration Summary */}
+          <div className="lg:col-span-1">
+            <div className="card sticky top-6">
+              <div className="card-header">
+                <h2 className="text-lg font-medium text-gray-900 dark:text-gray-100 transition-colors duration-200">
+                  {t('registration.summary')}
+                </h2>
+              </div>
+              <div className="card-body">
+                <div className="space-y-3">
+                  {tickets.map((ticket) => {
+                    const quantity = selectedTickets[ticket.id] || 0;
+                    if (quantity === 0) return null;
+                    
+                    return (
+                      <div key={ticket.id} className={`flex justify-between ${isRTL ? 'flex-row-reverse' : ''}`}>
+                        <span className="text-sm text-gray-600 dark:text-gray-400 transition-colors duration-200">
+                          {ticket.name} x {quantity}
+                        </span>
+                        <span className="text-sm font-medium text-gray-900 dark:text-gray-100 transition-colors duration-200">
+                          ${(ticket.price * quantity).toFixed(2)}
+                        </span>
+                      </div>
+                    );
+                  })}
                   
-                  {selectedTicket && (
-                    <div className="mt-4 p-4 bg-blue-50 rounded-lg">
-                      <p className={`text-sm text-blue-700 ${isRTL ? 'text-right' : ''}`}>
-                        <strong>Note:</strong> This is a demo payment system. Your registration will be confirmed immediately with a QR code ticket.
-                      </p>
-                    </div>
+                  {getTotalTickets() > 0 && (
+                    <>
+                      <div className="border-t border-gray-200 dark:border-gray-700 pt-3 transition-colors duration-200">
+                        <div className={`flex justify-between font-medium ${isRTL ? 'flex-row-reverse' : ''}`}>
+                          <span className="text-gray-900 dark:text-gray-100 transition-colors duration-200">{t('registration.total')}</span>
+                          <span className="text-gray-900 dark:text-gray-100 transition-colors duration-200">${calculateTotal().toFixed(2)}</span>
+                        </div>
+                      </div>
+                      
+                      <button
+                        onClick={handleRegister}
+                        disabled={registering || getTotalTickets() === 0}
+                        className="btn-primary w-full mt-4"
+                      >
+                        {registering ? t('registration.registering') : t('registration.registerNow')}
+                      </button>
+                    </>
+                  )}
+                  
+                  {getTotalTickets() === 0 && (
+                    <p className="text-sm text-gray-600 dark:text-gray-400 text-center py-4 transition-colors duration-200">
+                      {t('registration.selectTicketsToStart')}
+                    </p>
                   )}
                 </div>
               </div>
-            )}
+            </div>
           </div>
-        )}
+        </div>
       </div>
     </div>
   );
