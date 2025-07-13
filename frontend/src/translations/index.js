@@ -514,6 +514,8 @@ export const translations = {
       settings: "الإعدادات",
       profile: "الملف الشخصي",
       logout: "تسجيل الخروج",
+      switchToDark: "التبديل إلى الوضع المظلم",
+      switchToLight: "التبديل إلى الوضع المضيء",
       accessDenied: "تم رفض الوصول",
       accessDeniedMessage: "ليس لديك صلاحية للوصول إلى هذه الصفحة.",
       notFound: "غير موجود",
