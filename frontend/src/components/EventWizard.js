@@ -119,7 +119,7 @@ const EventWizard = () => {
                 value={eventData.title}
                 onChange={handleChange}
                 className="form-input"
-                placeholder={t('events.titlePlaceholder')}
+                placeholder={t('wizard.enterEventTitle')}
                 required
               />
             </div>
