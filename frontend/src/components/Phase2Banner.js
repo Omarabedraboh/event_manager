@@ -1,6 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useLanguage } from '../contexts/LanguageContext';
+import Logo from './Logo';
 
 const Phase2Banner = ({ feature, description }) => {
   const { t, isRTL } = useLanguage();
