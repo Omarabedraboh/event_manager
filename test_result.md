@@ -309,6 +309,8 @@ test_plan:
     - "Venue Manager Arabic Support"
     - "Registration Page Arabic Support"
     - "Phase2 Banner Arabic Support"
+    - "Dark Theme System"
+    - "Theme Toggle Component"
   stuck_tasks: []
   test_all: true
   test_priority: "high_first"
