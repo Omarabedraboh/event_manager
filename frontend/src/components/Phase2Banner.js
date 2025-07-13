@@ -1,31 +1,20 @@
 import React from 'react';
 import { useLanguage } from '../contexts/LanguageContext';
-import Navigation from './Navigation';
 
-const Phase2Banner = ({ feature, description }) => {
+const Phase2Banner = () => {
   const { t, isRTL } = useLanguage();
 
   return (
-    <div className={`min-h-screen bg-gray-50 ${isRTL ? 'font-arabic' : ''}`}>
-      <Navigation />
-      <div className="phase2-banner">
-        <div className="phase2-content">
-          <div className={`text-center ${isRTL ? 'text-right' : ''}`}>
-            <div className="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-blue-100 mb-4">
-              <svg className="h-8 w-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
-              </svg>
-            </div>
-            <h1 className="text-3xl font-bold text-gray-900 mb-4">{feature}</h1>
-            <p className="text-lg text-gray-600 mb-8">{description}</p>
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
-              <h3 className="text-lg font-semibold text-blue-900 mb-2">
-                Coming Soon in Phase 2
-              </h3>
-              <p className="text-blue-700">
-                This feature is planned for the next development phase. Stay tuned for advanced functionality and enhanced user experience!
-              </p>
-            </div>
+    <div className={`bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-700 dark:to-purple-700 text-white py-3 transition-colors duration-200 ${isRTL ? 'font-arabic' : ''}`}>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className={`flex items-center justify-center text-center ${isRTL ? 'flex-row-reverse' : ''}`}>
+          <div className="flex items-center">
+            <svg className="w-5 h-5 mr-2 ml-2" fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+            </svg>
+            <span className="text-sm font-medium">
+              🚀 {t('banner.phase2')} - {t('banner.moreFeatures')}
+            </span>
           </div>
         </div>
       </div>
