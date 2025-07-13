@@ -302,7 +302,7 @@ const EventWizard = () => {
           {t('events.reviewPublish')}
         </h3>
         
-        <div className="bg-gray-50 rounded-lg p-6 space-y-4">
+        <div className="bg-gray-50 dark:bg-gray-700 transition-colors duration-200 rounded-lg p-6 space-y-4">
           <div>
             <h4 className={`font-medium text-gray-900 dark:text-gray-100 transition-colors duration-200 ${isRTL ? 'text-right' : ''}`}>
               {t('events.eventDetails')}
