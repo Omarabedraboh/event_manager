@@ -12,7 +12,7 @@ const LanguageSwitcher = () => {
         className={`
           bg-transparent border-0 text-sm font-medium cursor-pointer focus:outline-none
           ${isRTL ? 'text-right pl-6 pr-2' : 'text-left pr-6 pl-2'}
-          text-gray-700 hover:text-gray-900
+          text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100
         `}
       >
         <option value="en">English</option>
