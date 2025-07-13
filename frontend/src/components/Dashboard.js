@@ -320,7 +320,7 @@ const Dashboard = () => {
                 </div>
               ) : (
                 <div className={`text-center py-8 ${isRTL ? 'text-right' : ''}`}>
-                  <p className="text-gray-500">{t('events.noEvents')}</p>
+                  <p className="text-gray-600 dark:text-gray-400">{t('events.noEvents')}</p>
                   {user.role === 'organizer' && (
                     <button
                       onClick={() => navigate('/events/create')}
