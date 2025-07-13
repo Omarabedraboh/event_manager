@@ -398,7 +398,7 @@ const EventWizard = () => {
   ];
 
   return (
-    <div className={`min-h-screen bg-gray-50 ${isRTL ? 'font-arabic' : ''}`}>
+    <div className={`min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-200 ${isRTL ? 'font-arabic' : ''}`}>
       <Navigation />
       
       <div className="max-w-4xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
@@ -411,10 +411,10 @@ const EventWizard = () => {
 
         {/* Header */}
         <div className="mb-8">
-          <h1 className={`text-3xl font-bold text-gray-900 ${isRTL ? 'text-right' : ''}`}>
+          <h1 className={`text-3xl font-bold text-gray-900 dark:text-gray-100 transition-colors duration-200 ${isRTL ? 'text-right' : ''}`}>
             {t('wizard.createNewEvent')}
           </h1>
-          <p className={`text-gray-600 ${isRTL ? 'text-right' : ''}`}>
+          <p className={`text-gray-600 dark:text-gray-400 transition-colors duration-200 ${isRTL ? 'text-right' : ''}`}>
             {t('wizard.stepByStepWizard')}
           </p>
         </div>
