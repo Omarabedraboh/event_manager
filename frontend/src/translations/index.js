@@ -2,7 +2,7 @@ export const translations = {
   en: {
     // Navigation
     nav: {
-      brand: "EventMS",
+      brand: "EventSphere",
       dashboard: "Dashboard",
       createEvent: "Create Event",
       venues: "Venues",
