@@ -10,7 +10,7 @@ from datetime import datetime, timedelta
 
 class VenueAccessTester:
     def __init__(self):
-        self.base_url = "https://71e2e852-b2f7-48b5-8610-a3981c8caca7.preview.emergentagent.com"
+        self.base_url = "https://044a47c0-2656-4300-86d0-89ca21a96529.preview.emergentagent.com"
         self.api_url = f"{self.base_url}/api"
         self.test_timestamp = datetime.now().strftime("%H%M%S")
         
