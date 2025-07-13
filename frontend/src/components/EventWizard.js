@@ -308,7 +308,7 @@ const EventWizard = () => {
               {t('events.eventDetails')}
             </h4>
             <p className={`text-gray-600 dark:text-gray-400 transition-colors duration-200 ${isRTL ? 'text-right' : ''}`}>{eventData.title}</p>
-            <p className={`text-sm text-gray-500 ${isRTL ? 'text-right' : ''}`}>{eventData.description}</p>
+            <p className={`text-sm text-gray-500 dark:text-gray-500 transition-colors duration-200 ${isRTL ? 'text-right' : ''}`}>{eventData.description}</p>
           </div>
 
           <div>
