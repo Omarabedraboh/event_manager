@@ -4,6 +4,7 @@ import { useAuth } from '../App';
 import { useLanguage } from '../contexts/LanguageContext';
 import LanguageSwitcher from './LanguageSwitcher';
 import ThemeToggle from './ThemeToggle';
+import Logo from './Logo';
 
 const Navigation = () => {
   const { user, logout } = useAuth();
