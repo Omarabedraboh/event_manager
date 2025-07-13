@@ -189,7 +189,7 @@ const EventWizard = () => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 transition-colors duration-200">
+              <label className="block text-sm font-medium text-gray-900 dark:text-gray-100 mb-2 transition-colors duration-200">
                 {t('events.maxAttendees')}
               </label>
               <input
