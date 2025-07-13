@@ -258,6 +258,12 @@ export const translations = {
         tagline: "Your Complete Event Universe",
         description: "Where Ideas Become Experiences"
       },
+      
+      // Banner
+      banner: {
+        phase2: "Phase 2",
+        moreFeatures: "More Features Coming Soon"
+      },
       manage: "Manage",
       close: "Close"
     },
