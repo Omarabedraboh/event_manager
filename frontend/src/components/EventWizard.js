@@ -435,8 +435,8 @@ const EventWizard = () => {
                   {step.title}
                 </div>
                 {index < steps.length - 1 && (
-                  <div className={`${isRTL ? 'mr-4' : 'ml-4'} w-12 h-1 ${
-                    currentStep > step.number ? 'bg-blue-600' : 'bg-gray-300'
+                  <div className={`${isRTL ? 'mr-4' : 'ml-4'} w-12 h-1 transition-colors duration-200 ${
+                    currentStep > step.number ? 'bg-blue-600 dark:bg-blue-500' : 'bg-gray-300 dark:bg-gray-600'
                   }`} />
                 )}
               </div>
