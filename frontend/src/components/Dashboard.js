@@ -151,7 +151,7 @@ const Dashboard = () => {
                       <p className="text-sm font-medium text-gray-600">{t('dashboard.myRegistrations')}</p>
                       <p className="text-2xl font-bold text-gray-900">{stats.my_registrations || 0}</p>
                     </div>
-                    <div className="p-3 bg-blue-100 rounded-full">
+                    <div className="p-3 bg-blue-100 dark:bg-blue-900/30 rounded-full transition-colors duration-200">
                       <svg className="w-6 h-6 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
                         <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                       </svg>
