@@ -159,7 +159,7 @@ const Navigation = () => {
                   className={`block px-3 py-2 rounded-md text-base font-medium transition-colors duration-200 ${
                     isActiveLink(item.path)
                       ? 'text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20'
-                      : 'text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-700'
+                      : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-900'
                   }`}
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
