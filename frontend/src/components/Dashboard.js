@@ -134,7 +134,7 @@ const Dashboard = () => {
                       <p className="text-sm font-medium text-gray-600 dark:text-gray-400 transition-colors duration-200">{t('dashboard.totalRegistrations')}</p>
                       <p className="text-2xl font-bold text-gray-900 dark:text-gray-100 transition-colors duration-200">{stats.total_registrations || 0}</p>
                     </div>
-                    <div className="p-3 bg-purple-100 rounded-full">
+                    <div className="p-3 bg-purple-100 dark:bg-purple-900/30 rounded-full transition-colors duration-200">
                       <svg className="w-6 h-6 text-purple-600" fill="currentColor" viewBox="0 0 20 20">
                         <path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z" />
                       </svg>
