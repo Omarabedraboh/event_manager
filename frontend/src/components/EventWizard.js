@@ -134,7 +134,7 @@ const EventWizard = () => {
                 onChange={handleChange}
                 rows="4"
                 className="form-textarea"
-                placeholder={t('events.descriptionPlaceholder')}
+                placeholder={t('wizard.describeYourEvent')}
                 required
               />
             </div>
