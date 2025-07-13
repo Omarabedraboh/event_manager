@@ -214,7 +214,7 @@ const LoginPage = () => {
           <div className="mt-4 text-center">
             <button
               onClick={() => setIsLogin(!isLogin)}
-              className="text-blue-600 hover:text-blue-800 text-sm"
+              className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 text-sm transition-colors duration-200"
             >
               {isLogin 
                 ? t('auth.noAccount') + ' ' + t('auth.registerHere')
