@@ -272,15 +272,15 @@ export const translations = {
   ar: {
     // Navigation
     nav: {
-      brand: "نظام إدارة الفعاليات",
+      brand: "EventSphere",
       dashboard: "لوحة التحكم",
-      createEvent: "إنشاء فعالية",
+      createEvent: "إنشاء حدث",
       venues: "الأماكن",
       myVenues: "أماكني",
       analytics: "التحليلات",
       networking: "التواصل",
       marketing: "التسويق",
-      sponsorDashboard: "لوحة الرعاة",
+      sponsorDashboard: "لوحة الراعي",
       profile: "إعدادات الملف الشخصي",
       signOut: "تسجيل الخروج"
     },
