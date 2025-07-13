@@ -110,8 +110,8 @@ const LoginPage = () => {
                 </button>
               ))}
             </div>
-            <div className="mt-2 border-t pt-4">
-              <p className="text-xs text-gray-500">
+            <div className="mt-2 border-t border-gray-200 dark:border-gray-600 pt-4 transition-colors duration-200">
+              <p className="text-xs text-gray-500 dark:text-gray-400 transition-colors duration-200">
                 Click any role above to login instantly with demo credentials
               </p>
             </div>
