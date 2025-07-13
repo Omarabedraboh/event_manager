@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../App';
+import { useLanguage } from '../contexts/LanguageContext';
 import axios from 'axios';
 import Navigation from './Navigation';
 
@@ -9,6 +10,7 @@ const API = `${BACKEND_URL}/api`;
 
 const EventWizard = () => {
   const { user } = useAuth();
+  const { t, isRTL } = useLanguage();
   const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState(1);
   const [venues, setVenues] = useState([]);
@@ -71,7 +73,7 @@ const EventWizard = () => {
       setCurrentStep(prev => prev + 1);
       setError('');
     } else {
-      setError('Please fill in all required fields');
+      setError(t('events.fillRequiredFields'));
     }
   };
 
@@ -104,52 +106,64 @@ const EventWizard = () => {
   const renderStep1 = () => (
     <div className="space-y-6">
       <div>
-        <h3 className="text-lg font-medium text-gray-900 mb-4">Event Details</h3>
+        <h3 className={`text-lg font-medium text-gray-900 mb-4 ${isRTL ? 'text-right' : ''}`}>
+          {t('events.eventDetails')}
+        </h3>
         
         <div className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700">Event Title *</label>
+            <label className={`block text-sm font-medium text-gray-700 ${isRTL ? 'text-right' : ''}`}>
+              {t('events.eventTitle')} {t('wizard.requiredField')}
+            </label>
             <input
               type="text"
               name="title"
               value={eventData.title}
               onChange={handleChange}
-              placeholder="Enter event title"
+              placeholder={t('wizard.enterEventTitle')}
               className="form-input"
+              dir={isRTL ? 'rtl' : 'ltr'}
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700">Description *</label>
+            <label className={`block text-sm font-medium text-gray-700 ${isRTL ? 'text-right' : ''}`}>
+              {t('events.description')} {t('wizard.requiredField')}
+            </label>
             <textarea
               name="description"
               value={eventData.description}
               onChange={handleChange}
               rows="4"
-              placeholder="Describe your event"
+              placeholder={t('wizard.describeYourEvent')}
               className="form-textarea"
+              dir={isRTL ? 'rtl' : 'ltr'}
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700">Event Type *</label>
+            <label className={`block text-sm font-medium text-gray-700 ${isRTL ? 'text-right' : ''}`}>
+              {t('events.eventType')} {t('wizard.requiredField')}
+            </label>
             <select
               name="event_type"
               value={eventData.event_type}
               onChange={handleChange}
               className="form-select"
             >
-              <option value="physical">Physical Event</option>
-              <option value="virtual">Virtual Event</option>
-              <option value="hybrid">Hybrid Event (Physical + Virtual)</option>
+              <option value="physical">{t('events.physicalEvent')}</option>
+              <option value="virtual">{t('events.virtualEvent')}</option>
+              <option value="hybrid">{t('events.hybridEvent')}</option>
             </select>
-            <p className="mt-1 text-sm text-gray-500">
-              {eventData.event_type === 'hybrid' && 'Hybrid events allow both in-person and virtual attendance'}
+            <p className={`mt-1 text-sm text-gray-500 ${isRTL ? 'text-right' : ''}`}>
+              {eventData.event_type === 'hybrid' && t('wizard.hybridEventNote')}
             </p>
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700">Maximum Attendees</label>
+            <label className={`block text-sm font-medium text-gray-700 ${isRTL ? 'text-right' : ''}`}>
+              {t('wizard.maximumAttendeesLabel')}
+            </label>
             <input
               type="number"
               name="max_attendees"
@@ -167,11 +181,15 @@ const EventWizard = () => {
   const renderStep2 = () => (
     <div className="space-y-6">
       <div>
-        <h3 className="text-lg font-medium text-gray-900 mb-4">Event Schedule</h3>
+        <h3 className={`text-lg font-medium text-gray-900 mb-4 ${isRTL ? 'text-right' : ''}`}>
+          {t('events.eventSchedule')}
+        </h3>
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700">Start Date & Time *</label>
+            <label className={`block text-sm font-medium text-gray-700 ${isRTL ? 'text-right' : ''}`}>
+              {t('wizard.startDateTime')} {t('wizard.requiredField')}
+            </label>
             <input
               type="datetime-local"
               name="start_date"
@@ -182,7 +200,9 @@ const EventWizard = () => {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700">End Date & Time *</label>
+            <label className={`block text-sm font-medium text-gray-700 ${isRTL ? 'text-right' : ''}`}>
+              {t('wizard.endDateTime')} {t('wizard.requiredField')}
+            </label>
             <input
               type="datetime-local"
               name="end_date"
@@ -195,8 +215,8 @@ const EventWizard = () => {
 
         {eventData.start_date && eventData.end_date && (
           <div className="mt-4 p-4 bg-blue-50 rounded-lg">
-            <p className="text-sm text-blue-700">
-              Event duration: {Math.round((new Date(eventData.end_date) - new Date(eventData.start_date)) / (1000 * 60 * 60))} hours
+            <p className={`text-sm text-blue-700 ${isRTL ? 'text-right' : ''}`}>
+              {t('events.eventDuration')}: {Math.round((new Date(eventData.end_date) - new Date(eventData.start_date)) / (1000 * 60 * 60))} {t('events.hours')}
             </p>
           </div>
         )}
@@ -207,12 +227,14 @@ const EventWizard = () => {
   const renderStep3 = () => (
     <div className="space-y-6">
       <div>
-        <h3 className="text-lg font-medium text-gray-900 mb-4">Event Location</h3>
+        <h3 className={`text-lg font-medium text-gray-900 mb-4 ${isRTL ? 'text-right' : ''}`}>
+          {t('events.eventLocation')}
+        </h3>
         
         {(eventData.event_type === 'physical' || eventData.event_type === 'hybrid') && (
           <div className="mb-6">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Physical Venue {eventData.event_type === 'hybrid' ? '(Required for hybrid)' : '*'}
+            <label className={`block text-sm font-medium text-gray-700 mb-2 ${isRTL ? 'text-right' : ''}`}>
+              {t('wizard.physicalVenue')} {eventData.event_type === 'hybrid' ? t('wizard.requiredForHybrid') : t('wizard.requiredField')}
             </label>
             <select
               name="venue_id"
@@ -220,17 +242,17 @@ const EventWizard = () => {
               onChange={handleChange}
               className="form-select"
             >
-              <option value="">Select a venue</option>
+              <option value="">{t('events.selectVenue')}</option>
               {venues.map(venue => (
                 <option key={venue.id} value={venue.id}>
-                  {venue.name} - {venue.address} (Capacity: {venue.capacity})
+                  {venue.name} - {venue.address} ({t('venues.capacity')}: {venue.capacity})
                 </option>
               ))}
             </select>
             
             {venues.length === 0 && (
-              <p className="mt-2 text-sm text-yellow-600">
-                No venues available. Contact venue owners to add venues.
+              <p className={`mt-2 text-sm text-yellow-600 ${isRTL ? 'text-right' : ''}`}>
+                {t('events.noVenuesAvailable')}
               </p>
             )}
           </div>
@@ -238,31 +260,34 @@ const EventWizard = () => {
 
         {(eventData.event_type === 'virtual' || eventData.event_type === 'hybrid') && (
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Virtual Meeting Link {eventData.event_type === 'hybrid' ? '(Required for hybrid)' : '*'}
+            <label className={`block text-sm font-medium text-gray-700 mb-2 ${isRTL ? 'text-right' : ''}`}>
+              {t('wizard.virtualMeetingLink')} {eventData.event_type === 'hybrid' ? t('wizard.requiredForHybrid') : t('wizard.requiredField')}
             </label>
             <input
               type="url"
               name="virtual_link"
               value={eventData.virtual_link}
               onChange={handleChange}
-              placeholder="https://zoom.us/j/123456789 or https://meet.google.com/abc-defg-hij"
+              placeholder={t('wizard.enterMeetingLink')}
               className="form-input"
+              dir={isRTL ? 'rtl' : 'ltr'}
             />
-            <p className="mt-1 text-sm text-gray-500">
-              Enter the virtual meeting link (Zoom, Google Meet, Teams, etc.)
+            <p className={`mt-1 text-sm text-gray-500 ${isRTL ? 'text-right' : ''}`}>
+              {t('events.enterVirtualLink')}
             </p>
           </div>
         )}
 
         {eventData.event_type === 'hybrid' && (
           <div className="mt-6 p-4 bg-purple-50 rounded-lg">
-            <h4 className="font-medium text-purple-900 mb-2">Hybrid Event Benefits</h4>
-            <ul className="text-sm text-purple-700 space-y-1">
-              <li>• Reach wider audience with virtual attendance</li>
-              <li>• Provide flexible attendance options</li>
-              <li>• Increase event accessibility</li>
-              <li>• Maximize venue utilization</li>
+            <h4 className={`font-medium text-purple-900 mb-2 ${isRTL ? 'text-right' : ''}`}>
+              {t('events.hybridBenefits')}
+            </h4>
+            <ul className={`text-sm text-purple-700 space-y-1 ${isRTL ? 'text-right' : ''}`}>
+              <li>{t('events.reachWiderAudience')}</li>
+              <li>{t('events.flexibleOptions')}</li>
+              <li>{t('events.increaseAccessibility')}</li>
+              <li>{t('events.maximizeVenue')}</li>
             </ul>
           </div>
         )}
@@ -273,40 +298,52 @@ const EventWizard = () => {
   const renderStep4 = () => (
     <div className="space-y-6">
       <div>
-        <h3 className="text-lg font-medium text-gray-900 mb-4">Review & Publish</h3>
+        <h3 className={`text-lg font-medium text-gray-900 mb-4 ${isRTL ? 'text-right' : ''}`}>
+          {t('events.reviewPublish')}
+        </h3>
         
         <div className="bg-gray-50 rounded-lg p-6 space-y-4">
           <div>
-            <h4 className="font-medium text-gray-900">Event Details</h4>
-            <p className="text-gray-600">{eventData.title}</p>
-            <p className="text-sm text-gray-500">{eventData.description}</p>
+            <h4 className={`font-medium text-gray-900 ${isRTL ? 'text-right' : ''}`}>
+              {t('events.eventDetails')}
+            </h4>
+            <p className={`text-gray-600 ${isRTL ? 'text-right' : ''}`}>{eventData.title}</p>
+            <p className={`text-sm text-gray-500 ${isRTL ? 'text-right' : ''}`}>{eventData.description}</p>
           </div>
 
           <div>
-            <h4 className="font-medium text-gray-900">Type & Capacity</h4>
-            <div className="flex space-x-4">
+            <h4 className={`font-medium text-gray-900 ${isRTL ? 'text-right' : ''}`}>
+              {t('events.type')} & {t('events.capacity')}
+            </h4>
+            <div className={`flex space-x-4 ${isRTL ? 'space-x-reverse flex-row-reverse' : ''}`}>
               <span className={`badge ${
                 eventData.event_type === 'physical' ? 'event-type-physical' :
                 eventData.event_type === 'virtual' ? 'event-type-virtual' :
                 'event-type-hybrid'
               }`}>
-                {eventData.event_type}
+                {t(`events.${eventData.event_type}`)}
               </span>
-              <span className="text-sm text-gray-600">Max: {eventData.max_attendees} attendees</span>
+              <span className="text-sm text-gray-600">
+                {t('events.maxAttendees')}: {eventData.max_attendees}
+              </span>
             </div>
           </div>
 
           <div>
-            <h4 className="font-medium text-gray-900">Schedule</h4>
-            <p className="text-gray-600">
+            <h4 className={`font-medium text-gray-900 ${isRTL ? 'text-right' : ''}`}>
+              {t('events.eventSchedule')}
+            </h4>
+            <p className={`text-gray-600 ${isRTL ? 'text-right' : ''}`}>
               {new Date(eventData.start_date).toLocaleString()} - {new Date(eventData.end_date).toLocaleString()}
             </p>
           </div>
 
           {eventData.venue_id && (
             <div>
-              <h4 className="font-medium text-gray-900">Venue</h4>
-              <p className="text-gray-600">
+              <h4 className={`font-medium text-gray-900 ${isRTL ? 'text-right' : ''}`}>
+                {t('events.venue')}
+              </h4>
+              <p className={`text-gray-600 ${isRTL ? 'text-right' : ''}`}>
                 {venues.find(v => v.id === eventData.venue_id)?.name}
               </p>
             </div>
@@ -314,32 +351,38 @@ const EventWizard = () => {
 
           {eventData.virtual_link && (
             <div>
-              <h4 className="font-medium text-gray-900">Virtual Link</h4>
-              <p className="text-gray-600 break-all">{eventData.virtual_link}</p>
+              <h4 className={`font-medium text-gray-900 ${isRTL ? 'text-right' : ''}`}>
+                {t('events.virtualLinkLabel')}
+              </h4>
+              <p className={`text-gray-600 break-all ${isRTL ? 'text-right' : ''}`}>
+                {eventData.virtual_link}
+              </p>
             </div>
           )}
         </div>
 
         <div className="bg-blue-50 rounded-lg p-4">
-          <h4 className="font-medium text-blue-900 mb-2">Publishing Options</h4>
-          <p className="text-sm text-blue-700 mb-4">
-            You can save as draft for later editing or publish immediately to make it visible to attendees.
+          <h4 className={`font-medium text-blue-900 mb-2 ${isRTL ? 'text-right' : ''}`}>
+            {t('events.publishingOptions')}
+          </h4>
+          <p className={`text-sm text-blue-700 mb-4 ${isRTL ? 'text-right' : ''}`}>
+            {t('events.saveAsDraft')}
           </p>
           
-          <div className="flex space-x-3">
+          <div className={`flex space-x-3 ${isRTL ? 'space-x-reverse flex-row-reverse' : ''}`}>
             <button
               onClick={() => handleSubmit(false)}
               disabled={loading}
               className="btn-secondary"
             >
-              {loading ? 'Saving...' : 'Save as Draft'}
+              {loading ? t('events.saving') : t('events.saveAsDraftBtn')}
             </button>
             <button
               onClick={() => handleSubmit(true)}
               disabled={loading}
               className="btn-primary"
             >
-              {loading ? 'Publishing...' : 'Save & Publish'}
+              {loading ? t('events.publishing') : t('events.saveAndPublish')}
             </button>
           </div>
         </div>
@@ -348,33 +391,37 @@ const EventWizard = () => {
   );
 
   const steps = [
-    { number: 1, title: 'Event Details', component: renderStep1 },
-    { number: 2, title: 'Schedule', component: renderStep2 },
-    { number: 3, title: 'Location', component: renderStep3 },
-    { number: 4, title: 'Review', component: renderStep4 }
+    { number: 1, title: t('wizard.step1'), component: renderStep1 },
+    { number: 2, title: t('wizard.step2'), component: renderStep2 },
+    { number: 3, title: t('wizard.step3'), component: renderStep3 },
+    { number: 4, title: t('wizard.step4'), component: renderStep4 }
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className={`min-h-screen bg-gray-50 ${isRTL ? 'font-arabic' : ''}`}>
       <Navigation />
       
       <div className="max-w-4xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
         {/* Breadcrumb */}
-        <div className="breadcrumb">
-          <span className="breadcrumb-item">Dashboard</span>
+        <div className={`breadcrumb ${isRTL ? 'flex-row-reverse' : ''}`}>
+          <span className="breadcrumb-item">{t('nav.dashboard')}</span>
           <span className="breadcrumb-separator">/</span>
-          <span className="breadcrumb-item">Create Event</span>
+          <span className="breadcrumb-item">{t('nav.createEvent')}</span>
         </div>
 
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">Create New Event</h1>
-          <p className="text-gray-600">Set up your event with our step-by-step wizard</p>
+          <h1 className={`text-3xl font-bold text-gray-900 ${isRTL ? 'text-right' : ''}`}>
+            {t('wizard.createNewEvent')}
+          </h1>
+          <p className={`text-gray-600 ${isRTL ? 'text-right' : ''}`}>
+            {t('wizard.stepByStepWizard')}
+          </p>
         </div>
 
         {/* Progress Steps */}
         <div className="mb-8">
-          <div className="flex items-center justify-between">
+          <div className={`flex items-center justify-between ${isRTL ? 'flex-row-reverse' : ''}`}>
             {steps.map((step, index) => (
               <div key={step.number} className="flex items-center">
                 <div className={`flex items-center justify-center w-8 h-8 rounded-full text-sm font-medium ${
@@ -384,11 +431,11 @@ const EventWizard = () => {
                 }`}>
                   {step.number}
                 </div>
-                <div className="ml-2 text-sm font-medium text-gray-900">
+                <div className={`${isRTL ? 'mr-2' : 'ml-2'} text-sm font-medium text-gray-900`}>
                   {step.title}
                 </div>
                 {index < steps.length - 1 && (
-                  <div className={`ml-4 w-12 h-1 ${
+                  <div className={`${isRTL ? 'mr-4' : 'ml-4'} w-12 h-1 ${
                     currentStep > step.number ? 'bg-blue-600' : 'bg-gray-300'
                   }`} />
                 )}
@@ -412,13 +459,13 @@ const EventWizard = () => {
         </div>
 
         {/* Navigation Buttons */}
-        <div className="flex justify-between">
+        <div className={`flex justify-between ${isRTL ? 'flex-row-reverse' : ''}`}>
           <button
             onClick={prevStep}
             disabled={currentStep === 1}
             className={`btn-secondary ${currentStep === 1 ? 'opacity-50 cursor-not-allowed' : ''}`}
           >
-            Previous
+            {t('wizard.previous')}
           </button>
           
           {currentStep < steps.length ? (
@@ -426,7 +473,7 @@ const EventWizard = () => {
               onClick={nextStep}
               className="btn-primary"
             >
-              Next
+              {t('wizard.next')}
             </button>
           ) : null}
         </div>
