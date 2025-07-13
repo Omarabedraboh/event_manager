@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import axios from 'axios';
 import {jwtDecode} from 'jwt-decode';
 import './App.css';
+import { LanguageProvider } from './contexts/LanguageContext';
 import LoginPage from './components/LoginPage';
 import Dashboard from './components/Dashboard';
 import EventWizard from './components/EventWizard';
@@ -142,77 +143,79 @@ const ProtectedRoute = ({ children, requiredRoles = [] }) => {
 // Main App Component
 function App() {
   return (
-    <AuthProvider>
-      <BrowserRouter>
-        <div className="App min-h-screen bg-gray-50">
-          <Routes>
-            <Route path="/login" element={<LoginPage />} />
-            
-            {/* Dashboard Routes */}
-            <Route path="/" element={
-              <ProtectedRoute>
-                <Dashboard />
-              </ProtectedRoute>
-            } />
-            
-            {/* Event Management Routes */}
-            <Route path="/events/create" element={
-              <ProtectedRoute requiredRoles={['organizer', 'admin']}>
-                <EventWizard />
-              </ProtectedRoute>
-            } />
-            
-            <Route path="/events/:id" element={
-              <ProtectedRoute requiredRoles={['organizer', 'admin']}>
-                <EventManagement />
-              </ProtectedRoute>
-            } />
-            
-            {/* Venue Management */}
-            <Route path="/venues" element={
-              <ProtectedRoute requiredRoles={['venue_owner', 'admin']}>
-                <VenueManager />
-              </ProtectedRoute>
-            } />
-            
-            {/* Registration */}
-            <Route path="/register/:eventId" element={
-              <ProtectedRoute requiredRoles={['attendee', 'admin']}>
-                <RegistrationPage />
-              </ProtectedRoute>
-            } />
-            
-            {/* Phase 2 Features */}
-            <Route path="/analytics" element={
-              <ProtectedRoute>
-                <Phase2Banner feature="Analytics Hub" description="Advanced analytics and reporting dashboard" />
-              </ProtectedRoute>
-            } />
-            
-            <Route path="/networking" element={
-              <ProtectedRoute>
-                <Phase2Banner feature="AI Matchmaking" description="Intelligent networking and attendee matching" />
-              </ProtectedRoute>
-            } />
-            
-            <Route path="/marketing" element={
-              <ProtectedRoute>
-                <Phase2Banner feature="Marketing Center" description="Email campaigns and social media automation" />
-              </ProtectedRoute>
-            } />
-            
-            <Route path="/sponsors" element={
-              <ProtectedRoute>
-                <Phase2Banner feature="Sponsor Dashboard" description="Sponsor management and lead tracking" />
-              </ProtectedRoute>
-            } />
-            
-            {/* Redirect to login if not authenticated */}
-            <Route path="*" element={<Navigate to="/" replace />} />
-          </Routes>
-        </div>
-      </BrowserRouter>
-    </AuthProvider>
+    <LanguageProvider>
+      <AuthProvider>
+        <BrowserRouter>
+          <div className="App min-h-screen bg-gray-50">
+            <Routes>
+              <Route path="/login" element={<LoginPage />} />
+              
+              {/* Dashboard Routes */}
+              <Route path="/" element={
+                <ProtectedRoute>
+                  <Dashboard />
+                </ProtectedRoute>
+              } />
+              
+              {/* Event Management Routes */}
+              <Route path="/events/create" element={
+                <ProtectedRoute requiredRoles={['organizer', 'admin']}>
+                  <EventWizard />
+                </ProtectedRoute>
+              } />
+              
+              <Route path="/events/:id" element={
+                <ProtectedRoute requiredRoles={['organizer', 'admin']}>
+                  <EventManagement />
+                </ProtectedRoute>
+              } />
+              
+              {/* Venue Management */}
+              <Route path="/venues" element={
+                <ProtectedRoute requiredRoles={['venue_owner', 'admin']}>
+                  <VenueManager />
+                </ProtectedRoute>
+              } />
+              
+              {/* Registration */}
+              <Route path="/register/:eventId" element={
+                <ProtectedRoute requiredRoles={['attendee', 'admin']}>
+                  <RegistrationPage />
+                </ProtectedRoute>
+              } />
+              
+              {/* Phase 2 Features */}
+              <Route path="/analytics" element={
+                <ProtectedRoute>
+                  <Phase2Banner feature="Analytics Hub" description="Advanced analytics and reporting dashboard" />
+                </ProtectedRoute>
+              } />
+              
+              <Route path="/networking" element={
+                <ProtectedRoute>
+                  <Phase2Banner feature="AI Matchmaking" description="Intelligent networking and attendee matching" />
+                </ProtectedRoute>
+              } />
+              
+              <Route path="/marketing" element={
+                <ProtectedRoute>
+                  <Phase2Banner feature="Marketing Center" description="Email campaigns and social media automation" />
+                </ProtectedRoute>
+              } />
+              
+              <Route path="/sponsors" element={
+                <ProtectedRoute>
+                  <Phase2Banner feature="Sponsor Dashboard" description="Sponsor management and lead tracking" />
+                </ProtectedRoute>
+              } />
+              
+              {/* Redirect to login if not authenticated */}
+              <Route path="*" element={<Navigate to="/" replace />} />
+            </Routes>
+          </div>
+        </BrowserRouter>
+      </AuthProvider>
+    </LanguageProvider>
   );
 }
 

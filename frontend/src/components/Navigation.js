@@ -1,9 +1,12 @@
 import React, { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../App';
+import { useLanguage } from '../contexts/LanguageContext';
+import LanguageSwitcher from './LanguageSwitcher';
 
 const Navigation = () => {
   const { user, logout } = useAuth();
+  const { t, isRTL } = useLanguage();
   const navigate = useNavigate();
   const location = useLocation();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -18,32 +21,32 @@ const Navigation = () => {
     if (!user) return [];
 
     const baseItems = [
-      { path: '/', label: 'Dashboard', roles: ['all'] }
+      { path: '/', label: t('nav.dashboard'), roles: ['all'] }
     ];
 
     const roleSpecificItems = {
       organizer: [
-        { path: '/events/create', label: 'Create Event' },
-        { path: '/venues', label: 'Venues' },
-        { path: '/analytics', label: 'Analytics' }
+        { path: '/events/create', label: t('nav.createEvent') },
+        { path: '/venues', label: t('nav.venues') },
+        { path: '/analytics', label: t('nav.analytics') }
       ],
       attendee: [
-        { path: '/networking', label: 'Networking' }
+        { path: '/networking', label: t('nav.networking') }
       ],
       venue_owner: [
-        { path: '/venues', label: 'My Venues' }
+        { path: '/venues', label: t('nav.myVenues') }
       ],
       admin: [
-        { path: '/events/create', label: 'Create Event' },
-        { path: '/venues', label: 'Venues' },
-        { path: '/analytics', label: 'Analytics' },
-        { path: '/marketing', label: 'Marketing' }
+        { path: '/events/create', label: t('nav.createEvent') },
+        { path: '/venues', label: t('nav.venues') },
+        { path: '/analytics', label: t('nav.analytics') },
+        { path: '/marketing', label: t('nav.marketing') }
       ],
       speaker: [
-        { path: '/networking', label: 'Networking' }
+        { path: '/networking', label: t('nav.networking') }
       ],
       sponsor: [
-        { path: '/sponsors', label: 'Sponsor Dashboard' }
+        { path: '/sponsors', label: t('nav.sponsorDashboard') }
       ]
     };
 
@@ -58,35 +61,41 @@ const Navigation = () => {
   };
 
   return (
-    <nav className="navbar">
+    <nav className="navbar shadow-lg">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
           {/* Logo and brand */}
           <div className="flex items-center">
-            <Link to="/" className="navbar-brand">
-              EventMS
+            <Link to="/" className={`navbar-brand text-xl font-bold text-blue-600 ${isRTL ? 'font-arabic' : ''}`}>
+              {t('nav.brand')}
             </Link>
           </div>
 
           {/* Desktop navigation */}
-          <div className="hidden md:flex items-center space-x-4">
+          <div className="hidden md:flex items-center space-x-4 rtl:space-x-reverse">
             {getNavItems().map((item) => (
               <Link
                 key={item.path}
                 to={item.path}
-                className={`nav-link ${isActiveLink(item.path) ? 'active' : ''}`}
+                className={`nav-link px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                  isActiveLink(item.path) 
+                    ? 'text-blue-600 bg-blue-50' 
+                    : 'text-gray-700 hover:text-gray-900 hover:bg-gray-50'
+                }`}
               >
                 {item.label}
               </Link>
             ))}
           </div>
 
-          {/* User menu */}
-          <div className="flex items-center">
+          {/* User menu and language switcher */}
+          <div className="flex items-center space-x-4 rtl:space-x-reverse">
+            <LanguageSwitcher />
+            
             <div className="relative">
               <button
                 onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                className="flex items-center space-x-2 text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium"
+                className="flex items-center space-x-2 rtl:space-x-reverse text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium"
               >
                 <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white text-sm font-bold">
                   {user?.name?.charAt(0).toUpperCase()}
@@ -98,10 +107,12 @@ const Navigation = () => {
               </button>
 
               {isDropdownOpen && (
-                <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-10">
+                <div className={`absolute mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-10 border ${
+                  isRTL ? 'left-0' : 'right-0'
+                }`}>
                   <div className="px-4 py-2 border-b border-gray-200">
                     <p className="text-sm font-medium text-gray-900">{user?.name}</p>
-                    <p className="text-sm text-gray-500 capitalize">{user?.role?.replace('_', ' ')}</p>
+                    <p className="text-sm text-gray-500 capitalize">{t(`roles.${user?.role}`)}</p>
                   </div>
                   
                   <Link
@@ -109,14 +120,14 @@ const Navigation = () => {
                     className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                     onClick={() => setIsDropdownOpen(false)}
                   >
-                    Profile Settings
+                    {t('nav.profile')}
                   </Link>
                   
                   <button
                     onClick={handleLogout}
-                    className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                    className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rtl:text-right"
                   >
-                    Sign out
+                    {t('nav.signOut')}
                   </button>
                 </div>
               )}
@@ -125,7 +136,7 @@ const Navigation = () => {
             {/* Mobile menu button */}
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="md:hidden ml-2 p-2 rounded-md text-gray-700 hover:text-gray-900"
+              className="md:hidden ml-2 rtl:ml-0 rtl:mr-2 p-2 rounded-md text-gray-700 hover:text-gray-900"
             >
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" />
