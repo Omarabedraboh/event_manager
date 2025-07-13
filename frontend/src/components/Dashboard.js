@@ -187,7 +187,7 @@ const Dashboard = () => {
                       <p className="text-sm font-medium text-gray-600">{t('dashboard.totalVenues')}</p>
                       <p className="text-2xl font-bold text-gray-900">{stats.total_venues || 0}</p>
                     </div>
-                    <div className="p-3 bg-blue-100 rounded-full">
+                    <div className="p-3 bg-blue-100 dark:bg-blue-900/30 rounded-full transition-colors duration-200">
                       <svg className="w-6 h-6 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
                         <path fillRule="evenodd" d="M4 4a2 2 0 00-2 2v8a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2H4zm2 3a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z" clipRule="evenodd" />
                       </svg>
