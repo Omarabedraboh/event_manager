@@ -98,303 +98,226 @@ const EventWizard = () => {
 
       navigate(`/events/${eventId}`);
     } catch (error) {
-      setError(error.response?.data?.detail || 'Failed to create event');
+      setError('Failed to create event');
+      console.error(error);
     }
     setLoading(false);
   };
 
-  const renderStep1 = () => (
-    <div className="space-y-6">
-      <div>
-        <h3 className={`text-lg font-medium text-gray-900 dark:text-gray-100 transition-colors duration-200 mb-4 ${isRTL ? 'text-right' : ''}`}>
-          {t('events.eventDetails')}
-        </h3>
-        
-        <div className="space-y-4">
-          <div>
-            <label className={`block text-sm font-medium text-gray-700 dark:text-gray-300 transition-colors duration-200 ${isRTL ? 'text-right' : ''}`}>
-              {t('events.eventTitle')} {t('wizard.requiredField')}
-            </label>
-            <input
-              type="text"
-              name="title"
-              value={eventData.title}
-              onChange={handleChange}
-              placeholder={t('wizard.enterEventTitle')}
-              className="form-input"
-              dir={isRTL ? 'rtl' : 'ltr'}
-            />
-          </div>
+  const renderStep = () => {
+    switch (currentStep) {
+      case 1:
+        return (
+          <div className="space-y-6">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 transition-colors duration-200">
+                {t('events.eventTitle')}
+              </label>
+              <input
+                type="text"
+                name="title"
+                value={eventData.title}
+                onChange={handleChange}
+                className="form-input"
+                placeholder={t('events.titlePlaceholder')}
+                required
+              />
+            </div>
 
-          <div>
-            <label className={`block text-sm font-medium text-gray-700 dark:text-gray-300 transition-colors duration-200 ${isRTL ? 'text-right' : ''}`}>
-              {t('events.description')} {t('wizard.requiredField')}
-            </label>
-            <textarea
-              name="description"
-              value={eventData.description}
-              onChange={handleChange}
-              rows="4"
-              placeholder={t('wizard.describeYourEvent')}
-              className="form-textarea"
-              dir={isRTL ? 'rtl' : 'ltr'}
-            />
-          </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 transition-colors duration-200">
+                {t('events.description')}
+              </label>
+              <textarea
+                name="description"
+                value={eventData.description}
+                onChange={handleChange}
+                rows="4"
+                className="form-textarea"
+                placeholder={t('events.descriptionPlaceholder')}
+                required
+              />
+            </div>
 
-          <div>
-            <label className={`block text-sm font-medium text-gray-700 dark:text-gray-300 transition-colors duration-200 ${isRTL ? 'text-right' : ''}`}>
-              {t('events.eventType')} {t('wizard.requiredField')}
-            </label>
-            <select
-              name="event_type"
-              value={eventData.event_type}
-              onChange={handleChange}
-              className="form-select"
-            >
-              <option value="physical">{t('events.physicalEvent')}</option>
-              <option value="virtual">{t('events.virtualEvent')}</option>
-              <option value="hybrid">{t('events.hybridEvent')}</option>
-            </select>
-            <p className={`mt-1 text-sm text-gray-500 ${isRTL ? 'text-right' : ''}`}>
-              {eventData.event_type === 'hybrid' && t('wizard.hybridEventNote')}
-            </p>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 transition-colors duration-200">
+                {t('events.eventType')}
+              </label>
+              <select
+                name="event_type"
+                value={eventData.event_type}
+                onChange={handleChange}
+                className="form-select"
+              >
+                <option value="physical">{t('events.types.physical')}</option>
+                <option value="virtual">{t('events.types.virtual')}</option>
+                <option value="hybrid">{t('events.types.hybrid')}</option>
+              </select>
+            </div>
           </div>
+        );
 
-          <div>
-            <label className={`block text-sm font-medium text-gray-700 dark:text-gray-300 transition-colors duration-200 ${isRTL ? 'text-right' : ''}`}>
-              {t('wizard.maximumAttendeesLabel')}
-            </label>
-            <input
-              type="number"
-              name="max_attendees"
-              value={eventData.max_attendees}
-              onChange={handleChange}
-              min="1"
-              className="form-input"
-            />
+      case 2:
+        return (
+          <div className="space-y-6">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 transition-colors duration-200">
+                {t('events.startDate')}
+              </label>
+              <input
+                type="datetime-local"
+                name="start_date"
+                value={eventData.start_date}
+                onChange={handleChange}
+                className="form-input"
+                required
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 transition-colors duration-200">
+                {t('events.endDate')}
+              </label>
+              <input
+                type="datetime-local"
+                name="end_date"
+                value={eventData.end_date}
+                onChange={handleChange}
+                className="form-input"
+                required
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 transition-colors duration-200">
+                {t('events.maxAttendees')}
+              </label>
+              <input
+                type="number"
+                name="max_attendees"
+                value={eventData.max_attendees}
+                onChange={handleChange}
+                min="1"
+                className="form-input"
+              />
+            </div>
           </div>
-        </div>
-      </div>
-    </div>
-  );
+        );
 
-  const renderStep2 = () => (
-    <div className="space-y-6">
-      <div>
-        <h3 className={`text-lg font-medium text-gray-900 dark:text-gray-100 transition-colors duration-200 mb-4 ${isRTL ? 'text-right' : ''}`}>
-          {t('events.eventSchedule')}
-        </h3>
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label className={`block text-sm font-medium text-gray-700 dark:text-gray-300 transition-colors duration-200 ${isRTL ? 'text-right' : ''}`}>
-              {t('wizard.startDateTime')} {t('wizard.requiredField')}
-            </label>
-            <input
-              type="datetime-local"
-              name="start_date"
-              value={eventData.start_date}
-              onChange={handleChange}
-              className="form-input"
-            />
-          </div>
+      case 3:
+        return (
+          <div className="space-y-6">
+            {(eventData.event_type === 'physical' || eventData.event_type === 'hybrid') && (
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 transition-colors duration-200">
+                  {t('events.selectVenue')}
+                </label>
+                <select
+                  name="venue_id"
+                  value={eventData.venue_id}
+                  onChange={handleChange}
+                  className="form-select"
+                  required={eventData.event_type === 'physical' || eventData.event_type === 'hybrid'}
+                >
+                  <option value="">{t('events.selectVenuePlaceholder')}</option>
+                  {venues.map(venue => (
+                    <option key={venue.id} value={venue.id}>
+                      {venue.name} - {venue.address} (${venue.price_per_hour}/{t('events.perHour')})
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
 
-          <div>
-            <label className={`block text-sm font-medium text-gray-700 dark:text-gray-300 transition-colors duration-200 ${isRTL ? 'text-right' : ''}`}>
-              {t('wizard.endDateTime')} {t('wizard.requiredField')}
-            </label>
-            <input
-              type="datetime-local"
-              name="end_date"
-              value={eventData.end_date}
-              onChange={handleChange}
-              className="form-input"
-            />
-          </div>
-        </div>
-
-        {eventData.start_date && eventData.end_date && (
-          <div className="mt-4 p-4 bg-blue-50 rounded-lg">
-            <p className={`text-sm text-blue-700 ${isRTL ? 'text-right' : ''}`}>
-              {t('events.eventDuration')}: {Math.round((new Date(eventData.end_date) - new Date(eventData.start_date)) / (1000 * 60 * 60))} {t('events.hours')}
-            </p>
-          </div>
-        )}
-      </div>
-    </div>
-  );
-
-  const renderStep3 = () => (
-    <div className="space-y-6">
-      <div>
-        <h3 className={`text-lg font-medium text-gray-900 dark:text-gray-100 transition-colors duration-200 mb-4 ${isRTL ? 'text-right' : ''}`}>
-          {t('events.eventLocation')}
-        </h3>
-        
-        {(eventData.event_type === 'physical' || eventData.event_type === 'hybrid') && (
-          <div className="mb-6">
-            <label className={`block text-sm font-medium text-gray-700 mb-2 ${isRTL ? 'text-right' : ''}`}>
-              {t('wizard.physicalVenue')} {eventData.event_type === 'hybrid' ? t('wizard.requiredForHybrid') : t('wizard.requiredField')}
-            </label>
-            <select
-              name="venue_id"
-              value={eventData.venue_id}
-              onChange={handleChange}
-              className="form-select"
-            >
-              <option value="">{t('events.selectVenue')}</option>
-              {venues.map(venue => (
-                <option key={venue.id} value={venue.id}>
-                  {venue.name} - {venue.address} ({t('venues.capacity')}: {venue.capacity})
-                </option>
-              ))}
-            </select>
-            
-            {venues.length === 0 && (
-              <p className={`mt-2 text-sm text-yellow-600 ${isRTL ? 'text-right' : ''}`}>
-                {t('events.noVenuesAvailable')}
-              </p>
+            {(eventData.event_type === 'virtual' || eventData.event_type === 'hybrid') && (
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 transition-colors duration-200">
+                  {t('events.virtualLink')}
+                </label>
+                <input
+                  type="url"
+                  name="virtual_link"
+                  value={eventData.virtual_link}
+                  onChange={handleChange}
+                  className="form-input"
+                  placeholder="https://zoom.us/j/..."
+                  required={eventData.event_type === 'virtual' || eventData.event_type === 'hybrid'}
+                />
+              </div>
             )}
           </div>
-        )}
+        );
 
-        {(eventData.event_type === 'virtual' || eventData.event_type === 'hybrid') && (
-          <div>
-            <label className={`block text-sm font-medium text-gray-700 mb-2 ${isRTL ? 'text-right' : ''}`}>
-              {t('wizard.virtualMeetingLink')} {eventData.event_type === 'hybrid' ? t('wizard.requiredForHybrid') : t('wizard.requiredField')}
-            </label>
-            <input
-              type="url"
-              name="virtual_link"
-              value={eventData.virtual_link}
-              onChange={handleChange}
-              placeholder={t('wizard.enterMeetingLink')}
-              className="form-input"
-              dir={isRTL ? 'rtl' : 'ltr'}
-            />
-            <p className={`mt-1 text-sm text-gray-500 ${isRTL ? 'text-right' : ''}`}>
-              {t('events.enterVirtualLink')}
-            </p>
-          </div>
-        )}
-
-        {eventData.event_type === 'hybrid' && (
-          <div className="mt-6 p-4 bg-purple-50 rounded-lg">
-            <h4 className={`font-medium text-purple-900 mb-2 ${isRTL ? 'text-right' : ''}`}>
-              {t('events.hybridBenefits')}
-            </h4>
-            <ul className={`text-sm text-purple-700 space-y-1 ${isRTL ? 'text-right' : ''}`}>
-              <li>{t('events.reachWiderAudience')}</li>
-              <li>{t('events.flexibleOptions')}</li>
-              <li>{t('events.increaseAccessibility')}</li>
-              <li>{t('events.maximizeVenue')}</li>
-            </ul>
-          </div>
-        )}
-      </div>
-    </div>
-  );
-
-  const renderStep4 = () => (
-    <div className="space-y-6">
-      <div>
-        <h3 className={`text-lg font-medium text-gray-900 dark:text-gray-100 transition-colors duration-200 mb-4 ${isRTL ? 'text-right' : ''}`}>
-          {t('events.reviewPublish')}
-        </h3>
-        
-        <div className="bg-gray-50 dark:bg-gray-700 transition-colors duration-200 rounded-lg p-6 space-y-4">
-          <div>
-            <h4 className={`font-medium text-gray-900 dark:text-gray-100 transition-colors duration-200 ${isRTL ? 'text-right' : ''}`}>
-              {t('events.eventDetails')}
-            </h4>
-            <p className={`text-gray-600 dark:text-gray-400 transition-colors duration-200 ${isRTL ? 'text-right' : ''}`}>{eventData.title}</p>
-            <p className={`text-sm text-gray-500 dark:text-gray-500 transition-colors duration-200 ${isRTL ? 'text-right' : ''}`}>{eventData.description}</p>
-          </div>
-
-          <div>
-            <h4 className={`font-medium text-gray-900 dark:text-gray-100 transition-colors duration-200 ${isRTL ? 'text-right' : ''}`}>
-              {t('events.type')} & {t('events.capacity')}
-            </h4>
-            <div className={`flex space-x-4 ${isRTL ? 'space-x-reverse flex-row-reverse' : ''}`}>
-              <span className={`badge ${
-                eventData.event_type === 'physical' ? 'event-type-physical' :
-                eventData.event_type === 'virtual' ? 'event-type-virtual' :
-                'event-type-hybrid'
-              }`}>
-                {t(`events.${eventData.event_type}`)}
-              </span>
-              <span className="text-sm text-gray-600">
-                {t('events.maxAttendees')}: {eventData.max_attendees}
-              </span>
-            </div>
-          </div>
-
-          <div>
-            <h4 className={`font-medium text-gray-900 dark:text-gray-100 transition-colors duration-200 ${isRTL ? 'text-right' : ''}`}>
-              {t('events.eventSchedule')}
-            </h4>
-            <p className={`text-gray-600 dark:text-gray-400 transition-colors duration-200 ${isRTL ? 'text-right' : ''}`}>
-              {new Date(eventData.start_date).toLocaleString()} - {new Date(eventData.end_date).toLocaleString()}
-            </p>
-          </div>
-
-          {eventData.venue_id && (
-            <div>
-              <h4 className={`font-medium text-gray-900 dark:text-gray-100 transition-colors duration-200 ${isRTL ? 'text-right' : ''}`}>
-                {t('events.venue')}
-              </h4>
-              <p className={`text-gray-600 dark:text-gray-400 transition-colors duration-200 ${isRTL ? 'text-right' : ''}`}>
-                {venues.find(v => v.id === eventData.venue_id)?.name}
+      case 4:
+        return (
+          <div className="text-center space-y-6">
+            <div className="p-6 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg transition-colors duration-200">
+              <div className="flex justify-center mb-4">
+                <div className="p-3 bg-green-100 dark:bg-green-900/30 rounded-full transition-colors duration-200">
+                  <svg className="w-8 h-8 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
+                  </svg>
+                </div>
+              </div>
+              <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2 transition-colors duration-200">
+                {t('events.reviewEvent')}
+              </h3>
+              <p className="text-gray-600 dark:text-gray-400 transition-colors duration-200">
+                {t('events.reviewEventDescription')}
               </p>
             </div>
-          )}
 
-          {eventData.virtual_link && (
-            <div>
-              <h4 className={`font-medium text-gray-900 dark:text-gray-100 transition-colors duration-200 ${isRTL ? 'text-right' : ''}`}>
-                {t('events.virtualLinkLabel')}
-              </h4>
-              <p className={`text-gray-600 dark:text-gray-400 transition-colors duration-200 break-all ${isRTL ? 'text-right' : ''}`}>
-                {eventData.virtual_link}
-              </p>
+            <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6 text-left transition-colors duration-200">
+              <h4 className="font-medium text-gray-900 dark:text-gray-100 mb-4 transition-colors duration-200">{t('events.eventDetails')}</h4>
+              <div className="space-y-3 text-sm">
+                <div>
+                  <span className="font-medium text-gray-700 dark:text-gray-300 transition-colors duration-200">{t('events.title')}:</span>
+                  <span className="ml-2 text-gray-900 dark:text-gray-100 transition-colors duration-200">{eventData.title}</span>
+                </div>
+                <div>
+                  <span className="font-medium text-gray-700 dark:text-gray-300 transition-colors duration-200">{t('events.type')}:</span>
+                  <span className="ml-2 text-gray-900 dark:text-gray-100 transition-colors duration-200">{t(`events.types.${eventData.event_type}`)}</span>
+                </div>
+                <div>
+                  <span className="font-medium text-gray-700 dark:text-gray-300 transition-colors duration-200">{t('events.startDate')}:</span>
+                  <span className="ml-2 text-gray-900 dark:text-gray-100 transition-colors duration-200">{eventData.start_date}</span>
+                </div>
+                <div>
+                  <span className="font-medium text-gray-700 dark:text-gray-300 transition-colors duration-200">{t('events.endDate')}:</span>
+                  <span className="ml-2 text-gray-900 dark:text-gray-100 transition-colors duration-200">{eventData.end_date}</span>
+                </div>
+              </div>
             </div>
-          )}
-        </div>
 
-        <div className="bg-blue-50 dark:bg-blue-900/20 transition-colors duration-200 rounded-lg p-4">
-          <h4 className={`font-medium text-blue-900 dark:text-blue-100 transition-colors duration-200 mb-2 ${isRTL ? 'text-right' : ''}`}>
-            {t('events.publishingOptions')}
-          </h4>
-          <p className={`text-sm text-blue-700 dark:text-blue-300 transition-colors duration-200 mb-4 ${isRTL ? 'text-right' : ''}`}>
-            {t('events.saveAsDraft')}
-          </p>
-          
-          <div className={`flex space-x-3 ${isRTL ? 'space-x-reverse flex-row-reverse' : ''}`}>
-            <button
-              onClick={() => handleSubmit(false)}
-              disabled={loading}
-              className="btn-secondary"
-            >
-              {loading ? t('events.saving') : t('events.saveAsDraftBtn')}
-            </button>
-            <button
-              onClick={() => handleSubmit(true)}
-              disabled={loading}
-              className="btn-primary"
-            >
-              {loading ? t('events.publishing') : t('events.saveAndPublish')}
-            </button>
+            <div className="flex space-x-4 justify-center">
+              <button
+                onClick={() => handleSubmit(false)}
+                disabled={loading}
+                className="btn-secondary min-w-[120px]"
+              >
+                {loading ? t('common.saving') : t('events.saveDraft')}
+              </button>
+              <button
+                onClick={() => handleSubmit(true)}
+                disabled={loading}
+                className="btn-primary min-w-[120px]"
+              >
+                {loading ? t('common.publishing') : t('events.saveAndPublish')}
+              </button>
+            </div>
           </div>
-        </div>
-      </div>
-    </div>
-  );
+        );
+
+      default:
+        return null;
+    }
+  };
 
   const steps = [
-    { number: 1, title: t('wizard.step1'), component: renderStep1 },
-    { number: 2, title: t('wizard.step2'), component: renderStep2 },
-    { number: 3, title: t('wizard.step3'), component: renderStep3 },
-    { number: 4, title: t('wizard.step4'), component: renderStep4 }
+    { number: 1, title: t('events.steps.basicInfo') },
+    { number: 2, title: t('events.steps.dateTime') },
+    { number: 3, title: t('events.steps.location') },
+    { number: 4, title: t('events.steps.review') }
   ];
 
   return (
@@ -402,41 +325,40 @@ const EventWizard = () => {
       <Navigation />
       
       <div className="max-w-4xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-        {/* Breadcrumb */}
-        <div className={`breadcrumb ${isRTL ? 'flex-row-reverse' : ''}`}>
-          <span className="breadcrumb-item">{t('nav.dashboard')}</span>
-          <span className="breadcrumb-separator">/</span>
-          <span className="breadcrumb-item">{t('nav.createEvent')}</span>
-        </div>
-
         {/* Header */}
         <div className="mb-8">
-          <h1 className={`text-3xl font-bold text-gray-900 dark:text-gray-100 transition-colors duration-200 ${isRTL ? 'text-right' : ''}`}>
-            {t('wizard.createNewEvent')}
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100 transition-colors duration-200">
+            {t('events.createEvent')}
           </h1>
-          <p className={`text-gray-600 dark:text-gray-400 transition-colors duration-200 ${isRTL ? 'text-right' : ''}`}>
-            {t('wizard.stepByStepWizard')}
+          <p className="text-gray-600 dark:text-gray-400 transition-colors duration-200">
+            {t('events.createEventDescription')}
           </p>
         </div>
 
         {/* Progress Steps */}
         <div className="mb-8">
-          <div className={`flex items-center justify-between ${isRTL ? 'flex-row-reverse' : ''}`}>
+          <div className="flex items-center justify-between">
             {steps.map((step, index) => (
               <div key={step.number} className="flex items-center">
                 <div className={`flex items-center justify-center w-8 h-8 rounded-full text-sm font-medium transition-colors duration-200 ${
                   currentStep >= step.number
-                    ? 'bg-blue-600 dark:bg-blue-500 text-white'
-                    : 'bg-gray-300 dark:bg-gray-600 text-gray-600 dark:text-gray-400'
+                    ? 'bg-blue-600 text-white'
+                    : 'bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-400'
                 }`}>
                   {step.number}
                 </div>
-                <div className={`${isRTL ? 'mr-2' : 'ml-2'} text-sm font-medium text-gray-900 dark:text-gray-100 transition-colors duration-200`}>
+                <span className={`ml-2 text-sm font-medium transition-colors duration-200 ${
+                  currentStep >= step.number
+                    ? 'text-blue-600 dark:text-blue-400'
+                    : 'text-gray-500 dark:text-gray-400'
+                }`}>
                   {step.title}
-                </div>
+                </span>
                 {index < steps.length - 1 && (
-                  <div className={`${isRTL ? 'mr-4' : 'ml-4'} w-12 h-1 transition-colors duration-200 ${
-                    currentStep > step.number ? 'bg-blue-600 dark:bg-blue-500' : 'bg-gray-300 dark:bg-gray-600'
+                  <div className={`ml-4 h-px w-16 transition-colors duration-200 ${
+                    currentStep > step.number
+                      ? 'bg-blue-600'
+                      : 'bg-gray-200 dark:bg-gray-700'
                   }`} />
                 )}
               </div>
@@ -444,38 +366,39 @@ const EventWizard = () => {
           </div>
         </div>
 
-        {/* Error Alert */}
+        {/* Error Display */}
         {error && (
           <div className="alert alert-error mb-6">
             {error}
           </div>
         )}
 
-        {/* Step Content */}
-        <div className="card mb-6">
+        {/* Form Content */}
+        <div className="card max-w-2xl mx-auto">
           <div className="card-body">
-            {steps[currentStep - 1].component()}
+            {renderStep()}
           </div>
-        </div>
 
-        {/* Navigation Buttons */}
-        <div className={`flex justify-between ${isRTL ? 'flex-row-reverse' : ''}`}>
-          <button
-            onClick={prevStep}
-            disabled={currentStep === 1}
-            className={`btn-secondary ${currentStep === 1 ? 'opacity-50 cursor-not-allowed' : ''}`}
-          >
-            {t('wizard.previous')}
-          </button>
-          
-          {currentStep < steps.length ? (
-            <button
-              onClick={nextStep}
-              className="btn-primary"
-            >
-              {t('wizard.next')}
-            </button>
-          ) : null}
+          {/* Navigation Buttons */}
+          {currentStep < 4 && (
+            <div className="card-footer">
+              <div className={`flex justify-between ${isRTL ? 'flex-row-reverse' : ''}`}>
+                <button
+                  onClick={prevStep}
+                  disabled={currentStep === 1}
+                  className="btn-secondary disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {t('common.previous')}
+                </button>
+                <button
+                  onClick={nextStep}
+                  className="btn-primary"
+                >
+                  {t('common.next')}
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>

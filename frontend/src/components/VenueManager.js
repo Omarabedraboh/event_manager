@@ -48,17 +48,17 @@ const VenueManager = () => {
       const mockBookings = [
         {
           id: '1',
-          venue_id: venueId,
-          start_time: new Date(2025, 2, 15, 10, 0).toISOString(),
-          end_time: new Date(2025, 2, 15, 14, 0).toISOString(),
-          event_title: 'Tech Conference 2025'
+          title: 'Corporate Meeting',
+          start: new Date(2024, 2, 15, 9, 0),
+          end: new Date(2024, 2, 15, 17, 0),
+          eventId: 'event1'
         },
         {
           id: '2',
-          venue_id: venueId,
-          start_time: new Date(2025, 2, 20, 16, 0).toISOString(),
-          end_time: new Date(2025, 2, 20, 20, 0).toISOString(),
-          event_title: 'Product Launch Event'
+          title: 'Wedding Reception',
+          start: new Date(2024, 2, 20, 18, 0),
+          end: new Date(2024, 2, 20, 23, 0),
+          eventId: 'event2'
         }
       ];
       setBookings(mockBookings);
@@ -69,9 +69,11 @@ const VenueManager = () => {
 
   const handleVenueSubmit = async (e) => {
     e.preventDefault();
+    setError('');
+
     try {
-      const response = await axios.post(`${API}/venues`, venueForm);
-      setVenues([...venues, response.data]);
+      await axios.post(`${API}/venues`, venueForm);
+      setShowVenueForm(false);
       setVenueForm({
         name: '',
         description: '',
@@ -79,32 +81,19 @@ const VenueManager = () => {
         capacity: 100,
         price_per_hour: 50
       });
-      setShowVenueForm(false);
-      setError('');
+      fetchVenues();
     } catch (error) {
-      setError(error.response?.data?.detail || 'Failed to create venue');
+      setError('Failed to create venue');
+      console.error(error);
     }
   };
 
-  const checkAvailability = async (venueId, date, time) => {
-    try {
-      const startDate = new Date(date);
-      startDate.setHours(parseInt(time.split(':')[0]), parseInt(time.split(':')[1]));
-      const endDate = new Date(startDate);
-      endDate.setHours(endDate.getHours() + 2); // Check 2-hour slot
-
-      const response = await axios.get(`${API}/venues/${venueId}/availability`, {
-        params: {
-          start_date: startDate.toISOString(),
-          end_date: endDate.toISOString()
-        }
-      });
-
-      return response.data.available;
-    } catch (error) {
-      console.error('Failed to check availability:', error);
-      return false;
-    }
+  const handleInputChange = (e) => {
+    const { name, value, type } = e.target;
+    setVenueForm(prev => ({
+      ...prev,
+      [name]: type === 'number' ? parseFloat(value) : value
+    }));
   };
 
   const generateCalendarDays = () => {
@@ -116,48 +105,37 @@ const VenueManager = () => {
     startDate.setDate(startDate.getDate() - firstDay.getDay());
 
     const days = [];
-    for (let i = 0; i < 42; i++) {
-      const day = new Date(startDate);
-      day.setDate(startDate.getDate() + i);
-      
-      const isCurrentMonth = day.getMonth() === month;
-      const isToday = day.toDateString() === new Date().toDateString();
-      const hasBooking = bookings.some(booking => {
-        const bookingDate = new Date(booking.start_time);
-        return bookingDate.toDateString() === day.toDateString();
-      });
+    const currentDate = new Date(startDate);
 
+    for (let i = 0; i < 42; i++) {
+      const isCurrentMonth = currentDate.getMonth() === month;
+      const isToday = currentDate.toDateString() === new Date().toDateString();
+      
       days.push({
-        date: day,
+        date: new Date(currentDate),
         isCurrentMonth,
         isToday,
-        hasBooking
+        bookings: bookings.filter(booking => 
+          booking.start.toDateString() === currentDate.toDateString()
+        )
       });
+      
+      currentDate.setDate(currentDate.getDate() + 1);
     }
-
+    
     return days;
-  };
-
-  const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
   };
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-500"></div>
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 transition-colors duration-200">
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-500 dark:border-blue-400"></div>
       </div>
     );
   }
 
   return (
-    <div className={`min-h-screen bg-gray-50 ${isRTL ? 'font-arabic' : ''}`}>
+    <div className={`min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-200 ${isRTL ? 'font-arabic' : ''}`}>
       <Navigation />
       
       <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
@@ -165,10 +143,10 @@ const VenueManager = () => {
         <div className="mb-8">
           <div className={`flex justify-between items-center ${isRTL ? 'flex-row-reverse' : ''}`}>
             <div>
-              <h1 className={`text-3xl font-bold text-gray-900 ${isRTL ? 'text-right' : ''}`}>
+              <h1 className={`text-3xl font-bold text-gray-900 dark:text-gray-100 transition-colors duration-200 ${isRTL ? 'text-right' : ''}`}>
                 {user.role === 'venue_owner' ? t('nav.myVenues') : t('venues.title')}
               </h1>
-              <p className={`text-gray-600 ${isRTL ? 'text-right' : ''}`}>
+              <p className={`text-gray-600 dark:text-gray-400 transition-colors duration-200 ${isRTL ? 'text-right' : ''}`}>
                 Manage venue availability and bookings
               </p>
             </div>
@@ -183,7 +161,6 @@ const VenueManager = () => {
           </div>
         </div>
 
-        {/* Error Alert */}
         {error && (
           <div className="alert alert-error mb-6">
             {error}
@@ -191,66 +168,72 @@ const VenueManager = () => {
         )}
 
         {/* Venues Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-          {venues.map(venue => (
-            <div key={venue.id} className="card">
-              <div className="card-header">
-                <h3 className={`text-lg font-medium text-gray-900 ${isRTL ? 'text-right' : ''}`}>
-                  {venue.name}
-                </h3>
-                <p className={`text-sm text-gray-500 ${isRTL ? 'text-right' : ''}`}>
-                  {venue.address}
-                </p>
-              </div>
-              <div className="card-body">
-                <p className={`text-gray-600 mb-4 ${isRTL ? 'text-right' : ''}`}>
-                  {venue.description}
-                </p>
-                
-                <div className="space-y-2 mb-4">
-                  <div className={`flex justify-between ${isRTL ? 'flex-row-reverse' : ''}`}>
-                    <span className="text-gray-600">{t('venues.capacity')}:</span>
-                    <span className="font-medium">{venue.capacity} people</span>
+        {venues.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {venues.map((venue) => (
+              <div key={venue.id} className="card">
+                <div className="card-body">
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2 transition-colors duration-200">
+                    {venue.name}
+                  </h3>
+                  <p className="text-gray-600 dark:text-gray-400 mb-4 transition-colors duration-200">
+                    {venue.description}
+                  </p>
+                  
+                  <div className="space-y-2 text-sm">
+                    <div className="flex items-center text-gray-600 dark:text-gray-400 transition-colors duration-200">
+                      <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                      </svg>
+                      {venue.address}
+                    </div>
+                    <div className="flex items-center text-gray-600 dark:text-gray-400 transition-colors duration-200">
+                      <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
+                      </svg>
+                      {venue.capacity} guests
+                    </div>
+                    <div className="flex items-center text-gray-600 dark:text-gray-400 transition-colors duration-200">
+                      <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"/>
+                      </svg>
+                      ${venue.price_per_hour}/hour
+                    </div>
                   </div>
-                  <div className={`flex justify-between ${isRTL ? 'flex-row-reverse' : ''}`}>
-                    <span className="text-gray-600">{t('venues.pricePerHour')}:</span>
-                    <span className="font-medium">${venue.price_per_hour}</span>
-                  </div>
-                </div>
 
-                <div className={`flex space-x-2 ${isRTL ? 'space-x-reverse flex-row-reverse' : ''}`}>
-                  <button
-                    onClick={() => {
-                      setShowCalendar(venue.id);
-                      fetchVenueBookings(venue.id);
-                    }}
-                    className="btn-primary flex-1 text-sm"
-                  >
-                    View Calendar
-                  </button>
-                  {user.role === 'organizer' && (
+                  <div className={`flex gap-2 mt-4 ${isRTL ? 'flex-row-reverse' : ''}`}>
                     <button
                       onClick={() => {
-                        alert('Booking functionality would redirect to event creation with this venue pre-selected');
+                        setShowCalendar(venue.id);
+                        fetchVenueBookings(venue.id);
                       }}
-                      className="btn-secondary flex-1 text-sm"
+                      className="btn-primary flex-1 text-sm"
                     >
-                      {t('venues.bookVenue')}
+                      View Calendar
                     </button>
-                  )}
+                    {user.role === 'organizer' && (
+                      <button
+                        onClick={() => {
+                          alert('Booking functionality would redirect to event creation with this venue pre-selected');
+                        }}
+                        className="btn-secondary flex-1 text-sm"
+                      >
+                        Book Venue
+                      </button>
+                    )}
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
-        </div>
-
-        {venues.length === 0 && (
-          <div className={`text-center py-12 ${isRTL ? 'text-right' : ''}`}>
-            <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            ))}
+          </div>
+        ) : (
+          <div className="text-center py-12">
+            <svg className="mx-auto h-12 w-12 text-gray-400 dark:text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
             </svg>
-            <h3 className="mt-2 text-sm font-medium text-gray-900">{t('venues.noVenues')}</h3>
-            <p className="mt-1 text-sm text-gray-500">
+            <h3 className="mt-2 text-sm font-medium text-gray-900 dark:text-gray-100 transition-colors duration-200">{t('venues.noVenues')}</h3>
+            <p className="mt-1 text-sm text-gray-500 dark:text-gray-400 transition-colors duration-200">
               {user.role === 'venue_owner' ? t('venues.createFirstVenue') : 'No venues available yet.'}
             </p>
           </div>
@@ -259,94 +242,101 @@ const VenueManager = () => {
         {/* Add Venue Modal */}
         {showVenueForm && (
           <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
-            <div className="relative top-20 mx-auto p-5 border max-w-md shadow-lg rounded-md bg-white">
+            <div className="relative top-20 mx-auto p-5 border w-11/12 md:w-1/2 shadow-lg rounded-md bg-white dark:bg-gray-800 transition-colors duration-200">
               <div className="mt-3">
-                <h3 className={`text-lg font-medium text-gray-900 mb-4 ${isRTL ? 'text-right' : ''}`}>
+                <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-4 transition-colors duration-200">
                   {t('venues.createVenue')}
                 </h3>
+                
                 <form onSubmit={handleVenueSubmit} className="space-y-4">
                   <div>
-                    <label className={`block text-sm font-medium text-gray-700 ${isRTL ? 'text-right' : ''}`}>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 transition-colors duration-200">
                       {t('venues.venueName')}
                     </label>
                     <input
                       type="text"
+                      name="name"
                       value={venueForm.name}
-                      onChange={(e) => setVenueForm({...venueForm, name: e.target.value})}
-                      required
+                      onChange={handleInputChange}
                       className="form-input"
-                      placeholder={t('venues.venueName')}
-                      dir={isRTL ? 'rtl' : 'ltr'}
+                      required
                     />
                   </div>
-                  
+
                   <div>
-                    <label className={`block text-sm font-medium text-gray-700 ${isRTL ? 'text-right' : ''}`}>
-                      {t('venues.venueDescription')}
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 transition-colors duration-200">
+                      {t('venues.description')}
                     </label>
                     <textarea
+                      name="description"
                       value={venueForm.description}
-                      onChange={(e) => setVenueForm({...venueForm, description: e.target.value})}
+                      onChange={handleInputChange}
                       rows="3"
                       className="form-textarea"
-                      placeholder={t('venues.venueDescription')}
-                      dir={isRTL ? 'rtl' : 'ltr'}
+                      required
                     />
                   </div>
-                  
+
                   <div>
-                    <label className={`block text-sm font-medium text-gray-700 ${isRTL ? 'text-right' : ''}`}>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 transition-colors duration-200">
                       {t('venues.address')}
                     </label>
                     <input
                       type="text"
+                      name="address"
                       value={venueForm.address}
-                      onChange={(e) => setVenueForm({...venueForm, address: e.target.value})}
-                      required
+                      onChange={handleInputChange}
                       className="form-input"
-                      placeholder={t('venues.address')}
-                      dir={isRTL ? 'rtl' : 'ltr'}
+                      required
                     />
                   </div>
-                  
+
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <label className={`block text-sm font-medium text-gray-700 ${isRTL ? 'text-right' : ''}`}>
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 transition-colors duration-200">
                         {t('venues.capacity')}
                       </label>
                       <input
                         type="number"
-                        min="1"
+                        name="capacity"
                         value={venueForm.capacity}
-                        onChange={(e) => setVenueForm({...venueForm, capacity: parseInt(e.target.value)})}
+                        onChange={handleInputChange}
+                        min="1"
                         className="form-input"
+                        required
                       />
                     </div>
+
                     <div>
-                      <label className={`block text-sm font-medium text-gray-700 ${isRTL ? 'text-right' : ''}`}>
-                        {t('venues.pricePerHour')} ($)
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 transition-colors duration-200">
+                        {t('venues.pricePerHour')}
                       </label>
                       <input
                         type="number"
+                        name="price_per_hour"
+                        value={venueForm.price_per_hour}
+                        onChange={handleInputChange}
                         min="0"
                         step="0.01"
-                        value={venueForm.price_per_hour}
-                        onChange={(e) => setVenueForm({...venueForm, price_per_hour: parseFloat(e.target.value)})}
                         className="form-input"
+                        required
                       />
                     </div>
                   </div>
-                  
-                  <div className={`flex space-x-3 ${isRTL ? 'space-x-reverse flex-row-reverse' : ''}`}>
-                    <button type="submit" className="btn-primary flex-1">
-                      {t('venues.saveVenue')}
-                    </button>
+
+                  <div className={`flex justify-end space-x-3 pt-4 ${isRTL ? 'flex-row-reverse space-x-reverse' : ''}`}>
                     <button
                       type="button"
                       onClick={() => setShowVenueForm(false)}
-                      className="btn-secondary flex-1"
+                      className="btn-secondary"
                     >
                       {t('common.cancel')}
+                    </button>
+                    <button
+                      type="submit"
+                      className="btn-primary"
+                    >
+                      {t('venues.createVenue')}
                     </button>
                   </div>
                 </form>
@@ -358,18 +348,18 @@ const VenueManager = () => {
         {/* Calendar Modal */}
         {showCalendar && (
           <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
-            <div className="relative top-10 mx-auto p-5 border max-w-4xl shadow-lg rounded-md bg-white">
+            <div className="relative top-10 mx-auto p-5 border w-11/12 md:w-3/4 lg:w-1/2 shadow-lg rounded-md bg-white dark:bg-gray-800 transition-colors duration-200">
               <div className="mt-3">
                 <div className={`flex justify-between items-center mb-4 ${isRTL ? 'flex-row-reverse' : ''}`}>
-                  <h3 className={`text-lg font-medium text-gray-900 ${isRTL ? 'text-right' : ''}`}>
-                    {venues.find(v => v.id === showCalendar)?.name} - {t('venues.availability')} Calendar
+                  <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 transition-colors duration-200">
+                    {t('venues.availability')}
                   </h3>
                   <button
                     onClick={() => setShowCalendar(null)}
-                    className="text-gray-400 hover:text-gray-600"
+                    className="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 transition-colors duration-200"
                   >
                     <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path>
                     </svg>
                   </button>
                 </div>
@@ -377,96 +367,63 @@ const VenueManager = () => {
                 {/* Calendar Header */}
                 <div className={`flex justify-between items-center mb-4 ${isRTL ? 'flex-row-reverse' : ''}`}>
                   <button
-                    onClick={() => {
-                      const newDate = new Date(selectedDate);
-                      newDate.setMonth(newDate.getMonth() - 1);
-                      setSelectedDate(newDate);
-                    }}
-                    className="btn-secondary"
+                    onClick={() => setSelectedDate(new Date(selectedDate.getFullYear(), selectedDate.getMonth() - 1, 1))}
+                    className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors duration-200"
                   >
-                    {t('wizard.previous')}
+                    <svg className="w-5 h-5 text-gray-600 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7"></path>
+                    </svg>
                   </button>
-                  <h4 className="text-xl font-semibold">
+                  
+                  <h4 className="text-lg font-medium text-gray-900 dark:text-gray-100 transition-colors duration-200">
                     {selectedDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
                   </h4>
+                  
                   <button
-                    onClick={() => {
-                      const newDate = new Date(selectedDate);
-                      newDate.setMonth(newDate.getMonth() + 1);
-                      setSelectedDate(newDate);
-                    }}
-                    className="btn-secondary"
+                    onClick={() => setSelectedDate(new Date(selectedDate.getFullYear(), selectedDate.getMonth() + 1, 1))}
+                    className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors duration-200"
                   >
-                    {t('wizard.next')}
+                    <svg className="w-5 h-5 text-gray-600 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7"></path>
+                    </svg>
                   </button>
                 </div>
 
                 {/* Calendar Grid */}
-                <div className="calendar-grid">
-                  {/* Day headers */}
+                <div className="grid grid-cols-7 gap-1 mb-2">
                   {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
-                    <div key={day} className="calendar-cell text-center font-medium text-gray-700 bg-gray-100">
+                    <div key={day} className="p-2 text-center text-sm font-medium text-gray-500 dark:text-gray-400 transition-colors duration-200">
                       {day}
                     </div>
                   ))}
-                  
-                  {/* Calendar days */}
+                </div>
+
+                <div className="grid grid-cols-7 gap-1">
                   {generateCalendarDays().map((day, index) => (
                     <div
                       key={index}
-                      className={`calendar-cell ${
-                        !day.isCurrentMonth ? 'text-gray-400 bg-gray-100' :
-                        day.isToday ? 'bg-blue-100 text-blue-900' :
-                        day.hasBooking ? 'occupied' : ''
-                      }`}
+                      className={`p-2 text-center text-sm rounded transition-colors duration-200 ${
+                        day.isCurrentMonth
+                          ? day.isToday
+                            ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-900 dark:text-blue-100'
+                            : 'text-gray-900 dark:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-700'
+                          : 'text-gray-400 dark:text-gray-600'
+                      } ${day.bookings.length > 0 ? 'bg-red-100 dark:bg-red-900/30' : ''}`}
                     >
-                      <div className="font-medium">{day.date.getDate()}</div>
-                      {day.hasBooking && day.isCurrentMonth && (
-                        <div className="text-xs mt-1">
-                          <div className="bg-red-200 text-red-800 px-1 rounded">Booked</div>
-                        </div>
+                      {day.date.getDate()}
+                      {day.bookings.length > 0 && (
+                        <div className="w-1 h-1 bg-red-500 dark:bg-red-400 rounded-full mx-auto mt-1"></div>
                       )}
                     </div>
                   ))}
                 </div>
 
-                {/* Legend */}
-                <div className={`mt-4 flex justify-center space-x-6 text-sm ${isRTL ? 'space-x-reverse flex-row-reverse' : ''}`}>
+                <div className="mt-4 text-xs text-gray-500 dark:text-gray-400 transition-colors duration-200">
                   <div className="flex items-center">
-                    <div className="w-4 h-4 bg-white border border-gray-300 mr-2 rtl:mr-0 rtl:ml-2"></div>
-                    {t('venues.available')}
-                  </div>
-                  <div className="flex items-center">
-                    <div className="w-4 h-4 bg-red-100 border border-red-300 mr-2 rtl:mr-0 rtl:ml-2"></div>
-                    Booked
-                  </div>
-                  <div className="flex items-center">
-                    <div className="w-4 h-4 bg-blue-100 border border-blue-300 mr-2 rtl:mr-0 rtl:ml-2"></div>
-                    Today
+                    <div className="w-2 h-2 bg-red-500 dark:bg-red-400 rounded-full mr-2"></div>
+                    Booked dates
                   </div>
                 </div>
-
-                {/* Upcoming Bookings */}
-                {bookings.length > 0 && (
-                  <div className="mt-6">
-                    <h4 className={`font-medium text-gray-900 mb-3 ${isRTL ? 'text-right' : ''}`}>
-                      Upcoming Bookings
-                    </h4>
-                    <div className="space-y-2">
-                      {bookings.map(booking => (
-                        <div key={booking.id} className={`flex items-center justify-between p-3 bg-gray-50 rounded-lg ${isRTL ? 'flex-row-reverse' : ''}`}>
-                          <div className={isRTL ? 'text-right' : ''}>
-                            <h5 className="font-medium text-gray-900">{booking.event_title}</h5>
-                            <p className="text-sm text-gray-600">
-                              {formatDate(booking.start_time)} - {formatDate(booking.end_time)}
-                            </p>
-                          </div>
-                          <span className="badge badge-success">Confirmed</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
               </div>
             </div>
           </div>
