@@ -541,6 +541,12 @@ export const translations = {
         tagline: "عالم الفعاليات الكامل",
         description: "حيث تصبح الأفكار تجارب"
       },
+      
+      // Banner Arabic
+      banner: {
+        phase2: "المرحلة الثانية",
+        moreFeatures: "المزيد من الميزات قريباً"
+      },
       manage: "إدارة",
       close: "إغلاق"
     },
