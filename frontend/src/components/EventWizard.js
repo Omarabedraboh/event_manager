@@ -149,9 +149,9 @@ const EventWizard = () => {
                 onChange={handleChange}
                 className="form-select"
               >
-                <option value="physical">{t('events.types.physical')}</option>
-                <option value="virtual">{t('events.types.virtual')}</option>
-                <option value="hybrid">{t('events.types.hybrid')}</option>
+                <option value="physical">{t('events.physical')}</option>
+                <option value="virtual">{t('events.virtual')}</option>
+                <option value="hybrid">{t('events.hybrid')}</option>
               </select>
             </div>
           </div>
