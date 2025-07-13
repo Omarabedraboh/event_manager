@@ -16,10 +16,10 @@ const Phase2Banner = () => {
             </div>
             <div>
               <span className="text-sm font-semibold">
-                🌟 {t('brand.name')} - {t('brand.tagline')}
+                🌟 {t('common.brand.name')} - {t('common.brand.tagline')}
               </span>
               <p className="text-xs opacity-90 mt-1">
-                {t('brand.description')}
+                {t('common.brand.description')}
               </p>
             </div>
           </div>
