@@ -7,5 +7,11 @@ module.exports = {
   theme: {
     extend: {},
   },
-  plugins: [],
+  plugins: [
+    require('@tailwindcss/forms'),
+  ],
+  // Enable RTL support
+  future: {
+    hoverOnlyWhenSupported: true,
+  },
 };
