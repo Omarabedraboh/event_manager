@@ -90,10 +90,10 @@ const LoginPage = () => {
         <div className="text-center">
           <div className="mb-4">
             <h2 className="text-4xl font-bold text-gray-900 dark:text-gray-100 transition-colors duration-200">
-              {t('brand.name')}
+              {t('common.brand.name')}
             </h2>
             <p className="text-lg text-blue-600 dark:text-blue-400 font-medium mt-2 transition-colors duration-200">
-              {t('brand.tagline')}
+              {t('common.brand.tagline')}
             </p>
           </div>
           <p className="mt-2 text-gray-600 dark:text-gray-400 transition-colors duration-200">
