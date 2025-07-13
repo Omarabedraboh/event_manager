@@ -174,7 +174,7 @@ function App() {
               
               {/* Venue Management */}
               <Route path="/venues" element={
-                <ProtectedRoute requiredRoles={['venue_owner', 'admin']}>
+                <ProtectedRoute requiredRoles={['organizer', 'venue_owner', 'admin']}>
                   <VenueManager />
                 </ProtectedRoute>
               } />
