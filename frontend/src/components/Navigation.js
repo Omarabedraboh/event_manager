@@ -29,7 +29,8 @@ const Navigation = () => {
       organizer: [
         { path: '/events/create', label: t('nav.createEvent') },
         { path: '/venues', label: t('nav.venues') },
-        { path: '/analytics', label: t('nav.analytics') }
+        { path: '/analytics', label: t('nav.analytics') },
+        { path: '/marketing', label: t('nav.marketing') }
       ],
       attendee: [
         { path: '/networking', label: t('nav.networking') }
