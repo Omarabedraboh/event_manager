@@ -308,7 +308,7 @@ const VenueManager = () => {
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 transition-colors duration-200">
+                      <label className="block text-sm font-medium text-gray-900 dark:text-gray-100 mb-1 transition-colors duration-200">
                         {t('venues.pricePerHour')}
                       </label>
                       <input
