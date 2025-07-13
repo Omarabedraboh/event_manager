@@ -4,6 +4,7 @@ import { useAuth } from '../App';
 import { useLanguage } from '../contexts/LanguageContext';
 import axios from 'axios';
 import Navigation from './Navigation';
+import Logo from './Logo';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
