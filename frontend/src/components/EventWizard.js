@@ -431,7 +431,7 @@ const EventWizard = () => {
                 }`}>
                   {step.number}
                 </div>
-                <div className={`${isRTL ? 'mr-2' : 'ml-2'} text-sm font-medium text-gray-900`}>
+                <div className={`${isRTL ? 'mr-2' : 'ml-2'} text-sm font-medium text-gray-900 dark:text-gray-100 transition-colors duration-200`}>
                   {step.title}
                 </div>
                 {index < steps.length - 1 && (
