@@ -12,8 +12,8 @@ const ThemeToggle = () => {
       className={`
         flex items-center justify-center w-10 h-10 rounded-lg transition-all duration-200
         ${isDarkMode 
-          ? 'bg-gray-700 hover:bg-gray-600 text-yellow-400' 
-          : 'bg-gray-100 hover:bg-gray-200 text-gray-600'
+          ? 'bg-gray-800 hover:bg-gray-700 text-yellow-400' 
+          : 'bg-gray-50 hover:bg-gray-100 text-gray-600'
         }
         focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2
         ${currentLanguage === 'ar' ? 'font-arabic' : ''}
