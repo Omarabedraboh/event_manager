@@ -528,6 +528,13 @@ export const translations = {
       notFound: "غير موجود",
       pageNotFound: "الصفحة غير موجودة",
       update: "تحديث",
+      
+      // Brand Arabic
+      brand: {
+        name: "EventSphere",
+        tagline: "عالم الفعاليات الكامل",
+        description: "حيث تصبح الأفكار تجارب"
+      },
       manage: "إدارة",
       close: "إغلاق"
     },
