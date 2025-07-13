@@ -2,6 +2,53 @@
 @tailwind components;
 @tailwind utilities;
 
+/* RTL Support */
+[dir="rtl"] {
+  direction: rtl;
+}
+
+[dir="ltr"] {
+  direction: ltr;
+}
+
+/* Arabic font support */
+@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700&display=swap');
+
+.font-arabic {
+  font-family: 'Cairo', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* RTL-aware spacing */
+.rtl\:space-x-reverse > :not([hidden]) ~ :not([hidden]) {
+  --tw-space-x-reverse: 1;
+}
+
+/* RTL margins and padding */
+.rtl\:ml-0 {
+  margin-left: 0;
+}
+
+.rtl\:mr-2 {
+  margin-right: 0.5rem;
+}
+
+.rtl\:text-right {
+  text-align: right;
+}
+
+.rtl\:text-left {
+  text-align: left;
+}
+
+/* RTL positioning */
+.rtl\:left-0 {
+  left: 0;
+}
+
+.rtl\:right-auto {
+  right: auto;
+}
+
 .App {
   text-align: center;
 }
