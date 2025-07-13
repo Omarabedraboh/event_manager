@@ -217,7 +217,8 @@ function App() {
           </div>
         </BrowserRouter>
       </AuthProvider>
-    </LanguageProvider>
+    </ThemeProvider>
+  </LanguageProvider>
   );
 }
 
