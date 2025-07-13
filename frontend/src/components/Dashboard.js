@@ -255,7 +255,7 @@ const Dashboard = () => {
           {user.role === 'venue_owner' && (
             <div className="card">
               <div className="card-header">
-                <h3 className={`text-lg font-medium text-gray-900 ${isRTL ? 'text-right' : ''}`}>
+                <h3 className={`text-lg font-medium text-gray-900 dark:text-gray-100 transition-colors duration-200 ${isRTL ? 'text-right' : ''}`}>
                   {t('dashboard.quickActions')}
                 </h3>
               </div>
