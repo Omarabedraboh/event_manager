@@ -145,10 +145,11 @@ const ProtectedRoute = ({ children, requiredRoles = [] }) => {
 function App() {
   return (
     <LanguageProvider>
-      <AuthProvider>
-        <BrowserRouter>
-          <div className="App min-h-screen bg-gray-50">
-            <Routes>
+      <ThemeProvider>
+        <AuthProvider>
+          <BrowserRouter>
+            <div className="App min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-200">
+              <Routes>
               <Route path="/login" element={<LoginPage />} />
               
               {/* Dashboard Routes */}
