@@ -278,7 +278,7 @@ const RegistrationPage = () => {
                   <div>
                     <span className="font-medium text-gray-700 dark:text-gray-300 transition-colors duration-200">{t('registration.type')}:</span>
                     <p className="text-gray-900 dark:text-gray-100 transition-colors duration-200">
-                      {t(`events.types.${event.event_type}`)}
+                      {t(`events.${event.event_type}`)}
                     </p>
                   </div>
 
