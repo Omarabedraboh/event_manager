@@ -142,7 +142,7 @@ const EventWizard = () => {
           </div>
 
           <div>
-            <label className={`block text-sm font-medium text-gray-700 ${isRTL ? 'text-right' : ''}`}>
+            <label className={`block text-sm font-medium text-gray-700 dark:text-gray-300 transition-colors duration-200 ${isRTL ? 'text-right' : ''}`}>
               {t('events.eventType')} {t('wizard.requiredField')}
             </label>
             <select
