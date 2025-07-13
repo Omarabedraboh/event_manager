@@ -11,7 +11,7 @@ from datetime import datetime, timedelta
 from typing import Dict, Any, Optional
 
 class EventManagementAPITester:
-    def __init__(self, base_url="https://c7217d9f-240d-46a6-a42b-b702cd89252f.preview.emergentagent.com"):
+    def __init__(self, base_url="https://71e2e852-b2f7-48b5-8610-a3981c8caca7.preview.emergentagent.com"):
         self.base_url = base_url
         self.api_url = f"{base_url}/api"
         self.tokens = {}  # Store tokens for different users
