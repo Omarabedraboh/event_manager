@@ -176,7 +176,7 @@ const RegistrationPage = () => {
                 </h2>
                 <div className="space-y-2 text-sm text-gray-600 dark:text-gray-400 transition-colors duration-200">
                   <p><strong className="text-gray-900 dark:text-gray-100 transition-colors duration-200">{t('registration.when')}:</strong> {formatDate(event.start_date)}</p>
-                  <p><strong className="text-gray-900 dark:text-gray-100 transition-colors duration-200">{t('registration.type')}:</strong> {t(`events.types.${event.event_type}`)}</p>
+                  <p><strong className="text-gray-900 dark:text-gray-100 transition-colors duration-200">{t('registration.type')}:</strong> {t(`events.${event.event_type}`)}</p>
                   {event.venue_id && (
                     <p><strong className="text-gray-900 dark:text-gray-100 transition-colors duration-200">{t('registration.venue')}:</strong> {event.venue_id}</p>
                   )}
