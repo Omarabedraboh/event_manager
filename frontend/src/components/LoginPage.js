@@ -78,14 +78,19 @@ const LoginPage = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100">
+    <div className={`min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 ${isRTL ? 'font-arabic' : ''}`}>
       <div className="max-w-md w-full space-y-8 p-8">
+        {/* Language Switcher */}
+        <div className={`flex ${isRTL ? 'justify-start' : 'justify-end'} mb-4`}>
+          <LanguageSwitcher />
+        </div>
+        
         <div className="text-center">
           <h2 className="text-3xl font-bold text-gray-900">
-            Event Management System
+            {t('nav.brand')}
           </h2>
           <p className="mt-2 text-gray-600">
-            {isLogin ? 'Sign in to your account' : 'Create your account'}
+            {isLogin ? t('auth.loginSubtitle') : t('auth.registerSubtitle')}
           </p>
         </div>
 
@@ -101,7 +106,7 @@ const LoginPage = () => {
                   disabled={loading}
                   className="btn-secondary text-xs py-1 px-2 capitalize"
                 >
-                  {demoUser.role.replace('_', ' ')}
+                  {t(`roles.${demoUser.role}`)}
                 </button>
               ))}
             </div>
@@ -114,7 +119,9 @@ const LoginPage = () => {
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700">Email</label>
+              <label className={`block text-sm font-medium text-gray-700 ${isRTL ? 'text-right' : 'text-left'}`}>
+                {t('auth.email')}
+              </label>
               <input
                 type="email"
                 name="email"
@@ -122,12 +129,15 @@ const LoginPage = () => {
                 onChange={handleChange}
                 required
                 className="form-input"
-                placeholder="Enter your email"
+                placeholder={t('auth.email')}
+                dir={isRTL ? 'rtl' : 'ltr'}
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700">Password</label>
+              <label className={`block text-sm font-medium text-gray-700 ${isRTL ? 'text-right' : 'text-left'}`}>
+                {t('auth.password')}
+              </label>
               <input
                 type="password"
                 name="password"
@@ -135,14 +145,17 @@ const LoginPage = () => {
                 onChange={handleChange}
                 required
                 className="form-input"
-                placeholder="Enter your password"
+                placeholder={t('auth.password')}
+                dir={isRTL ? 'rtl' : 'ltr'}
               />
             </div>
 
             {!isLogin && (
               <>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">Full Name</label>
+                  <label className={`block text-sm font-medium text-gray-700 ${isRTL ? 'text-right' : 'text-left'}`}>
+                    {t('auth.name')}
+                  </label>
                   <input
                     type="text"
                     name="name"
@@ -150,24 +163,27 @@ const LoginPage = () => {
                     onChange={handleChange}
                     required
                     className="form-input"
-                    placeholder="Enter your full name"
+                    placeholder={t('auth.name')}
+                    dir={isRTL ? 'rtl' : 'ltr'}
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">Role</label>
+                  <label className={`block text-sm font-medium text-gray-700 ${isRTL ? 'text-right' : 'text-left'}`}>
+                    {t('auth.role')}
+                  </label>
                   <select
                     name="role"
                     value={formData.role}
                     onChange={handleChange}
                     className="form-select"
                   >
-                    <option value="attendee">Attendee</option>
-                    <option value="organizer">Event Organizer</option>
-                    <option value="venue_owner">Venue Owner</option>
-                    <option value="speaker">Speaker</option>
-                    <option value="sponsor">Sponsor</option>
-                    <option value="admin">Admin</option>
+                    <option value="attendee">{t('roles.attendee')}</option>
+                    <option value="organizer">{t('roles.organizer')}</option>
+                    <option value="venue_owner">{t('roles.venue_owner')}</option>
+                    <option value="speaker">{t('roles.speaker')}</option>
+                    <option value="sponsor">{t('roles.sponsor')}</option>
+                    <option value="admin">{t('roles.admin')}</option>
                   </select>
                 </div>
               </>
@@ -186,11 +202,11 @@ const LoginPage = () => {
             >
               {loading ? (
                 <>
-                  <span className="loading-spinner mr-2"></span>
-                  {isLogin ? 'Signing in...' : 'Creating account...'}
+                  <span className={`loading-spinner ${isRTL ? 'ml-2' : 'mr-2'}`}></span>
+                  {isLogin ? t('auth.loginButton') + '...' : t('auth.registerButton') + '...'}
                 </>
               ) : (
-                isLogin ? 'Sign In' : 'Create Account'
+                isLogin ? t('auth.loginButton') : t('auth.registerButton')
               )}
             </button>
           </form>
@@ -201,8 +217,8 @@ const LoginPage = () => {
               className="text-blue-600 hover:text-blue-800 text-sm"
             >
               {isLogin 
-                ? "Don't have an account? Sign up" 
-                : "Already have an account? Sign in"
+                ? t('auth.noAccount') + ' ' + t('auth.registerHere')
+                : t('auth.haveAccount') + ' ' + t('auth.signInHere')
               }
             </button>
           </div>
