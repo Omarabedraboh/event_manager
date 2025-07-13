@@ -78,10 +78,10 @@ const Navigation = () => {
               <Link
                 key={item.path}
                 to={item.path}
-                className={`nav-link px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                className={`nav-link px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 ${
                   isActiveLink(item.path) 
-                    ? 'text-blue-600 bg-blue-50' 
-                    : 'text-gray-700 hover:text-gray-900 hover:bg-gray-50'
+                    ? 'text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20' 
+                    : 'text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-700'
                 }`}
               >
                 {item.label}
