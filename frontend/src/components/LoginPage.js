@@ -81,8 +81,9 @@ const LoginPage = () => {
   return (
     <div className={`min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 transition-colors duration-200 ${isRTL ? 'font-arabic' : ''}`}>
       <div className="max-w-md w-full space-y-8 p-8">
-        {/* Language Switcher */}
-        <div className={`flex ${isRTL ? 'justify-start' : 'justify-end'} mb-4`}>
+        {/* Language Switcher and Theme Toggle */}
+        <div className={`flex items-center gap-4 ${isRTL ? 'justify-start' : 'justify-end'} mb-4`}>
+          <ThemeToggle />
           <LanguageSwitcher />
         </div>
         
