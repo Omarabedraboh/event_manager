@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../App';
+import { useLanguage } from '../contexts/LanguageContext';
 import axios from 'axios';
 import Navigation from './Navigation';
 
@@ -10,6 +11,7 @@ const API = `${BACKEND_URL}/api`;
 const RegistrationPage = () => {
   const { eventId } = useParams();
   const { user } = useAuth();
+  const { t, isRTL } = useLanguage();
   const navigate = useNavigate();
   
   const [event, setEvent] = useState(null);
@@ -65,7 +67,7 @@ const RegistrationPage = () => {
 
   const handleRegister = async () => {
     if (!selectedTicket) {
-      setError('Please select a ticket type');
+      setError(t('registration.selectTicket'));
       return;
     }
 
@@ -244,13 +246,13 @@ const RegistrationPage = () => {
 
   if (!event) {
     return (
-      <div className="min-h-screen bg-gray-50">
+      <div className={`min-h-screen bg-gray-50 ${isRTL ? 'font-arabic' : ''}`}>
         <Navigation />
         <div className="max-w-4xl mx-auto py-6 px-4">
-          <div className="text-center">
-            <h1 className="text-2xl font-bold text-red-600">Event Not Found</h1>
+          <div className={`text-center ${isRTL ? 'text-right' : ''}`}>
+            <h1 className="text-2xl font-bold text-red-600">{t('events.eventNotFound')}</h1>
             <button onClick={() => navigate('/')} className="btn-primary mt-4">
-              Back to Dashboard
+              {t('events.backToDashboard')}
             </button>
           </div>
         </div>
@@ -259,40 +261,46 @@ const RegistrationPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className={`min-h-screen bg-gray-50 ${isRTL ? 'font-arabic' : ''}`}>
       <Navigation />
       
       <div className="max-w-4xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
         {/* Success Registration */}
         {isRegistered && registrationData ? (
-          <div className="text-center">
+          <div className={`text-center ${isRTL ? 'text-right' : ''}`}>
             <div className="qr-code-container mx-auto mb-8">
-              <div className="text-center mb-6">
+              <div className={`text-center mb-6 ${isRTL ? 'text-right' : ''}`}>
                 <div className="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-green-100 mb-4">
                   <svg className="h-8 w-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
                   </svg>
                 </div>
-                <h1 className="text-3xl font-bold text-green-600">Registration Successful!</h1>
-                <p className="text-gray-600 mt-2">You're all set for {event.title}</p>
+                <h1 className="text-3xl font-bold text-green-600">
+                  {t('registration.registrationSuccessful')}
+                </h1>
+                <p className="text-gray-600 mt-2">
+                  You're all set for {event.title}
+                </p>
               </div>
 
               {registrationData.qr_code && (
                 <div className="bg-white p-6 rounded-lg shadow-lg max-w-md mx-auto">
-                  <h3 className="text-lg font-medium text-gray-900 mb-4">Your Event Ticket</h3>
+                  <h3 className={`text-lg font-medium text-gray-900 mb-4 ${isRTL ? 'text-right' : ''}`}>
+                    Your Event Ticket
+                  </h3>
                   <img
                     src={registrationData.qr_code}
                     alt="QR Code"
                     className="qr-code-image mx-auto"
                   />
-                  <p className="text-sm text-gray-600 mb-4">
+                  <p className={`text-sm text-gray-600 mb-4 ${isRTL ? 'text-right' : ''}`}>
                     Present this QR code at the event entrance
                   </p>
                   <button
                     onClick={downloadQRCode}
                     className="btn-primary w-full"
                   >
-                    Download & Print Ticket
+                    {t('registration.downloadTicket')} & Print Ticket
                   </button>
                 </div>
               )}
@@ -300,21 +308,23 @@ const RegistrationPage = () => {
 
             <div className="card max-w-2xl mx-auto">
               <div className="card-header">
-                <h3 className="text-lg font-medium text-gray-900">Event Details</h3>
+                <h3 className={`text-lg font-medium text-gray-900 ${isRTL ? 'text-right' : ''}`}>
+                  {t('events.eventDetails')}
+                </h3>
               </div>
-              <div className="card-body text-left">
+              <div className={`card-body text-left ${isRTL ? 'text-right' : ''}`}>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <h4 className="font-medium text-gray-900">Event</h4>
+                    <h4 className="font-medium text-gray-900">{t('events.title')}</h4>
                     <p className="text-gray-600">{event.title}</p>
                   </div>
                   <div>
-                    <h4 className="font-medium text-gray-900">Date & Time</h4>
+                    <h4 className="font-medium text-gray-900">{t('common.date')} & {t('common.time')}</h4>
                     <p className="text-gray-600">{formatDate(event.start_date)}</p>
                   </div>
                   {venue && (
                     <div>
-                      <h4 className="font-medium text-gray-900">Venue</h4>
+                      <h4 className="font-medium text-gray-900">{t('events.venue')}</h4>
                       <p className="text-gray-600">{venue.name}</p>
                       <p className="text-sm text-gray-500">{venue.address}</p>
                     </div>
@@ -322,7 +332,7 @@ const RegistrationPage = () => {
                   {event.virtual_link && (
                     <div>
                       <h4 className="font-medium text-gray-900">Virtual Access</h4>
-                      <a href={event.virtual_link} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-800 break-all">
+                      <a href={event.virtual_link} target="_blank" rel="noopener noreferrer" className={`text-blue-600 hover:text-blue-800 break-all ${isRTL ? 'text-right' : ''}`}>
                         {event.virtual_link}
                       </a>
                     </div>
@@ -331,12 +341,12 @@ const RegistrationPage = () => {
               </div>
             </div>
 
-            <div className="mt-8">
-              <button onClick={() => navigate('/')} className="btn-secondary mr-4">
-                Back to Dashboard
+            <div className={`mt-8 ${isRTL ? 'space-x-reverse flex-row-reverse' : ''}`}>
+              <button onClick={() => navigate('/')} className={`btn-secondary ${isRTL ? 'ml-4' : 'mr-4'}`}>
+                {t('events.backToDashboard')}
               </button>
               <button onClick={downloadQRCode} className="btn-primary">
-                Download Ticket Again
+                {t('registration.downloadTicket')} Again
               </button>
             </div>
           </div>
@@ -346,17 +356,21 @@ const RegistrationPage = () => {
             {/* Event Header */}
             <div className="card mb-8">
               <div className="card-body">
-                <div className="flex items-start justify-between">
+                <div className={`flex items-start justify-between ${isRTL ? 'flex-row-reverse' : ''}`}>
                   <div className="flex-1">
-                    <h1 className="text-3xl font-bold text-gray-900 mb-2">{event.title}</h1>
-                    <p className="text-gray-600 mb-4">{event.description}</p>
+                    <h1 className={`text-3xl font-bold text-gray-900 mb-2 ${isRTL ? 'text-right' : ''}`}>
+                      {event.title}
+                    </h1>
+                    <p className={`text-gray-600 mb-4 ${isRTL ? 'text-right' : ''}`}>
+                      {event.description}
+                    </p>
                     
-                    <div className="flex items-center space-x-4 mb-4">
+                    <div className={`flex items-center space-x-4 rtl:space-x-reverse mb-4 ${isRTL ? 'flex-row-reverse' : ''}`}>
                       <span className={`badge ${getEventTypeClass(event.event_type)}`}>
-                        {event.event_type}
+                        {t(`events.${event.event_type}`)}
                       </span>
                       <span className="text-gray-600">
-                        <svg className="w-4 h-4 inline mr-1" fill="currentColor" viewBox="0 0 20 20">
+                        <svg className="w-4 h-4 inline mr-1 rtl:mr-0 rtl:ml-1" fill="currentColor" viewBox="0 0 20 20">
                           <path fillRule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zM4 7h12v9H4V7z" clipRule="evenodd" />
                         </svg>
                         {formatDate(event.start_date)}
@@ -366,15 +380,21 @@ const RegistrationPage = () => {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       {venue && (
                         <div>
-                          <h4 className="font-medium text-gray-900">Venue</h4>
-                          <p className="text-gray-600">{venue.name}</p>
-                          <p className="text-sm text-gray-500">{venue.address}</p>
+                          <h4 className={`font-medium text-gray-900 ${isRTL ? 'text-right' : ''}`}>
+                            {t('events.venue')}
+                          </h4>
+                          <p className={`text-gray-600 ${isRTL ? 'text-right' : ''}`}>{venue.name}</p>
+                          <p className={`text-sm text-gray-500 ${isRTL ? 'text-right' : ''}`}>{venue.address}</p>
                         </div>
                       )}
                       {event.virtual_link && (
                         <div>
-                          <h4 className="font-medium text-gray-900">Virtual Access</h4>
-                          <p className="text-gray-600">Link will be provided after registration</p>
+                          <h4 className={`font-medium text-gray-900 ${isRTL ? 'text-right' : ''}`}>
+                            Virtual Access
+                          </h4>
+                          <p className={`text-gray-600 ${isRTL ? 'text-right' : ''}`}>
+                            Link will be provided after registration
+                          </p>
                         </div>
                       )}
                     </div>
@@ -393,7 +413,9 @@ const RegistrationPage = () => {
             {/* Ticket Selection */}
             <div className="card mb-8">
               <div className="card-header">
-                <h3 className="text-lg font-medium text-gray-900">Select Your Ticket</h3>
+                <h3 className={`text-lg font-medium text-gray-900 ${isRTL ? 'text-right' : ''}`}>
+                  {t('registration.selectTicket')}
+                </h3>
               </div>
               <div className="card-body">
                 {tickets.length > 0 ? (
@@ -412,8 +434,8 @@ const RegistrationPage = () => {
                           }`}
                           onClick={() => isAvailable && setSelectedTicket(ticket.id)}
                         >
-                          <div className="flex items-center justify-between">
-                            <div className="flex items-center space-x-3">
+                          <div className={`flex items-center justify-between ${isRTL ? 'flex-row-reverse' : ''}`}>
+                            <div className={`flex items-center space-x-3 ${isRTL ? 'space-x-reverse flex-row-reverse' : ''}`}>
                               <input
                                 type="radio"
                                 name="ticket"
@@ -423,11 +445,11 @@ const RegistrationPage = () => {
                                 disabled={!isAvailable}
                                 className="text-blue-600"
                               />
-                              <div className="flex items-center space-x-2">
+                              <div className={`flex items-center space-x-2 ${isRTL ? 'space-x-reverse flex-row-reverse' : ''}`}>
                                 {getTicketTypeIcon(ticket.ticket_type)}
-                                <div>
+                                <div className={isRTL ? 'text-right' : ''}>
                                   <h4 className={`font-medium capitalize ${isAvailable ? 'text-gray-900' : 'text-gray-500'}`}>
-                                    {ticket.ticket_type.replace('_', ' ')}
+                                    {t(`tickets.${ticket.ticket_type}`)}
                                   </h4>
                                   <p className={`text-sm ${isAvailable ? 'text-gray-600' : 'text-gray-400'}`}>
                                     {ticket.quantity_available - ticket.quantity_sold} of {ticket.quantity_available} available
@@ -435,12 +457,12 @@ const RegistrationPage = () => {
                                 </div>
                               </div>
                             </div>
-                            <div className="text-right">
+                            <div className={`text-right ${isRTL ? 'text-left' : ''}`}>
                               <p className={`text-2xl font-bold ${isAvailable ? 'text-gray-900' : 'text-gray-500'}`}>
                                 ${ticket.price}
                               </p>
                               {!isAvailable && (
-                                <span className="badge badge-danger text-xs">Sold Out</span>
+                                <span className="badge badge-danger text-xs">{t('registration.ticketSoldOut')}</span>
                               )}
                             </div>
                           </div>
@@ -449,7 +471,9 @@ const RegistrationPage = () => {
                     })}
                   </div>
                 ) : (
-                  <p className="text-gray-500 text-center py-8">No tickets available for this event</p>
+                  <p className={`text-gray-500 text-center py-8 ${isRTL ? 'text-right' : ''}`}>
+                    No tickets available for this event
+                  </p>
                 )}
               </div>
             </div>
@@ -458,9 +482,11 @@ const RegistrationPage = () => {
             {tickets.length > 0 && (
               <div className="card">
                 <div className="card-body">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <h3 className="text-lg font-medium text-gray-900">Complete Registration</h3>
+                  <div className={`flex items-center justify-between ${isRTL ? 'flex-row-reverse' : ''}`}>
+                    <div className={isRTL ? 'text-right' : ''}>
+                      <h3 className="text-lg font-medium text-gray-900">
+                        {t('registration.confirmRegistration')}
+                      </h3>
                       <p className="text-gray-600">
                         {selectedTicket ? 'Proceed with payment to secure your spot' : 'Select a ticket type to continue'}
                       </p>
@@ -472,18 +498,18 @@ const RegistrationPage = () => {
                     >
                       {registering ? (
                         <>
-                          <span className="loading-spinner mr-2"></span>
+                          <span className={`loading-spinner ${isRTL ? 'ml-2' : 'mr-2'}`}></span>
                           Processing...
                         </>
                       ) : (
-                        'Complete Registration'
+                        t('registration.confirmRegistration')
                       )}
                     </button>
                   </div>
                   
                   {selectedTicket && (
                     <div className="mt-4 p-4 bg-blue-50 rounded-lg">
-                      <p className="text-sm text-blue-700">
+                      <p className={`text-sm text-blue-700 ${isRTL ? 'text-right' : ''}`}>
                         <strong>Note:</strong> This is a demo payment system. Your registration will be confirmed immediately with a QR code ticket.
                       </p>
                     </div>

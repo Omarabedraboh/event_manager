@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../App';
+import { useLanguage } from '../contexts/LanguageContext';
 import axios from 'axios';
 import Navigation from './Navigation';
 
@@ -8,6 +9,7 @@ const API = `${BACKEND_URL}/api`;
 
 const VenueManager = () => {
   const { user } = useAuth();
+  const { t, isRTL } = useLanguage();
   const [venues, setVenues] = useState([]);
   const [bookings, setBookings] = useState([]);
   const [showVenueForm, setShowVenueForm] = useState(false);
@@ -155,25 +157,27 @@ const VenueManager = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className={`min-h-screen bg-gray-50 ${isRTL ? 'font-arabic' : ''}`}>
       <Navigation />
       
       <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="mb-8">
-          <div className="flex justify-between items-center">
+          <div className={`flex justify-between items-center ${isRTL ? 'flex-row-reverse' : ''}`}>
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">
-                {user.role === 'venue_owner' ? 'My Venues' : 'Venue Management'}
+              <h1 className={`text-3xl font-bold text-gray-900 ${isRTL ? 'text-right' : ''}`}>
+                {user.role === 'venue_owner' ? t('nav.myVenues') : t('venues.title')}
               </h1>
-              <p className="text-gray-600">Manage venue availability and bookings</p>
+              <p className={`text-gray-600 ${isRTL ? 'text-right' : ''}`}>
+                Manage venue availability and bookings
+              </p>
             </div>
             {user.role === 'venue_owner' && (
               <button
                 onClick={() => setShowVenueForm(true)}
                 className="btn-primary"
               >
-                Add New Venue
+                {t('venues.createVenue')}
               </button>
             )}
           </div>
@@ -191,24 +195,30 @@ const VenueManager = () => {
           {venues.map(venue => (
             <div key={venue.id} className="card">
               <div className="card-header">
-                <h3 className="text-lg font-medium text-gray-900">{venue.name}</h3>
-                <p className="text-sm text-gray-500">{venue.address}</p>
+                <h3 className={`text-lg font-medium text-gray-900 ${isRTL ? 'text-right' : ''}`}>
+                  {venue.name}
+                </h3>
+                <p className={`text-sm text-gray-500 ${isRTL ? 'text-right' : ''}`}>
+                  {venue.address}
+                </p>
               </div>
               <div className="card-body">
-                <p className="text-gray-600 mb-4">{venue.description}</p>
+                <p className={`text-gray-600 mb-4 ${isRTL ? 'text-right' : ''}`}>
+                  {venue.description}
+                </p>
                 
                 <div className="space-y-2 mb-4">
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Capacity:</span>
+                  <div className={`flex justify-between ${isRTL ? 'flex-row-reverse' : ''}`}>
+                    <span className="text-gray-600">{t('venues.capacity')}:</span>
                     <span className="font-medium">{venue.capacity} people</span>
                   </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Price per hour:</span>
+                  <div className={`flex justify-between ${isRTL ? 'flex-row-reverse' : ''}`}>
+                    <span className="text-gray-600">{t('venues.pricePerHour')}:</span>
                     <span className="font-medium">${venue.price_per_hour}</span>
                   </div>
                 </div>
 
-                <div className="flex space-x-2">
+                <div className={`flex space-x-2 ${isRTL ? 'space-x-reverse flex-row-reverse' : ''}`}>
                   <button
                     onClick={() => {
                       setShowCalendar(venue.id);
@@ -225,7 +235,7 @@ const VenueManager = () => {
                       }}
                       className="btn-secondary flex-1 text-sm"
                     >
-                      Book Now
+                      {t('venues.bookVenue')}
                     </button>
                   )}
                 </div>
@@ -235,13 +245,13 @@ const VenueManager = () => {
         </div>
 
         {venues.length === 0 && (
-          <div className="text-center py-12">
+          <div className={`text-center py-12 ${isRTL ? 'text-right' : ''}`}>
             <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
             </svg>
-            <h3 className="mt-2 text-sm font-medium text-gray-900">No venues</h3>
+            <h3 className="mt-2 text-sm font-medium text-gray-900">{t('venues.noVenues')}</h3>
             <p className="mt-1 text-sm text-gray-500">
-              {user.role === 'venue_owner' ? 'Get started by creating your first venue.' : 'No venues available yet.'}
+              {user.role === 'venue_owner' ? t('venues.createFirstVenue') : 'No venues available yet.'}
             </p>
           </div>
         )}
@@ -251,46 +261,59 @@ const VenueManager = () => {
           <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
             <div className="relative top-20 mx-auto p-5 border max-w-md shadow-lg rounded-md bg-white">
               <div className="mt-3">
-                <h3 className="text-lg font-medium text-gray-900 mb-4">Add New Venue</h3>
+                <h3 className={`text-lg font-medium text-gray-900 mb-4 ${isRTL ? 'text-right' : ''}`}>
+                  {t('venues.createVenue')}
+                </h3>
                 <form onSubmit={handleVenueSubmit} className="space-y-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">Venue Name</label>
+                    <label className={`block text-sm font-medium text-gray-700 ${isRTL ? 'text-right' : ''}`}>
+                      {t('venues.venueName')}
+                    </label>
                     <input
                       type="text"
                       value={venueForm.name}
                       onChange={(e) => setVenueForm({...venueForm, name: e.target.value})}
                       required
                       className="form-input"
-                      placeholder="Enter venue name"
+                      placeholder={t('venues.venueName')}
+                      dir={isRTL ? 'rtl' : 'ltr'}
                     />
                   </div>
                   
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">Description</label>
+                    <label className={`block text-sm font-medium text-gray-700 ${isRTL ? 'text-right' : ''}`}>
+                      {t('venues.venueDescription')}
+                    </label>
                     <textarea
                       value={venueForm.description}
                       onChange={(e) => setVenueForm({...venueForm, description: e.target.value})}
                       rows="3"
                       className="form-textarea"
-                      placeholder="Describe the venue"
+                      placeholder={t('venues.venueDescription')}
+                      dir={isRTL ? 'rtl' : 'ltr'}
                     />
                   </div>
                   
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">Address</label>
+                    <label className={`block text-sm font-medium text-gray-700 ${isRTL ? 'text-right' : ''}`}>
+                      {t('venues.address')}
+                    </label>
                     <input
                       type="text"
                       value={venueForm.address}
                       onChange={(e) => setVenueForm({...venueForm, address: e.target.value})}
                       required
                       className="form-input"
-                      placeholder="Enter venue address"
+                      placeholder={t('venues.address')}
+                      dir={isRTL ? 'rtl' : 'ltr'}
                     />
                   </div>
                   
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700">Capacity</label>
+                      <label className={`block text-sm font-medium text-gray-700 ${isRTL ? 'text-right' : ''}`}>
+                        {t('venues.capacity')}
+                      </label>
                       <input
                         type="number"
                         min="1"
@@ -300,7 +323,9 @@ const VenueManager = () => {
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700">Price/Hour ($)</label>
+                      <label className={`block text-sm font-medium text-gray-700 ${isRTL ? 'text-right' : ''}`}>
+                        {t('venues.pricePerHour')} ($)
+                      </label>
                       <input
                         type="number"
                         min="0"
@@ -312,14 +337,16 @@ const VenueManager = () => {
                     </div>
                   </div>
                   
-                  <div className="flex space-x-3">
-                    <button type="submit" className="btn-primary flex-1">Add Venue</button>
+                  <div className={`flex space-x-3 ${isRTL ? 'space-x-reverse flex-row-reverse' : ''}`}>
+                    <button type="submit" className="btn-primary flex-1">
+                      {t('venues.saveVenue')}
+                    </button>
                     <button
                       type="button"
                       onClick={() => setShowVenueForm(false)}
                       className="btn-secondary flex-1"
                     >
-                      Cancel
+                      {t('common.cancel')}
                     </button>
                   </div>
                 </form>
@@ -333,9 +360,9 @@ const VenueManager = () => {
           <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
             <div className="relative top-10 mx-auto p-5 border max-w-4xl shadow-lg rounded-md bg-white">
               <div className="mt-3">
-                <div className="flex justify-between items-center mb-4">
-                  <h3 className="text-lg font-medium text-gray-900">
-                    {venues.find(v => v.id === showCalendar)?.name} - Availability Calendar
+                <div className={`flex justify-between items-center mb-4 ${isRTL ? 'flex-row-reverse' : ''}`}>
+                  <h3 className={`text-lg font-medium text-gray-900 ${isRTL ? 'text-right' : ''}`}>
+                    {venues.find(v => v.id === showCalendar)?.name} - {t('venues.availability')} Calendar
                   </h3>
                   <button
                     onClick={() => setShowCalendar(null)}
@@ -348,7 +375,7 @@ const VenueManager = () => {
                 </div>
 
                 {/* Calendar Header */}
-                <div className="flex justify-between items-center mb-4">
+                <div className={`flex justify-between items-center mb-4 ${isRTL ? 'flex-row-reverse' : ''}`}>
                   <button
                     onClick={() => {
                       const newDate = new Date(selectedDate);
@@ -357,7 +384,7 @@ const VenueManager = () => {
                     }}
                     className="btn-secondary"
                   >
-                    Previous
+                    {t('wizard.previous')}
                   </button>
                   <h4 className="text-xl font-semibold">
                     {selectedDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
@@ -370,7 +397,7 @@ const VenueManager = () => {
                     }}
                     className="btn-secondary"
                   >
-                    Next
+                    {t('wizard.next')}
                   </button>
                 </div>
 
@@ -404,17 +431,17 @@ const VenueManager = () => {
                 </div>
 
                 {/* Legend */}
-                <div className="mt-4 flex justify-center space-x-6 text-sm">
+                <div className={`mt-4 flex justify-center space-x-6 text-sm ${isRTL ? 'space-x-reverse flex-row-reverse' : ''}`}>
                   <div className="flex items-center">
-                    <div className="w-4 h-4 bg-white border border-gray-300 mr-2"></div>
-                    Available
+                    <div className="w-4 h-4 bg-white border border-gray-300 mr-2 rtl:mr-0 rtl:ml-2"></div>
+                    {t('venues.available')}
                   </div>
                   <div className="flex items-center">
-                    <div className="w-4 h-4 bg-red-100 border border-red-300 mr-2"></div>
+                    <div className="w-4 h-4 bg-red-100 border border-red-300 mr-2 rtl:mr-0 rtl:ml-2"></div>
                     Booked
                   </div>
                   <div className="flex items-center">
-                    <div className="w-4 h-4 bg-blue-100 border border-blue-300 mr-2"></div>
+                    <div className="w-4 h-4 bg-blue-100 border border-blue-300 mr-2 rtl:mr-0 rtl:ml-2"></div>
                     Today
                   </div>
                 </div>
@@ -422,11 +449,13 @@ const VenueManager = () => {
                 {/* Upcoming Bookings */}
                 {bookings.length > 0 && (
                   <div className="mt-6">
-                    <h4 className="font-medium text-gray-900 mb-3">Upcoming Bookings</h4>
+                    <h4 className={`font-medium text-gray-900 mb-3 ${isRTL ? 'text-right' : ''}`}>
+                      Upcoming Bookings
+                    </h4>
                     <div className="space-y-2">
                       {bookings.map(booking => (
-                        <div key={booking.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                          <div>
+                        <div key={booking.id} className={`flex items-center justify-between p-3 bg-gray-50 rounded-lg ${isRTL ? 'flex-row-reverse' : ''}`}>
+                          <div className={isRTL ? 'text-right' : ''}>
                             <h5 className="font-medium text-gray-900">{booking.event_title}</h5>
                             <p className="text-sm text-gray-600">
                               {formatDate(booking.start_time)} - {formatDate(booking.end_time)}
