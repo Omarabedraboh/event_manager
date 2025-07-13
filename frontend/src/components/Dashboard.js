@@ -203,8 +203,8 @@ const Dashboard = () => {
                 <div className="card-body">
                   <div className={`flex items-center ${isRTL ? 'flex-row-reverse' : ''}`}>
                     <div className={`flex-1 ${isRTL ? 'text-right' : ''}`}>
-                      <p className="text-sm font-medium text-gray-600">{t('dashboard.totalBookings')}</p>
-                      <p className="text-2xl font-bold text-gray-900">{stats.total_bookings || 0}</p>
+                      <p className="text-sm font-medium text-gray-600 dark:text-gray-400 transition-colors duration-200">{t('dashboard.totalBookings')}</p>
+                      <p className="text-2xl font-bold text-gray-900 dark:text-gray-100 transition-colors duration-200">{stats.total_bookings || 0}</p>
                     </div>
                     <div className="p-3 bg-green-100 dark:bg-green-900/30 rounded-full transition-colors duration-200">
                       <svg className="w-6 h-6 text-green-600" fill="currentColor" viewBox="0 0 20 20">
