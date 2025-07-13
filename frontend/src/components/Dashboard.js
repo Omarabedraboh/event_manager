@@ -74,17 +74,17 @@ const Dashboard = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className={`min-h-screen bg-gray-50 ${isRTL ? 'font-arabic' : ''}`}>
       <Navigation />
       
       <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
         {/* Welcome Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900">
-            Welcome back, {user.name}!
+            {t('dashboard.welcome', { name: user.name })}
           </h1>
           <p className="text-gray-600 capitalize">
-            {user.role.replace('_', ' ')} Dashboard
+            {t(`roles.${user.role}`)} {t('nav.dashboard')}
           </p>
         </div>
 
@@ -94,9 +94,9 @@ const Dashboard = () => {
             <>
               <div className="card">
                 <div className="card-body">
-                  <div className="flex items-center">
-                    <div className="flex-1">
-                      <p className="text-sm font-medium text-gray-600">Total Events</p>
+                  <div className={`flex items-center ${isRTL ? 'flex-row-reverse' : ''}`}>
+                    <div className={`flex-1 ${isRTL ? 'text-right' : ''}`}>
+                      <p className="text-sm font-medium text-gray-600">{t('dashboard.totalEvents')}</p>
                       <p className="text-2xl font-bold text-gray-900">{stats.total_events || 0}</p>
                     </div>
                     <div className="p-3 bg-blue-100 rounded-full">
@@ -110,9 +110,9 @@ const Dashboard = () => {
 
               <div className="card">
                 <div className="card-body">
-                  <div className="flex items-center">
-                    <div className="flex-1">
-                      <p className="text-sm font-medium text-gray-600">Published Events</p>
+                  <div className={`flex items-center ${isRTL ? 'flex-row-reverse' : ''}`}>
+                    <div className={`flex-1 ${isRTL ? 'text-right' : ''}`}>
+                      <p className="text-sm font-medium text-gray-600">{t('dashboard.publishedEvents')}</p>
                       <p className="text-2xl font-bold text-gray-900">{stats.published_events || 0}</p>
                     </div>
                     <div className="p-3 bg-green-100 rounded-full">
@@ -126,9 +126,9 @@ const Dashboard = () => {
 
               <div className="card">
                 <div className="card-body">
-                  <div className="flex items-center">
-                    <div className="flex-1">
-                      <p className="text-sm font-medium text-gray-600">Total Registrations</p>
+                  <div className={`flex items-center ${isRTL ? 'flex-row-reverse' : ''}`}>
+                    <div className={`flex-1 ${isRTL ? 'text-right' : ''}`}>
+                      <p className="text-sm font-medium text-gray-600">{t('dashboard.totalRegistrations')}</p>
                       <p className="text-2xl font-bold text-gray-900">{stats.total_registrations || 0}</p>
                     </div>
                     <div className="p-3 bg-purple-100 rounded-full">
@@ -146,9 +146,9 @@ const Dashboard = () => {
             <>
               <div className="card">
                 <div className="card-body">
-                  <div className="flex items-center">
-                    <div className="flex-1">
-                      <p className="text-sm font-medium text-gray-600">My Registrations</p>
+                  <div className={`flex items-center ${isRTL ? 'flex-row-reverse' : ''}`}>
+                    <div className={`flex-1 ${isRTL ? 'text-right' : ''}`}>
+                      <p className="text-sm font-medium text-gray-600">{t('dashboard.myRegistrations')}</p>
                       <p className="text-2xl font-bold text-gray-900">{stats.my_registrations || 0}</p>
                     </div>
                     <div className="p-3 bg-blue-100 rounded-full">
@@ -162,9 +162,9 @@ const Dashboard = () => {
 
               <div className="card">
                 <div className="card-body">
-                  <div className="flex items-center">
-                    <div className="flex-1">
-                      <p className="text-sm font-medium text-gray-600">Available Events</p>
+                  <div className={`flex items-center ${isRTL ? 'flex-row-reverse' : ''}`}>
+                    <div className={`flex-1 ${isRTL ? 'text-right' : ''}`}>
+                      <p className="text-sm font-medium text-gray-600">{t('dashboard.upcomingEvents')}</p>
                       <p className="text-2xl font-bold text-gray-900">{events.length}</p>
                     </div>
                     <div className="p-3 bg-green-100 rounded-full">
@@ -182,9 +182,9 @@ const Dashboard = () => {
             <>
               <div className="card">
                 <div className="card-body">
-                  <div className="flex items-center">
-                    <div className="flex-1">
-                      <p className="text-sm font-medium text-gray-600">My Venues</p>
+                  <div className={`flex items-center ${isRTL ? 'flex-row-reverse' : ''}`}>
+                    <div className={`flex-1 ${isRTL ? 'text-right' : ''}`}>
+                      <p className="text-sm font-medium text-gray-600">{t('dashboard.totalVenues')}</p>
                       <p className="text-2xl font-bold text-gray-900">{stats.total_venues || 0}</p>
                     </div>
                     <div className="p-3 bg-blue-100 rounded-full">
@@ -198,9 +198,9 @@ const Dashboard = () => {
 
               <div className="card">
                 <div className="card-body">
-                  <div className="flex items-center">
-                    <div className="flex-1">
-                      <p className="text-sm font-medium text-gray-600">Total Bookings</p>
+                  <div className={`flex items-center ${isRTL ? 'flex-row-reverse' : ''}`}>
+                    <div className={`flex-1 ${isRTL ? 'text-right' : ''}`}>
+                      <p className="text-sm font-medium text-gray-600">{t('dashboard.totalBookings')}</p>
                       <p className="text-2xl font-bold text-gray-900">{stats.total_bookings || 0}</p>
                     </div>
                     <div className="p-3 bg-green-100 rounded-full">
@@ -220,7 +220,9 @@ const Dashboard = () => {
           {user.role === 'organizer' && (
             <div className="card">
               <div className="card-header">
-                <h3 className="text-lg font-medium text-gray-900">Quick Actions</h3>
+                <h3 className={`text-lg font-medium text-gray-900 ${isRTL ? 'text-right' : ''}`}>
+                  {t('dashboard.quickActions')}
+                </h3>
               </div>
               <div className="card-body">
                 <div className="space-y-3">
@@ -228,19 +230,19 @@ const Dashboard = () => {
                     onClick={() => navigate('/events/create')}
                     className="btn-primary w-full"
                   >
-                    Create New Event
+                    {t('events.createEvent')}
                   </button>
                   <button
                     onClick={() => navigate('/venues')}
                     className="btn-secondary w-full"
                   >
-                    Manage Venues
+                    {t('nav.venues')}
                   </button>
                   <button
                     onClick={() => navigate('/analytics')}
                     className="btn-secondary w-full"
                   >
-                    View Analytics
+                    {t('nav.analytics')}
                   </button>
                 </div>
               </div>
@@ -250,7 +252,9 @@ const Dashboard = () => {
           {user.role === 'venue_owner' && (
             <div className="card">
               <div className="card-header">
-                <h3 className="text-lg font-medium text-gray-900">Quick Actions</h3>
+                <h3 className={`text-lg font-medium text-gray-900 ${isRTL ? 'text-right' : ''}`}>
+                  {t('dashboard.quickActions')}
+                </h3>
               </div>
               <div className="card-body">
                 <div className="space-y-3">
@@ -258,13 +262,13 @@ const Dashboard = () => {
                     onClick={() => navigate('/venues')}
                     className="btn-primary w-full"
                   >
-                    Manage My Venues
+                    {t('nav.myVenues')}
                   </button>
                   <button
                     onClick={() => navigate('/venues')}
                     className="btn-secondary w-full"
                   >
-                    Add New Venue
+                    {t('venues.createVenue')}
                   </button>
                 </div>
               </div>
@@ -274,8 +278,8 @@ const Dashboard = () => {
           {/* Recent Events */}
           <div className="card">
             <div className="card-header">
-              <h3 className="text-lg font-medium text-gray-900">
-                {user.role === 'attendee' ? 'Available Events' : 'Recent Events'}
+              <h3 className={`text-lg font-medium text-gray-900 ${isRTL ? 'text-right' : ''}`}>
+                {user.role === 'attendee' ? t('dashboard.upcomingEvents') : t('dashboard.recentActivity')}
               </h3>
             </div>
             <div className="card-body">
@@ -283,23 +287,90 @@ const Dashboard = () => {
                 <div className="space-y-3 max-h-64 overflow-y-auto">
                   {events.slice(0, 5).map((event) => (
                     <div key={event.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                      <div className="flex-1">
+                      <div className={`flex-1 ${isRTL ? 'text-right' : ''}`}>
                         <h4 className="font-medium text-gray-900">{event.title}</h4>
                         <p className="text-sm text-gray-600">{formatDate(event.start_date)}</p>
                         <span className={`badge ${getEventTypeClass(event.event_type)}`}>
-                          {event.event_type}
+                          {t(`events.${event.event_type}`)}
                         </span>
                       </div>
-                      <div className="flex space-x-2">
+                      <div className={`flex space-x-2 ${isRTL ? 'space-x-reverse' : ''}`}>
                         {user.role === 'attendee' && (
                           <button
                             onClick={() => navigate(`/register/${event.id}`)}
                             className="btn-primary text-xs py-1 px-2"
                           >
-                            Register
+                            {t('registration.registerForEvent')}
                           </button>
                         )}
                         {(user.role === 'organizer' || user.role === 'admin') && (
+                          <button
+                            onClick={() => navigate(`/events/${event.id}`)}
+                            className="btn-secondary text-xs py-1 px-2"
+                          >
+                            {t('common.view')}
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className={`text-center py-8 ${isRTL ? 'text-right' : ''}`}>
+                  <p className="text-gray-500">{t('events.noEvents')}</p>
+                  {user.role === 'organizer' && (
+                    <button
+                      onClick={() => navigate('/events/create')}
+                      className="btn-primary mt-3"
+                    >
+                      {t('events.createFirstEvent')}
+                    </button>
+                  )}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Attendee Registrations */}
+        {user.role === 'attendee' && registrations.length > 0 && (
+          <div className="card">
+            <div className="card-header">
+              <h3 className={`text-lg font-medium text-gray-900 ${isRTL ? 'text-right' : ''}`}>
+                {t('registration.myRegistrations')}
+              </h3>
+            </div>
+            <div className="card-body">
+              <div className="space-y-4">
+                {registrations.slice(0, 3).map((registration) => (
+                  <div key={registration.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                    <div className={`flex-1 ${isRTL ? 'text-right' : ''}`}>
+                      <h4 className="font-medium text-gray-900">{registration.event?.title}</h4>
+                      <p className="text-sm text-gray-600">
+                        {registration.event ? formatDate(registration.event.start_date) : ''}
+                      </p>
+                      <span className="badge badge-success">
+                        {registration.ticket?.ticket_type}
+                      </span>
+                    </div>
+                    <div className="flex items-center space-x-4 rtl:space-x-reverse">
+                      {registration.qr_code && (
+                        <img 
+                          src={registration.qr_code} 
+                          alt="QR Code" 
+                          className="w-16 h-16 border rounded"
+                        />
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
                           <button
                             onClick={() => navigate(`/events/${event.id}`)}
                             className="btn-secondary text-xs py-1 px-2"
