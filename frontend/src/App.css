@@ -241,7 +241,7 @@
   background: #9ca3af;
 }
 
-/* Calendar styles */
+/* Calendar styles with dark mode */
 .calendar-grid {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
@@ -250,16 +250,21 @@
   border: 1px solid #e5e7eb;
 }
 
+.dark .calendar-grid {
+  background-color: #4b5563;
+  border: 1px solid #4b5563;
+}
+
 .calendar-cell {
-  @apply bg-white p-2 min-h-[100px] border border-gray-200 hover:bg-gray-50 cursor-pointer;
+  @apply bg-white dark:bg-gray-800 p-2 min-h-[100px] border border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer transition-colors duration-200;
 }
 
 .calendar-cell.occupied {
-  @apply bg-red-100 hover:bg-red-200;
+  @apply bg-red-100 dark:bg-red-900/30 hover:bg-red-200 dark:hover:bg-red-900/50;
 }
 
 .calendar-cell.selected {
-  @apply bg-blue-100 hover:bg-blue-200;
+  @apply bg-blue-100 dark:bg-blue-900/30 hover:bg-blue-200 dark:hover:bg-blue-900/50;
 }
 
 /* Event type badges */
