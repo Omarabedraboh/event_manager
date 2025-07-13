@@ -354,7 +354,7 @@ const EventWizard = () => {
               <h4 className={`font-medium text-gray-900 dark:text-gray-100 transition-colors duration-200 ${isRTL ? 'text-right' : ''}`}>
                 {t('events.virtualLinkLabel')}
               </h4>
-              <p className={`text-gray-600 break-all ${isRTL ? 'text-right' : ''}`}>
+              <p className={`text-gray-600 dark:text-gray-400 transition-colors duration-200 break-all ${isRTL ? 'text-right' : ''}`}>
                 {eventData.virtual_link}
               </p>
             </div>
