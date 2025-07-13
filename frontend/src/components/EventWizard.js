@@ -314,10 +314,10 @@ const EventWizard = () => {
   };
 
   const steps = [
-    { number: 1, title: t('events.steps.basicInfo') },
-    { number: 2, title: t('events.steps.dateTime') },
-    { number: 3, title: t('events.steps.location') },
-    { number: 4, title: t('events.steps.review') }
+    { number: 1, title: t('wizard.step1') },
+    { number: 2, title: t('wizard.step2') },
+    { number: 3, title: t('wizard.step3') },
+    { number: 4, title: t('wizard.step4') }
   ];
 
   return (
