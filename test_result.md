@@ -102,7 +102,7 @@
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
 
-user_problem_statement: "i want to make this fully Arabic - yes make it nativly arabic, keep technical terms if found but preferably translate everything, yes make it RTL, no keep the dates general and the standard 123, no make it bilingual between arabic and english (you already have the english)"
+user_problem_statement: "Access Denied - You don't have permission to access this page. for Demo Organizer when clicking venues - FIXED: Added organizer role to venues route protection"
 
 backend:
   - task: "Backend API Support"
