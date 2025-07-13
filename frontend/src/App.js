@@ -4,6 +4,7 @@ import axios from 'axios';
 import {jwtDecode} from 'jwt-decode';
 import './App.css';
 import { LanguageProvider } from './contexts/LanguageContext';
+import { ThemeProvider } from './contexts/ThemeContext';
 import LoginPage from './components/LoginPage';
 import Dashboard from './components/Dashboard';
 import EventWizard from './components/EventWizard';
