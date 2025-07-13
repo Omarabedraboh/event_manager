@@ -6,6 +6,7 @@ import LanguageSwitcher from './LanguageSwitcher';
 
 const LoginPage = () => {
   const { user, login, register } = useAuth();
+  const { t, isRTL } = useLanguage();
   const [isLogin, setIsLogin] = useState(true);
   const [formData, setFormData] = useState({
     email: '',
