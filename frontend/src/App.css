@@ -210,7 +210,7 @@
   }
 }
 
-/* Custom scrollbars */
+/* Custom scrollbars with dark mode */
 .custom-scrollbar::-webkit-scrollbar {
   width: 8px;
 }
@@ -220,13 +220,25 @@
   border-radius: 10px;
 }
 
+.dark .custom-scrollbar::-webkit-scrollbar-track {
+  background: #374151;
+}
+
 .custom-scrollbar::-webkit-scrollbar-thumb {
   background: #c1c1c1;
   border-radius: 10px;
 }
 
+.dark .custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #6b7280;
+}
+
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
   background: #a8a8a8;
+}
+
+.dark .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #9ca3af;
 }
 
 /* Calendar styles */
