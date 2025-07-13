@@ -89,7 +89,10 @@ const LoginPage = () => {
         </div>
         
         <div className="text-center">
-          <div className="mb-4">
+          <div className="mb-6">
+            <div className="flex justify-center mb-4">
+              <Logo size="xl" showText={false} />
+            </div>
             <h2 className="text-4xl font-bold text-gray-900 dark:text-gray-100 transition-colors duration-200">
               {t('common.brand.name')}
             </h2>
