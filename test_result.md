@@ -297,20 +297,7 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Language Context and Infrastructure"
-    - "Translation System"
-    - "RTL CSS Support"
-    - "Language Switcher Component"
-    - "Navigation Component Arabic Support"
-    - "Login Page Arabic Support"
-    - "Dashboard Arabic Support"
-    - "Event Wizard Arabic Support"
-    - "Event Management Arabic Support"
-    - "Venue Manager Arabic Support"
-    - "Registration Page Arabic Support"
-    - "Phase2 Banner Arabic Support"
-    - "Dark Theme System"
-    - "Theme Toggle Component"
+    - "Fix Venues Access Denied Issue"
   stuck_tasks: []
   test_all: true
   test_priority: "high_first"
