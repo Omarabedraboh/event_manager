@@ -343,7 +343,7 @@ const EventWizard = () => {
                 <div className={`flex items-center justify-center w-8 h-8 rounded-full text-sm font-medium transition-colors duration-200 ${
                   currentStep >= step.number
                     ? 'bg-blue-600 text-white'
-                    : 'bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-400'
+                    : 'bg-gray-50 dark:bg-gray-800 text-gray-600 dark:text-gray-400'
                 }`}>
                   {step.number}
                 </div>
