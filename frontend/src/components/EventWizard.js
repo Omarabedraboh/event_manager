@@ -106,7 +106,7 @@ const EventWizard = () => {
   const renderStep1 = () => (
     <div className="space-y-6">
       <div>
-        <h3 className={`text-lg font-medium text-gray-900 mb-4 ${isRTL ? 'text-right' : ''}`}>
+        <h3 className={`text-lg font-medium text-gray-900 dark:text-gray-100 transition-colors duration-200 mb-4 ${isRTL ? 'text-right' : ''}`}>
           {t('events.eventDetails')}
         </h3>
         
