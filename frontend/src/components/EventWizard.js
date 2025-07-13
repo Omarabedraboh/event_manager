@@ -343,7 +343,7 @@ const EventWizard = () => {
               <h4 className={`font-medium text-gray-900 dark:text-gray-100 transition-colors duration-200 ${isRTL ? 'text-right' : ''}`}>
                 {t('events.venue')}
               </h4>
-              <p className={`text-gray-600 ${isRTL ? 'text-right' : ''}`}>
+              <p className={`text-gray-600 dark:text-gray-400 transition-colors duration-200 ${isRTL ? 'text-right' : ''}`}>
                 {venues.find(v => v.id === eventData.venue_id)?.name}
               </p>
             </div>
