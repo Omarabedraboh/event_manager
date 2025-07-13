@@ -78,7 +78,7 @@ const LoginPage = () => {
   };
 
   return (
-    <div className={`min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 ${isRTL ? 'font-arabic' : ''}`}>
+    <div className={`min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 transition-colors duration-200 ${isRTL ? 'font-arabic' : ''}`}>
       <div className="max-w-md w-full space-y-8 p-8">
         {/* Language Switcher */}
         <div className={`flex ${isRTL ? 'justify-start' : 'justify-end'} mb-4`}>
@@ -86,18 +86,18 @@ const LoginPage = () => {
         </div>
         
         <div className="text-center">
-          <h2 className="text-3xl font-bold text-gray-900">
+          <h2 className="text-3xl font-bold text-gray-900 dark:text-gray-100 transition-colors duration-200">
             {t('nav.brand')}
           </h2>
-          <p className="mt-2 text-gray-600">
+          <p className="mt-2 text-gray-600 dark:text-gray-400 transition-colors duration-200">
             {isLogin ? t('auth.loginSubtitle') : t('auth.registerSubtitle')}
           </p>
         </div>
 
-        <div className="bg-white rounded-lg shadow-lg p-6">
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 transition-colors duration-200">
           {/* Demo Users Section */}
           <div className="mb-6">
-            <h3 className="text-lg font-medium text-gray-900 mb-3">Quick Demo Access</h3>
+            <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-3 transition-colors duration-200">Quick Demo Access</h3>
             <div className="grid grid-cols-2 gap-2">
               {demoUsers.map((demoUser) => (
                 <button
