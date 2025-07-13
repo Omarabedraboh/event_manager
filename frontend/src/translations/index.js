@@ -251,6 +251,13 @@ export const translations = {
       notFound: "Not Found",
       pageNotFound: "Page not found",
       update: "Update",
+      
+      // Brand
+      brand: {
+        name: "EventSphere",
+        tagline: "Your Complete Event Universe",
+        description: "Where Ideas Become Experiences"
+      },
       manage: "Manage",
       close: "Close"
     },
