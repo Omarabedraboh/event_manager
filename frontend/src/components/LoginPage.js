@@ -88,9 +88,14 @@ const LoginPage = () => {
         </div>
         
         <div className="text-center">
-          <h2 className="text-3xl font-bold text-gray-900 dark:text-gray-100 transition-colors duration-200">
-            {t('nav.brand')}
-          </h2>
+          <div className="mb-4">
+            <h2 className="text-4xl font-bold text-gray-900 dark:text-gray-100 transition-colors duration-200">
+              {t('brand.name')}
+            </h2>
+            <p className="text-lg text-blue-600 dark:text-blue-400 font-medium mt-2 transition-colors duration-200">
+              {t('brand.tagline')}
+            </p>
+          </div>
           <p className="mt-2 text-gray-600 dark:text-gray-400 transition-colors duration-200">
             {isLogin ? t('auth.loginSubtitle') : t('auth.registerSubtitle')}
           </p>
