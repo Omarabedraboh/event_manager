@@ -361,11 +361,11 @@ const EventWizard = () => {
           )}
         </div>
 
-        <div className="bg-blue-50 rounded-lg p-4">
-          <h4 className={`font-medium text-blue-900 mb-2 ${isRTL ? 'text-right' : ''}`}>
+        <div className="bg-blue-50 dark:bg-blue-900/20 transition-colors duration-200 rounded-lg p-4">
+          <h4 className={`font-medium text-blue-900 dark:text-blue-100 transition-colors duration-200 mb-2 ${isRTL ? 'text-right' : ''}`}>
             {t('events.publishingOptions')}
           </h4>
-          <p className={`text-sm text-blue-700 mb-4 ${isRTL ? 'text-right' : ''}`}>
+          <p className={`text-sm text-blue-700 dark:text-blue-300 transition-colors duration-200 mb-4 ${isRTL ? 'text-right' : ''}`}>
             {t('events.saveAsDraft')}
           </p>
           
