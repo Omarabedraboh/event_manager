@@ -312,7 +312,7 @@ const EventWizard = () => {
           </div>
 
           <div>
-            <h4 className={`font-medium text-gray-900 ${isRTL ? 'text-right' : ''}`}>
+            <h4 className={`font-medium text-gray-900 dark:text-gray-100 transition-colors duration-200 ${isRTL ? 'text-right' : ''}`}>
               {t('events.type')} & {t('events.capacity')}
             </h4>
             <div className={`flex space-x-4 ${isRTL ? 'space-x-reverse flex-row-reverse' : ''}`}>
