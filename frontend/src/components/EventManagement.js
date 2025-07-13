@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../App';
+import { useLanguage } from '../contexts/LanguageContext';
 import axios from 'axios';
 import Navigation from './Navigation';
 
@@ -10,6 +11,7 @@ const API = `${BACKEND_URL}/api`;
 const EventManagement = () => {
   const { id } = useParams();
   const { user } = useAuth();
+  const { t, isRTL } = useLanguage();
   const navigate = useNavigate();
   
   const [event, setEvent] = useState(null);
@@ -154,13 +156,13 @@ const EventManagement = () => {
 
   if (!event) {
     return (
-      <div className="min-h-screen bg-gray-50">
+      <div className={`min-h-screen bg-gray-50 ${isRTL ? 'font-arabic' : ''}`}>
         <Navigation />
         <div className="max-w-4xl mx-auto py-6 px-4">
-          <div className="text-center">
-            <h1 className="text-2xl font-bold text-red-600">Event Not Found</h1>
+          <div className={`text-center ${isRTL ? 'text-right' : ''}`}>
+            <h1 className="text-2xl font-bold text-red-600">{t('events.eventNotFound')}</h1>
             <button onClick={() => navigate('/')} className="btn-primary mt-4">
-              Back to Dashboard
+              {t('events.backToDashboard')}
             </button>
           </div>
         </div>
@@ -169,53 +171,55 @@ const EventManagement = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className={`min-h-screen bg-gray-50 ${isRTL ? 'font-arabic' : ''}`}>
       <Navigation />
       
       <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
         {/* Breadcrumb */}
-        <div className="breadcrumb">
-          <span className="breadcrumb-item">Dashboard</span>
+        <div className={`breadcrumb ${isRTL ? 'flex-row-reverse' : ''}`}>
+          <span className="breadcrumb-item">{t('nav.dashboard')}</span>
           <span className="breadcrumb-separator">/</span>
-          <span className="breadcrumb-item">Events</span>
+          <span className="breadcrumb-item">{t('events.title')}</span>
           <span className="breadcrumb-separator">/</span>
           <span className="breadcrumb-item">{event.title}</span>
         </div>
 
         {/* Header */}
         <div className="mb-8">
-          <div className="flex justify-between items-start">
+          <div className={`flex justify-between items-start ${isRTL ? 'flex-row-reverse' : ''}`}>
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">{event.title}</h1>
-              <div className="flex items-center space-x-4 mt-2">
+              <h1 className={`text-3xl font-bold text-gray-900 ${isRTL ? 'text-right' : ''}`}>
+                {event.title}
+              </h1>
+              <div className={`flex items-center space-x-4 rtl:space-x-reverse mt-2 ${isRTL ? 'flex-row-reverse' : ''}`}>
                 <span className={`badge ${getEventTypeClass(event.event_type)}`}>
-                  {event.event_type}
+                  {t(`events.${event.event_type}`)}
                 </span>
                 <span className={`badge ${event.is_published ? 'badge-success' : 'badge-warning'}`}>
-                  {event.is_published ? 'Published' : 'Draft'}
+                  {event.is_published ? t('events.published') : t('events.draft')}
                 </span>
               </div>
             </div>
-            <div className="flex space-x-3">
+            <div className={`flex space-x-3 rtl:space-x-reverse ${isRTL ? 'flex-row-reverse' : ''}`}>
               <button
                 onClick={() => setShowEditForm(true)}
                 className="btn-secondary"
               >
-                Edit Event
+                {t('events.editEvent')}
               </button>
               {!event.is_published && (
                 <button
                   onClick={handlePublish}
                   className="btn-success"
                 >
-                  Publish Event
+                  {t('events.publishEvent')}
                 </button>
               )}
               <button
                 onClick={() => navigate(`/register/${event.id}`)}
                 className="btn-primary"
               >
-                View Registration Page
+                {t('events.viewRegistrationPage')}
               </button>
             </div>
           </div>
@@ -232,9 +236,9 @@ const EventManagement = () => {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
           <div className="card">
             <div className="card-body">
-              <div className="flex items-center">
-                <div className="flex-1">
-                  <p className="text-sm font-medium text-gray-600">Total Registrations</p>
+              <div className={`flex items-center ${isRTL ? 'flex-row-reverse' : ''}`}>
+                <div className={`flex-1 ${isRTL ? 'text-right' : ''}`}>
+                  <p className="text-sm font-medium text-gray-600">{t('events.totalRegistrationsStats')}</p>
                   <p className="text-2xl font-bold text-gray-900">{totalRegistrations}</p>
                 </div>
                 <div className="p-3 bg-blue-100 rounded-full">
@@ -248,9 +252,9 @@ const EventManagement = () => {
 
           <div className="card">
             <div className="card-body">
-              <div className="flex items-center">
-                <div className="flex-1">
-                  <p className="text-sm font-medium text-gray-600">Capacity</p>
+              <div className={`flex items-center ${isRTL ? 'flex-row-reverse' : ''}`}>
+                <div className={`flex-1 ${isRTL ? 'text-right' : ''}`}>
+                  <p className="text-sm font-medium text-gray-600">{t('events.capacity')}</p>
                   <p className="text-2xl font-bold text-gray-900">{event.max_attendees}</p>
                 </div>
                 <div className="p-3 bg-green-100 rounded-full">
@@ -264,9 +268,9 @@ const EventManagement = () => {
 
           <div className="card">
             <div className="card-body">
-              <div className="flex items-center">
-                <div className="flex-1">
-                  <p className="text-sm font-medium text-gray-600">Revenue</p>
+              <div className={`flex items-center ${isRTL ? 'flex-row-reverse' : ''}`}>
+                <div className={`flex-1 ${isRTL ? 'text-right' : ''}`}>
+                  <p className="text-sm font-medium text-gray-600">{t('events.revenueStats')}</p>
                   <p className="text-2xl font-bold text-gray-900">${totalRevenue.toFixed(2)}</p>
                 </div>
                 <div className="p-3 bg-yellow-100 rounded-full">
@@ -281,9 +285,9 @@ const EventManagement = () => {
 
           <div className="card">
             <div className="card-body">
-              <div className="flex items-center">
-                <div className="flex-1">
-                  <p className="text-sm font-medium text-gray-600">Attendance Rate</p>
+              <div className={`flex items-center ${isRTL ? 'flex-row-reverse' : ''}`}>
+                <div className={`flex-1 ${isRTL ? 'text-right' : ''}`}>
+                  <p className="text-sm font-medium text-gray-600">{t('events.attendanceRate')}</p>
                   <p className="text-2xl font-bold text-gray-900">
                     {event.max_attendees > 0 ? Math.round((totalRegistrations / event.max_attendees) * 100) : 0}%
                   </p>
@@ -305,38 +309,54 @@ const EventManagement = () => {
             {/* Event Information */}
             <div className="card">
               <div className="card-header">
-                <h3 className="text-lg font-medium text-gray-900">Event Details</h3>
+                <h3 className={`text-lg font-medium text-gray-900 ${isRTL ? 'text-right' : ''}`}>
+                  {t('events.eventDetails')}
+                </h3>
               </div>
               <div className="card-body space-y-4">
                 <div>
-                  <h4 className="font-medium text-gray-900">Description</h4>
-                  <p className="text-gray-600">{event.description}</p>
+                  <h4 className={`font-medium text-gray-900 ${isRTL ? 'text-right' : ''}`}>
+                    {t('events.description')}
+                  </h4>
+                  <p className={`text-gray-600 ${isRTL ? 'text-right' : ''}`}>{event.description}</p>
                 </div>
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <h4 className="font-medium text-gray-900">Start Date</h4>
-                    <p className="text-gray-600">{formatDate(event.start_date)}</p>
+                    <h4 className={`font-medium text-gray-900 ${isRTL ? 'text-right' : ''}`}>
+                      {t('events.startDateLabel')}
+                    </h4>
+                    <p className={`text-gray-600 ${isRTL ? 'text-right' : ''}`}>
+                      {formatDate(event.start_date)}
+                    </p>
                   </div>
                   <div>
-                    <h4 className="font-medium text-gray-900">End Date</h4>
-                    <p className="text-gray-600">{formatDate(event.end_date)}</p>
+                    <h4 className={`font-medium text-gray-900 ${isRTL ? 'text-right' : ''}`}>
+                      {t('events.endDateLabel')}
+                    </h4>
+                    <p className={`text-gray-600 ${isRTL ? 'text-right' : ''}`}>
+                      {formatDate(event.end_date)}
+                    </p>
                   </div>
                 </div>
 
                 {event.venue_id && (
                   <div>
-                    <h4 className="font-medium text-gray-900">Venue</h4>
-                    <p className="text-gray-600">
-                      {venues.find(v => v.id === event.venue_id)?.name || 'Venue information loading...'}
+                    <h4 className={`font-medium text-gray-900 ${isRTL ? 'text-right' : ''}`}>
+                      {t('events.venueLabel')}
+                    </h4>
+                    <p className={`text-gray-600 ${isRTL ? 'text-right' : ''}`}>
+                      {venues.find(v => v.id === event.venue_id)?.name || t('events.venueInfo')}
                     </p>
                   </div>
                 )}
 
                 {event.virtual_link && (
                   <div>
-                    <h4 className="font-medium text-gray-900">Virtual Link</h4>
-                    <a href={event.virtual_link} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-800 break-all">
+                    <h4 className={`font-medium text-gray-900 ${isRTL ? 'text-right' : ''}`}>
+                      {t('events.virtualLinkLabel')}
+                    </h4>
+                    <a href={event.virtual_link} target="_blank" rel="noopener noreferrer" className={`text-blue-600 hover:text-blue-800 break-all ${isRTL ? 'text-right' : ''}`}>
                       {event.virtual_link}
                     </a>
                   </div>
@@ -347,13 +367,15 @@ const EventManagement = () => {
             {/* Tickets Management */}
             <div className="card">
               <div className="card-header">
-                <div className="flex justify-between items-center">
-                  <h3 className="text-lg font-medium text-gray-900">Tickets</h3>
+                <div className={`flex justify-between items-center ${isRTL ? 'flex-row-reverse' : ''}`}>
+                  <h3 className={`text-lg font-medium text-gray-900 ${isRTL ? 'text-right' : ''}`}>
+                    {t('tickets.title')}
+                  </h3>
                   <button
                     onClick={() => setShowTicketForm(true)}
                     className="btn-primary"
                   >
-                    Add Ticket Type
+                    {t('events.addTicketType')}
                   </button>
                 </div>
               </div>
@@ -361,24 +383,28 @@ const EventManagement = () => {
                 {tickets.length > 0 ? (
                   <div className="space-y-3">
                     {tickets.map(ticket => (
-                      <div key={ticket.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-                        <div>
-                          <h4 className="font-medium text-gray-900 capitalize">{ticket.ticket_type.replace('_', ' ')}</h4>
+                      <div key={ticket.id} className={`flex items-center justify-between p-4 bg-gray-50 rounded-lg ${isRTL ? 'flex-row-reverse' : ''}`}>
+                        <div className={isRTL ? 'text-right' : ''}>
+                          <h4 className="font-medium text-gray-900 capitalize">
+                            {t(`tickets.${ticket.ticket_type}`)}
+                          </h4>
                           <p className="text-sm text-gray-600">
-                            ${ticket.price} • {ticket.quantity_sold} / {ticket.quantity_available} sold
+                            ${ticket.price} • {ticket.quantity_sold} / {ticket.quantity_available} {t('events.sold')}
                           </p>
                         </div>
-                        <div className="text-right">
+                        <div className={`text-right ${isRTL ? 'text-left' : ''}`}>
                           <p className="font-medium text-gray-900">
                             ${(ticket.price * ticket.quantity_sold).toFixed(2)}
                           </p>
-                          <p className="text-sm text-gray-500">Revenue</p>
+                          <p className="text-sm text-gray-500">{t('events.revenueStats')}</p>
                         </div>
                       </div>
                     ))}
                   </div>
                 ) : (
-                  <p className="text-gray-500 text-center py-4">No tickets created yet</p>
+                  <p className={`text-gray-500 text-center py-4 ${isRTL ? 'text-right' : ''}`}>
+                    {t('events.noTicketsCreated')}
+                  </p>
                 )}
               </div>
             </div>
@@ -386,18 +412,20 @@ const EventManagement = () => {
             {/* Registrations List */}
             <div className="card">
               <div className="card-header">
-                <h3 className="text-lg font-medium text-gray-900">Recent Registrations</h3>
+                <h3 className={`text-lg font-medium text-gray-900 ${isRTL ? 'text-right' : ''}`}>
+                  {t('events.recentRegistrations')}
+                </h3>
               </div>
               <div className="card-body">
                 {registrations.length > 0 ? (
                   <div className="space-y-3 max-h-64 overflow-y-auto">
                     {registrations.slice(0, 10).map(registration => (
-                      <div key={registration.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                        <div>
+                      <div key={registration.id} className={`flex items-center justify-between p-3 bg-gray-50 rounded-lg ${isRTL ? 'flex-row-reverse' : ''}`}>
+                        <div className={isRTL ? 'text-right' : ''}>
                           <h4 className="font-medium text-gray-900">{registration.attendee?.name}</h4>
                           <p className="text-sm text-gray-600">{registration.attendee?.email}</p>
                         </div>
-                        <div className="text-right">
+                        <div className={`text-right ${isRTL ? 'text-left' : ''}`}>
                           <span className={`badge ${registration.payment_status === 'completed' ? 'badge-success' : 'badge-warning'}`}>
                             {registration.payment_status}
                           </span>
@@ -409,7 +437,9 @@ const EventManagement = () => {
                     ))}
                   </div>
                 ) : (
-                  <p className="text-gray-500 text-center py-4">No registrations yet</p>
+                  <p className={`text-gray-500 text-center py-4 ${isRTL ? 'text-right' : ''}`}>
+                    {t('events.noRegistrationsYet')}
+                  </p>
                 )}
               </div>
             </div>
@@ -420,14 +450,16 @@ const EventManagement = () => {
             {/* Quick Actions */}
             <div className="card">
               <div className="card-header">
-                <h3 className="text-lg font-medium text-gray-900">Quick Actions</h3>
+                <h3 className={`text-lg font-medium text-gray-900 ${isRTL ? 'text-right' : ''}`}>
+                  {t('dashboard.quickActions')}
+                </h3>
               </div>
               <div className="card-body space-y-3">
                 <button
                   onClick={() => navigate(`/register/${event.id}`)}
                   className="btn-primary w-full"
                 >
-                  View Registration Page
+                  {t('events.viewRegistrationPage')}
                 </button>
                 <button
                   onClick={() => {
@@ -454,13 +486,13 @@ const EventManagement = () => {
                   className="btn-secondary w-full"
                   disabled={registrations.length === 0}
                 >
-                  Export Attendees
+                  {t('events.exportAttendees')}
                 </button>
                 <button
                   onClick={() => navigate('/analytics')}
                   className="btn-secondary w-full"
                 >
-                  View Analytics
+                  {t('events.viewAnalytics')}
                 </button>
               </div>
             </div>
@@ -468,24 +500,26 @@ const EventManagement = () => {
             {/* Event Status */}
             <div className="card">
               <div className="card-header">
-                <h3 className="text-lg font-medium text-gray-900">Event Status</h3>
+                <h3 className={`text-lg font-medium text-gray-900 ${isRTL ? 'text-right' : ''}`}>
+                  {t('events.eventStatus')}
+                </h3>
               </div>
               <div className="card-body">
                 <div className="space-y-3">
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Status:</span>
+                  <div className={`flex justify-between ${isRTL ? 'flex-row-reverse' : ''}`}>
+                    <span className="text-gray-600">{t('events.status')}:</span>
                     <span className={`badge ${event.is_published ? 'badge-success' : 'badge-warning'}`}>
-                      {event.is_published ? 'Published' : 'Draft'}
+                      {event.is_published ? t('events.published') : t('events.draft')}
                     </span>
                   </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Type:</span>
+                  <div className={`flex justify-between ${isRTL ? 'flex-row-reverse' : ''}`}>
+                    <span className="text-gray-600">{t('events.type')}:</span>
                     <span className={`badge ${getEventTypeClass(event.event_type)}`}>
-                      {event.event_type}
+                      {t(`events.${event.event_type}`)}
                     </span>
                   </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Created:</span>
+                  <div className={`flex justify-between ${isRTL ? 'flex-row-reverse' : ''}`}>
+                    <span className="text-gray-600">{t('events.created')}:</span>
                     <span className="text-gray-900">
                       {new Date(event.created_at).toLocaleDateString()}
                     </span>
@@ -501,23 +535,29 @@ const EventManagement = () => {
           <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
             <div className="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
               <div className="mt-3">
-                <h3 className="text-lg font-medium text-gray-900 mb-4">Add Ticket Type</h3>
+                <h3 className={`text-lg font-medium text-gray-900 mb-4 ${isRTL ? 'text-right' : ''}`}>
+                  {t('events.addTicketType')}
+                </h3>
                 <form onSubmit={handleTicketSubmit} className="space-y-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">Ticket Type</label>
+                    <label className={`block text-sm font-medium text-gray-700 ${isRTL ? 'text-right' : ''}`}>
+                      {t('tickets.ticketType')}
+                    </label>
                     <select
                       value={ticketForm.ticket_type}
                       onChange={(e) => setTicketForm({...ticketForm, ticket_type: e.target.value})}
                       className="form-select"
                     >
-                      <option value="early_bird">Early Bird</option>
-                      <option value="regular">Regular</option>
-                      <option value="vip">VIP</option>
+                      <option value="early_bird">{t('tickets.earlyBird')}</option>
+                      <option value="regular">{t('tickets.regular')}</option>
+                      <option value="vip">{t('tickets.vip')}</option>
                     </select>
                   </div>
                   
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">Price ($)</label>
+                    <label className={`block text-sm font-medium text-gray-700 ${isRTL ? 'text-right' : ''}`}>
+                      {t('tickets.priceLabel')}
+                    </label>
                     <input
                       type="number"
                       step="0.01"
@@ -529,7 +569,9 @@ const EventManagement = () => {
                   </div>
                   
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">Quantity Available</label>
+                    <label className={`block text-sm font-medium text-gray-700 ${isRTL ? 'text-right' : ''}`}>
+                      {t('tickets.quantityAvailable')}
+                    </label>
                     <input
                       type="number"
                       min="1"
@@ -539,14 +581,16 @@ const EventManagement = () => {
                     />
                   </div>
                   
-                  <div className="flex space-x-3">
-                    <button type="submit" className="btn-primary flex-1">Add Ticket</button>
+                  <div className={`flex space-x-3 ${isRTL ? 'space-x-reverse flex-row-reverse' : ''}`}>
+                    <button type="submit" className="btn-primary flex-1">
+                      {t('tickets.addTicket')}
+                    </button>
                     <button
                       type="button"
                       onClick={() => setShowTicketForm(false)}
                       className="btn-secondary flex-1"
                     >
-                      Cancel
+                      {t('common.cancel')}
                     </button>
                   </div>
                 </form>
@@ -560,31 +604,41 @@ const EventManagement = () => {
           <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
             <div className="relative top-10 mx-auto p-5 border max-w-2xl shadow-lg rounded-md bg-white">
               <div className="mt-3">
-                <h3 className="text-lg font-medium text-gray-900 mb-4">Edit Event</h3>
+                <h3 className={`text-lg font-medium text-gray-900 mb-4 ${isRTL ? 'text-right' : ''}`}>
+                  {t('events.editEvent')}
+                </h3>
                 <form onSubmit={handleEventUpdate} className="space-y-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">Event Title</label>
+                    <label className={`block text-sm font-medium text-gray-700 ${isRTL ? 'text-right' : ''}`}>
+                      {t('events.eventTitle')}
+                    </label>
                     <input
                       type="text"
                       value={editForm.title}
                       onChange={(e) => setEditForm({...editForm, title: e.target.value})}
                       className="form-input"
+                      dir={isRTL ? 'rtl' : 'ltr'}
                     />
                   </div>
                   
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">Description</label>
+                    <label className={`block text-sm font-medium text-gray-700 ${isRTL ? 'text-right' : ''}`}>
+                      {t('events.description')}
+                    </label>
                     <textarea
                       value={editForm.description}
                       onChange={(e) => setEditForm({...editForm, description: e.target.value})}
                       rows="3"
                       className="form-textarea"
+                      dir={isRTL ? 'rtl' : 'ltr'}
                     />
                   </div>
                   
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700">Start Date</label>
+                      <label className={`block text-sm font-medium text-gray-700 ${isRTL ? 'text-right' : ''}`}>
+                        {t('events.startDateLabel')}
+                      </label>
                       <input
                         type="datetime-local"
                         value={editForm.start_date}
@@ -593,7 +647,9 @@ const EventManagement = () => {
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700">End Date</label>
+                      <label className={`block text-sm font-medium text-gray-700 ${isRTL ? 'text-right' : ''}`}>
+                        {t('events.endDateLabel')}
+                      </label>
                       <input
                         type="datetime-local"
                         value={editForm.end_date}
@@ -603,14 +659,16 @@ const EventManagement = () => {
                     </div>
                   </div>
                   
-                  <div className="flex space-x-3">
-                    <button type="submit" className="btn-primary flex-1">Update Event</button>
+                  <div className={`flex space-x-3 ${isRTL ? 'space-x-reverse flex-row-reverse' : ''}`}>
+                    <button type="submit" className="btn-primary flex-1">
+                      {t('common.update')} {t('events.title')}
+                    </button>
                     <button
                       type="button"
                       onClick={() => setShowEditForm(false)}
                       className="btn-secondary flex-1"
                     >
-                      Cancel
+                      {t('common.cancel')}
                     </button>
                   </div>
                 </form>
