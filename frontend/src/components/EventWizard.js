@@ -279,7 +279,7 @@ const EventWizard = () => {
                   <span className="ml-2 text-gray-900 dark:text-gray-100 transition-colors duration-200">{t(`events.${eventData.event_type}`)}</span>
                 </div>
                 <div>
-                  <span className="font-medium text-gray-700 dark:text-gray-300 transition-colors duration-200">{t('events.startDate')}:</span>
+                  <span className="font-medium text-gray-600 dark:text-gray-400 transition-colors duration-200">{t('events.startDate')}:</span>
                   <span className="ml-2 text-gray-900 dark:text-gray-100 transition-colors duration-200">{eventData.start_date}</span>
                 </div>
                 <div>
