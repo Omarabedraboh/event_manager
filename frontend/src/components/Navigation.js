@@ -109,17 +109,17 @@ const Navigation = () => {
               </button>
 
               {isDropdownOpen && (
-                <div className={`absolute mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-10 border ${
+                <div className={`absolute mt-2 w-48 bg-white dark:bg-gray-800 rounded-md shadow-lg py-1 z-10 border border-gray-200 dark:border-gray-700 transition-colors duration-200 ${
                   isRTL ? 'left-0' : 'right-0'
                 }`}>
-                  <div className="px-4 py-2 border-b border-gray-200">
-                    <p className="text-sm font-medium text-gray-900">{user?.name}</p>
-                    <p className="text-sm text-gray-500 capitalize">{t(`roles.${user?.role}`)}</p>
+                  <div className="px-4 py-2 border-b border-gray-200 dark:border-gray-700">
+                    <p className="text-sm font-medium text-gray-900 dark:text-gray-100">{user?.name}</p>
+                    <p className="text-sm text-gray-500 dark:text-gray-400 capitalize">{t(`roles.${user?.role}`)}</p>
                   </div>
                   
                   <Link
                     to="/profile"
-                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                    className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200"
                     onClick={() => setIsDropdownOpen(false)}
                   >
                     {t('nav.profile')}
@@ -127,7 +127,7 @@ const Navigation = () => {
                   
                   <button
                     onClick={handleLogout}
-                    className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rtl:text-right"
+                    className="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rtl:text-right transition-colors duration-200"
                   >
                     {t('nav.signOut')}
                   </button>
