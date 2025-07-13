@@ -10,6 +10,7 @@ const API = `${BACKEND_URL}/api`;
 
 const Dashboard = () => {
   const { user } = useAuth();
+  const { t, isRTL } = useLanguage();
   const navigate = useNavigate();
   const [stats, setStats] = useState({});
   const [events, setEvents] = useState([]);
