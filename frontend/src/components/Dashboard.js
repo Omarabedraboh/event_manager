@@ -87,7 +87,7 @@ const Dashboard = () => {
             {t(`roles.${user.role}`)} {t('nav.dashboard')}
           </p>
           <p className="text-sm text-blue-600 dark:text-blue-400 mt-1 font-medium transition-colors duration-200">
-            {t('brand.tagline')}
+            {t('common.brand.tagline')}
           </p>
         </div>
 
