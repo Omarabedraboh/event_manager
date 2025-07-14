@@ -298,7 +298,7 @@ class EventManagementAPITester:
             success, response = self.make_request("GET", "events/invalid-id", 
                                                 token=self.tokens["organizer"], expected_status=404)
             print(f"   Invalid event ID test - Success: {success}, Response: {response}")
-            self.log_test("Invalid event ID handled", not success)
+            self.log_test("Invalid event ID handled", success)
         
         # Test duplicate registration
         if "attendee" in self.tokens and "test_event" in self.events and "regular" in self.tickets:
