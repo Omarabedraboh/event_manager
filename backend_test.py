@@ -308,6 +308,7 @@ class EventManagementAPITester:
             }
             success, response = self.make_request("POST", "register", registration_data,
                                                 token=self.tokens["attendee"], expected_status=400)
+            print(f"   Duplicate registration test - Success: {success}, Response: {response}")
             self.log_test("Duplicate registration blocked", not success)
 
     def run_all_tests(self):
