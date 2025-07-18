@@ -285,7 +285,203 @@ class EventManagementAPITester:
                                             token=self.tokens["organizer"], expected_status=200)
         self.log_test("Book venue", success and "total_cost" in response)
 
-    def test_error_handling(self):
+    def test_event_access_control_bug_fixes(self):
+        """Test specific bug fixes for event access control"""
+        print("\n🔒 Testing Event Access Control Bug Fixes...")
+        
+        if "organizer" not in self.tokens or "attendee" not in self.tokens:
+            print("❌ Missing required tokens for access control test")
+            return
+        
+        # Create an unpublished event as organizer
+        unpublished_event_data = {
+            "title": f"Unpublished Event {self.test_timestamp}",
+            "description": "This event should not be visible to attendees",
+            "event_type": "physical",
+            "start_date": (datetime.now() + timedelta(days=3)).isoformat(),
+            "end_date": (datetime.now() + timedelta(days=3, hours=2)).isoformat(),
+            "max_attendees": 50
+        }
+        
+        success, response = self.make_request("POST", "events", unpublished_event_data, 
+                                            token=self.tokens["organizer"], expected_status=200)
+        self.log_test("Create unpublished event", success)
+        
+        if not success:
+            return
+            
+        unpublished_event_id = response["id"]
+        
+        # Test 1: Organizer can access their own unpublished event
+        success, event = self.make_request("GET", f"events/{unpublished_event_id}", 
+                                         token=self.tokens["organizer"], expected_status=200)
+        self.log_test("Organizer can access own unpublished event", success and event.get("id") == unpublished_event_id)
+        
+        # Test 2: Attendee cannot access unpublished event (should get 404)
+        success, response = self.make_request("GET", f"events/{unpublished_event_id}", 
+                                            token=self.tokens["attendee"], expected_status=404)
+        self.log_test("Attendee cannot access unpublished event (404)", success and response.get("detail") == "Event not found")
+        
+        # Test 3: Attendee cannot see unpublished events in events list
+        success, events = self.make_request("GET", "events", token=self.tokens["attendee"])
+        unpublished_visible = any(event.get("id") == unpublished_event_id for event in events)
+        self.log_test("Unpublished event not in attendee events list", success and not unpublished_visible)
+        
+        # Test 4: Publish the event and verify attendee can now access it
+        success, response = self.make_request("POST", f"events/{unpublished_event_id}/publish", 
+                                            token=self.tokens["organizer"])
+        self.log_test("Publish event", success)
+        
+        if success:
+            # Test 5: Attendee can now access published event
+            success, event = self.make_request("GET", f"events/{unpublished_event_id}", 
+                                             token=self.tokens["attendee"], expected_status=200)
+            self.log_test("Attendee can access published event", success and event.get("id") == unpublished_event_id)
+            
+            # Test 6: Published event appears in attendee events list
+            success, events = self.make_request("GET", "events", token=self.tokens["attendee"])
+            published_visible = any(event.get("id") == unpublished_event_id for event in events)
+            self.log_test("Published event visible in attendee events list", success and published_visible)
+        
+        # Test 7: Admin can access all events (if admin token exists)
+        if "admin" in self.tokens:
+            success, event = self.make_request("GET", f"events/{unpublished_event_id}", 
+                                             token=self.tokens["admin"], expected_status=200)
+            self.log_test("Admin can access any event", success and event.get("id") == unpublished_event_id)
+
+    def test_ticket_creation_schema_bug_fixes(self):
+        """Test specific bug fixes for ticket creation schema"""
+        print("\n🎫 Testing Ticket Creation Schema Bug Fixes...")
+        
+        if "organizer" not in self.tokens or "test_event" not in self.events:
+            print("❌ No organizer token or test event available")
+            return
+
+        event_id = self.events["test_event"]["id"]
+        
+        # Test 1: Correct ticket creation schema (event_id, ticket_type, price, quantity_available)
+        correct_ticket_data = {
+            "event_id": event_id,
+            "ticket_type": "regular",
+            "price": 99.99,
+            "quantity_available": 100
+        }
+        
+        success, response = self.make_request("POST", "tickets", correct_ticket_data,
+                                            token=self.tokens["organizer"], expected_status=200)
+        self.log_test("Create ticket with correct schema", success and "id" in response)
+        
+        if success:
+            # Verify the created ticket has correct fields
+            ticket = response
+            schema_correct = (
+                ticket.get("event_id") == event_id and
+                ticket.get("ticket_type") == "regular" and
+                ticket.get("price") == 99.99 and
+                ticket.get("quantity_available") == 100 and
+                ticket.get("quantity_sold") == 0
+            )
+            self.log_test("Ticket created with correct schema fields", schema_correct)
+            
+            # Store this ticket for later tests
+            self.tickets["schema_test"] = ticket
+
+    def test_event_tickets_endpoint_bug_fixes(self):
+        """Test specific bug fixes for /events/{event_id}/tickets endpoint"""
+        print("\n🎟️ Testing Event Tickets Endpoint Bug Fixes...")
+        
+        if "organizer" not in self.tokens or "test_event" not in self.events:
+            print("❌ No organizer token or test event available")
+            return
+
+        event_id = self.events["test_event"]["id"]
+        
+        # Test 1: /events/{event_id}/tickets endpoint works correctly
+        success, tickets = self.make_request("GET", f"events/{event_id}/tickets",
+                                           token=self.tokens["organizer"], expected_status=200)
+        self.log_test("GET /events/{event_id}/tickets endpoint works", success and isinstance(tickets, list))
+        
+        if success:
+            # Test 2: Endpoint returns tickets for the correct event
+            all_tickets_correct_event = all(ticket.get("event_id") == event_id for ticket in tickets)
+            self.log_test("All returned tickets belong to correct event", all_tickets_correct_event)
+            
+            # Test 3: Attendee can also access tickets for published events
+            if "attendee" in self.tokens:
+                success, attendee_tickets = self.make_request("GET", f"events/{event_id}/tickets",
+                                                           token=self.tokens["attendee"], expected_status=200)
+                self.log_test("Attendee can access tickets for published event", success and isinstance(attendee_tickets, list))
+
+    def test_registration_workflow_bug_fixes(self):
+        """Test event registration workflow with bug fixes"""
+        print("\n📋 Testing Registration Workflow Bug Fixes...")
+        
+        if "attendee" not in self.tokens or "test_event" not in self.events:
+            print("❌ Missing attendee token or test event")
+            return
+        
+        event_id = self.events["test_event"]["id"]
+        
+        # First ensure we have tickets for this event
+        if "schema_test" not in self.tickets:
+            print("❌ No test ticket available for registration")
+            return
+            
+        ticket_id = self.tickets["schema_test"]["id"]
+        
+        # Test 1: Registration with correct event and ticket IDs
+        registration_data = {
+            "event_id": event_id,
+            "ticket_id": ticket_id
+        }
+        
+        success, response = self.make_request("POST", "register", registration_data,
+                                            token=self.tokens["attendee"], expected_status=200)
+        self.log_test("Registration with correct IDs works", success and "qr_code" in response)
+        
+        if success:
+            # Test 2: Registration includes QR code
+            has_qr_code = "qr_code" in response and response["qr_code"].startswith("data:image/png;base64,")
+            self.log_test("Registration includes valid QR code", has_qr_code)
+            
+            # Test 3: Registration appears in attendee's registrations
+            success, registrations = self.make_request("GET", "my-registrations",
+                                                     token=self.tokens["attendee"])
+            registration_found = any(reg.get("event_id") == event_id for reg in registrations)
+            self.log_test("Registration appears in attendee's list", success and registration_found)
+
+    def run_bug_fix_tests(self):
+        """Run specific bug fix tests"""
+        print("🔧 Starting Bug Fix Verification Tests")
+        print(f"Testing against: {self.base_url}")
+        print("=" * 60)
+        
+        try:
+            # First run basic setup
+            self.test_user_registration_and_login()
+            self.test_venue_management()
+            self.test_event_management()
+            
+            # Then run specific bug fix tests
+            self.test_event_access_control_bug_fixes()
+            self.test_ticket_creation_schema_bug_fixes()
+            self.test_event_tickets_endpoint_bug_fixes()
+            self.test_registration_workflow_bug_fixes()
+            
+        except Exception as e:
+            print(f"\n💥 Bug fix test suite failed with error: {str(e)}")
+            return False
+        
+        # Print final results
+        print("\n" + "=" * 60)
+        print(f"📊 Bug Fix Test Results: {self.tests_passed}/{self.tests_run} tests passed")
+        
+        if self.tests_passed == self.tests_run:
+            print("🎉 All bug fix tests passed! Issues have been resolved.")
+            return True
+        else:
+            print(f"⚠️ {self.tests_run - self.tests_passed} tests failed. Some issues remain.")
+            return False
         """Test error handling scenarios"""
         print("\n⚠️ Testing Error Handling...")
         
