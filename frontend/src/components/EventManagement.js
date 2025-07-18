@@ -43,7 +43,7 @@ const EventManagement = () => {
     try {
       const [eventRes, ticketsRes, registrationsRes] = await Promise.all([
         axios.get(`${API}/events/${id}`),
-        axios.get(`${API}/tickets?event_id=${id}`),
+        axios.get(`${API}/events/${id}/tickets`),
         axios.get(`${API}/events/${id}/registrations`)
       ]);
 
