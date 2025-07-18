@@ -5,7 +5,6 @@ import { useLanguage } from '../contexts/LanguageContext';
 import axios from 'axios';
 import Navigation from './Navigation';
 import Logo from './Logo';
-import TranslationDebug from './TranslationDebug';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
