@@ -33,7 +33,7 @@ const RegistrationPage = () => {
     try {
       const [eventRes, ticketsRes] = await Promise.all([
         axios.get(`${API}/events/${eventId}`),
-        axios.get(`${API}/tickets?event_id=${eventId}`)
+        axios.get(`${API}/events/${eventId}/tickets`)
       ]);
 
       setEvent(eventRes.data);
