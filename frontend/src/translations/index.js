@@ -450,7 +450,9 @@ export const translations = {
       eventNotFound: "الفعالية غير موجودة",
       eventNotFoundMessage: "الفعالية التي تبحث عنها غير موجودة أو تم حذفها.",
       backToDashboard: "العودة للوحة التحكم",
-      totalRegistrationsStats: "إجمالي التسجيلات",
+      totalRegistrations: "إجمالي التسجيلات",
+      totalSales: "إجمالي المبيعات",
+      totalTickets: "إجمالي التذاكر",
       capacity: "السعة",
       revenueStats: "الإيرادات",
       attendanceRate: "معدل الحضور",
@@ -471,7 +473,38 @@ export const translations = {
       status: "الحالة",
       type: "النوع",
       created: "تاريخ الإنشاء",
-      fillRequiredFields: "يرجى ملء جميع الحقول المطلوبة"
+      fillRequiredFields: "يرجى ملء جميع الحقول المطلوبة",
+      createAnother: "إنشاء فعالية أخرى",
+      quickActions: "إجراءات سريعة",
+      manageTickets: "إدارة التذاكر",
+      eventTickets: "تذاكر الفعالية",
+      createTicket: "إنشاء تذكرة",
+      ticketName: "اسم التذكرة",
+      price: "السعر",
+      quantity: "الكمية",
+      remaining: "المتبقي",
+      saleStarts: "بداية البيع",
+      saleEnds: "نهاية البيع",
+      noTickets: "لا توجد تذاكر بعد",
+      createFirstTicket: "أنشئ تذكرتك الأولى",
+      registrations: "التسجيلات",
+      attendee: "الحاضر",
+      ticket: "التذكرة",
+      registrationDate: "تاريخ التسجيل",
+      noRegistrations: "لا توجد تسجيلات بعد",
+      noRegistrationsMessage: "لم يسجل أحد في هذه الفعالية بعد.",
+      tabs: {
+        overview: "نظرة عامة",
+        tickets: "التذاكر",
+        registrations: "التسجيلات"
+      },
+      status: {
+        ended: "انتهت",
+        live: "مباشرة",
+        published: "منشورة",
+        draft: "مسودة",
+        confirmed: "مؤكد"
+      }
     },
     
     // Event Wizard Steps
