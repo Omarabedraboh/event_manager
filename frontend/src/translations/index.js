@@ -253,7 +253,31 @@ export const translations = {
       ticketSoldOut: "Ticket sold out",
       myRegistrations: "My Registrations",
       qrCode: "QR Code",
-      downloadTicket: "Download Ticket"
+      downloadTicket: "Download Ticket",
+      
+      // New keys for RegistrationPage
+      selectTickets: "Please select at least one ticket",
+      success: "Registration Complete!",
+      successMessage: "You have successfully registered for this event. Your tickets are ready!",
+      when: "When",
+      type: "Type",
+      venue: "Venue",
+      joinLink: "Join Link",
+      joinEvent: "Join Event",
+      yourTicket: "Your Ticket",
+      qrCodeInfo: "Show this QR code at the event for entry",
+      backToDashboard: "Back to Dashboard",
+      printTicket: "Print Ticket",
+      registerFor: "Register for",
+      eventDetails: "Event Details",
+      maxAttendees: "Maximum Attendees",
+      available: "available",
+      noTicketsAvailable: "No tickets available for this event",
+      summary: "Registration Summary",
+      total: "Total:",
+      registering: "Registering...",
+      registerNow: "Register Now",
+      selectTicketsToStart: "Select tickets to start registration"
     },
     
     // Common
