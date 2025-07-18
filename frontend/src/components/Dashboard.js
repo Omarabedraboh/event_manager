@@ -220,6 +220,11 @@ const Dashboard = () => {
           )}
         </div>
 
+        {/* Translation Debug - Temporary */}
+        <div className="mb-8">
+          <TranslationDebug />
+        </div>
+
         {/* Quick Actions */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
           {user.role === 'organizer' && (
