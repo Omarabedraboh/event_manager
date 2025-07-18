@@ -254,6 +254,20 @@ async def get_event(event_id: str, current_user: User = Depends(get_current_user
     event = await db.events.find_one({"id": event_id})
     if not event:
         raise HTTPException(status_code=404, detail="Event not found")
+    
+    # Check if user can access this event
+    if current_user.role == UserRole.ORGANIZER:
+        # Organizers can only see their own events
+        if event["organizer_id"] != current_user.id:
+            raise HTTPException(status_code=404, detail="Event not found")
+    elif current_user.role == UserRole.ADMIN:
+        # Admins can see all events
+        pass
+    else:
+        # Other users can only see published events
+        if not event.get("is_published", False):
+            raise HTTPException(status_code=404, detail="Event not found")
+    
     return Event(**event)
 
 @api_router.put("/events/{event_id}")
