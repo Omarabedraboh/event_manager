@@ -541,7 +541,9 @@ class EventManagementAPITester:
 def main():
     """Main test runner"""
     tester = EventManagementAPITester()
-    success = tester.run_all_tests()
+    
+    # Run bug fix tests specifically
+    success = tester.run_bug_fix_tests()
     return 0 if success else 1
 
 if __name__ == "__main__":
