@@ -123,7 +123,9 @@ export const translations = {
       eventNotFound: "Event Not Found",
       eventNotFoundMessage: "The event you're looking for doesn't exist or has been removed.",
       backToDashboard: "Back to Dashboard",
-      totalRegistrationsStats: "Total Registrations",
+      totalRegistrations: "Total Registrations",
+      totalSales: "Total Sales",
+      totalTickets: "Total Tickets",
       capacity: "Capacity",
       revenueStats: "Revenue",
       attendanceRate: "Attendance Rate",
@@ -144,7 +146,38 @@ export const translations = {
       status: "Status",
       type: "Type",
       created: "Created",
-      fillRequiredFields: "Please fill in all required fields"
+      fillRequiredFields: "Please fill in all required fields",
+      createAnother: "Create Another Event",
+      quickActions: "Quick Actions",
+      manageTickets: "Manage Tickets",
+      eventTickets: "Event Tickets",
+      createTicket: "Create Ticket",
+      ticketName: "Ticket Name",
+      price: "Price",
+      quantity: "Quantity",
+      remaining: "Remaining",
+      saleStarts: "Sale Starts",
+      saleEnds: "Sale Ends",
+      noTickets: "No tickets yet",
+      createFirstTicket: "Create your first ticket",
+      registrations: "Registrations",
+      attendee: "Attendee",
+      ticket: "Ticket",
+      registrationDate: "Registration Date",
+      noRegistrations: "No registrations yet",
+      noRegistrationsMessage: "No one has registered for this event yet.",
+      tabs: {
+        overview: "Overview",
+        tickets: "Tickets",
+        registrations: "Registrations"
+      },
+      status: {
+        ended: "Ended",
+        live: "Live",
+        published: "Published",
+        draft: "Draft",
+        confirmed: "Confirmed"
+      }
     },
     
     // Event Wizard Steps
