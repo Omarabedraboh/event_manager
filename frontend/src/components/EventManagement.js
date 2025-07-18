@@ -474,29 +474,19 @@ const EventManagement = () => {
                 <form onSubmit={handleTicketSubmit} className="space-y-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 transition-colors duration-200">
-                      {t('events.ticketName')}
+                      {t('events.ticketType')}
                     </label>
-                    <input
-                      type="text"
-                      name="name"
-                      value={ticketForm.name}
+                    <select
+                      name="ticket_type"
+                      value={ticketForm.ticket_type}
                       onChange={handleInputChange}
-                      className="form-input"
+                      className="form-select"
                       required
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 transition-colors duration-200">
-                      {t('events.description')}
-                    </label>
-                    <textarea
-                      name="description"
-                      value={ticketForm.description}
-                      onChange={handleInputChange}
-                      rows="3"
-                      className="form-textarea"
-                    />
+                    >
+                      <option value="regular">{t('events.regular')}</option>
+                      <option value="early_bird">{t('events.earlyBird')}</option>
+                      <option value="vip">{t('events.vip')}</option>
+                    </select>
                   </div>
 
                   <div className="grid grid-cols-2 gap-4">
@@ -522,40 +512,12 @@ const EventManagement = () => {
                       </label>
                       <input
                         type="number"
-                        name="quantity"
-                        value={ticketForm.quantity}
+                        name="quantity_available"
+                        value={ticketForm.quantity_available}
                         onChange={handleInputChange}
                         min="1"
                         className="form-input"
                         required
-                      />
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 transition-colors duration-200">
-                        {t('events.saleStarts')}
-                      </label>
-                      <input
-                        type="datetime-local"
-                        name="sale_starts"
-                        value={ticketForm.sale_starts}
-                        onChange={handleInputChange}
-                        className="form-input"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 transition-colors duration-200">
-                        {t('events.saleEnds')}
-                      </label>
-                      <input
-                        type="datetime-local"
-                        name="sale_ends"
-                        value={ticketForm.sale_ends}
-                        onChange={handleInputChange}
-                        className="form-input"
                       />
                     </div>
                   </div>
