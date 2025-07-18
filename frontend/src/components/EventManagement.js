@@ -79,12 +79,9 @@ const EventManagement = () => {
       
       setShowTicketForm(false);
       setTicketForm({
-        name: '',
-        description: '',
+        ticket_type: 'regular',
         price: 0,
-        quantity: 100,
-        sale_starts: '',
-        sale_ends: ''
+        quantity_available: 100
       });
       fetchEventData();
     } catch (error) {
