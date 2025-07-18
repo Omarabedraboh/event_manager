@@ -528,6 +528,8 @@ export const translations = {
       next: "التالي",
       previous: "السابق",
       loading: "جاري التحميل...",
+      saving: "جاري الحفظ...",
+      publishing: "جاري النشر...",
       error: "خطأ",
       success: "نجح",
       confirm: "تأكيد",
@@ -551,6 +553,8 @@ export const translations = {
       accessDeniedMessage: "ليس لديك صلاحية للوصول إلى هذه الصفحة.",
       notFound: "غير موجود",
       pageNotFound: "الصفحة غير موجودة",
+      eventNotFound: "الفعالية غير موجودة",
+      eventNotFoundMessage: "الفعالية التي تبحث عنها غير موجودة أو تم حذفها.",
       update: "تحديث",
       
       // Brand Arabic
