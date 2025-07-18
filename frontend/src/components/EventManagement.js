@@ -23,12 +23,9 @@ const EventManagement = () => {
   const [error, setError] = useState('');
 
   const [ticketForm, setTicketForm] = useState({
-    name: '',
-    description: '',
+    ticket_type: 'regular',
     price: 0,
-    quantity: 100,
-    sale_starts: '',
-    sale_ends: ''
+    quantity_available: 100
   });
 
   const [showTicketForm, setShowTicketForm] = useState(false);
