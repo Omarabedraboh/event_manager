@@ -126,26 +126,76 @@
         agent: "main"
         comment: "EVENTSPHERE LOGO IMPLEMENTATION COMPLETE! 🎨✨ Successfully implemented professional swirl logo across entire application. ✅ Logo Design: Created beautiful blue gradient swirl logo that perfectly represents EventSphere's dynamic nature and aligns with brand colors ✅ Multiple Formats: SVG logo (scalable), large version for headers, favicon for browser tab ✅ Reusable Component: Built Logo.js component with multiple size options (sm, md, lg, xl) and text toggle ✅ Universal Implementation: Added logo to Navigation bar, LoginPage header, Dashboard, EventWizard, VenueManager, EventManagement, RegistrationPage, Phase2Banner ✅ Theme Compatibility: Logo works perfectly in both light and dark modes with proper styling ✅ Professional Branding: Application now has cohesive, professional brand identity with logo appearing consistently across all pages ✅ Technical Features: Proper favicon integration, scalable SVG format, responsive sizing, accessibility attributes ✅ Result: EventSphere now has a distinctive, memorable logo that enhances brand recognition and professionalism"
 
-user_problem_statement: "EventSphere Logo Implementation - Create and implement a professional logo for EventSphere across all pages including navigation bar, login page, dashboard, and other components. Logo should work in both light and dark themes and be scalable for different sizes."
+user_problem_statement: "Event Manager Bug Fixes: 1) Failed to create ticket when trying to create tickets, 2) Can't open registration page, 3) In attendee profile: when trying to register on some event: 'Event Not Found - The event you're looking for doesn't exist or has been removed.'"
 
 backend:
-  - task: "Backend API Support"
+  - task: "Fix Event Access Control"
     implemented: true
-    working: true
+    working: false
     file: "backend/server.py"
     stuck_count: 0
-    priority: "low"
-    needs_retesting: false
+    priority: "high"
+    needs_retesting: true
     status_history:
-      - working: true
+      - working: false
         agent: "main"
-        comment: "Backend unchanged - existing APIs support all language switching functionality on frontend"
-      - working: true
-        agent: "testing"
-        comment: "Comprehensive backend API testing completed successfully. Tested all endpoints: Authentication (register/login/me), Event management (CRUD + publish), Venue management (CRUD + booking), Ticket management, Registration system, Dashboard stats. All core functionality working correctly. Role-based access control verified. Error handling proper. 38/40 tests passed - 2 minor test expectation issues but actual functionality is correct."
-      - working: true
-        agent: "testing"
-        comment: "OFFLINE FUNCTIONALITY VERIFICATION COMPLETE! ✅ Comprehensive backend API testing confirms EventSphere works completely offline. All 40/40 tests passed successfully. ✅ Authentication System: User registration, login, JWT token generation working for all roles (organizer, attendee, venue_owner, speaker, sponsor, admin) ✅ Event Management: Full CRUD operations, event publishing, role-based access control working perfectly ✅ Venue Management: Venue creation, availability checking, booking system fully functional ✅ Registration System: Event registration with QR code generation working offline ✅ Ticket Management: All ticket types (early_bird, regular, vip) creation and management working ✅ Dashboard Statistics: Role-specific stats working for all user types ✅ Database Operations: MongoDB localhost:27017 accessible, all collections populated (users: 24, events: 4, venues: 4, tickets: 12, registrations: 4, venue_bookings: 4) ✅ Error Handling: Proper 401/403/404 responses, duplicate registration prevention ✅ JWT Security: Token-based authentication working without internet connection ✅ QR Code Generation: Offline QR code creation for event tickets confirmed ✅ Services Status: All services running (backend, frontend, mongodb) ✅ Configuration: Backend on localhost:8001, MongoDB on localhost:27017, all environment variables properly configured. Backend API is fully functional offline and ready for production use."
+        comment: "FIXED EVENT ACCESS CONTROL ISSUE! ✅ Updated get_event endpoint to properly check event visibility based on user role: 1) Organizers can only see their own events 2) Admins can see all events 3) Other users (attendees) can only see published events 4) Returns 404 'Event not found' if access denied instead of exposing unpublished events. This should fix the 'Event Not Found' error for attendees trying to access unpublished events."
+
+  - task: "Ticket Creation API Support"
+    implemented: true
+    working: false
+    file: "backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: false
+        agent: "main"
+        comment: "Backend ticket creation endpoint is already properly implemented and working. The issue was in the frontend sending wrong data structure. Backend expects: event_id, ticket_type, price, quantity_available."
+
+frontend:
+  - task: "Fix Registration Page Ticket Fetch"
+    implemented: true
+    working: false
+    file: "frontend/src/components/RegistrationPage.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: false
+        agent: "main"
+        comment: "FIXED REGISTRATION PAGE TICKET FETCH! ✅ Updated RegistrationPage.js to use correct API endpoint: Changed from /tickets?event_id=${eventId} to /events/${eventId}/tickets to match backend routes. This should fix the 'can't open registration page' issue."
+
+  - task: "Fix Ticket Creation Schema"
+    implemented: true
+    working: false
+    file: "frontend/src/components/EventManagement.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: false
+        agent: "main"
+        comment: "FIXED TICKET CREATION SCHEMA MISMATCH! ✅ Updated EventManagement.js ticket creation form to match backend schema: 1) Removed unsupported fields: name, description, sale_starts, sale_ends 2) Updated form to use correct fields: ticket_type (select dropdown), price, quantity_available 3) Added ticket type selection with options: regular, early_bird, vip 4) Updated form state management to use correct field names. This should fix the 'Failed to create ticket' error."
+
+metadata:
+  created_by: "main_agent"
+  version: "3.0"
+  test_sequence: 2
+  run_ui: false
+
+test_plan:
+  current_focus:
+    - "Fix Event Access Control"
+    - "Fix Registration Page Ticket Fetch"
+    - "Fix Ticket Creation Schema"
+  stuck_tasks: []
+  test_all: false
+  test_priority: "high_first"
+
+agent_communication:
+  - agent: "main"
+    message: "🔧 EVENT MANAGER BUG FIXES IMPLEMENTED! 🔧 Fixed three critical issues reported by user: 1) REGISTRATION PAGE: Fixed ticket fetch endpoint from /tickets?event_id to /events/{eventId}/tickets 2) TICKET CREATION: Fixed schema mismatch - updated form to use ticket_type, price, quantity_available instead of name, description, quantity, sale_starts, sale_ends 3) EVENT ACCESS: Added proper access control to event endpoint - attendees can only see published events, organizers see their own events, admins see all. All fixes implemented and ready for testing."
 
 frontend:
   - task: "Language Context and Infrastructure"
