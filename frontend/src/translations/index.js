@@ -234,6 +234,8 @@ export const translations = {
       next: "Next",
       previous: "Previous",
       loading: "Loading...",
+      saving: "Saving...",
+      publishing: "Publishing...",
       error: "Error",
       success: "Success",
       confirm: "Confirm",
@@ -257,6 +259,8 @@ export const translations = {
       accessDeniedMessage: "You don't have permission to access this page.",
       notFound: "Not Found",
       pageNotFound: "Page not found",
+      eventNotFound: "Event Not Found",
+      eventNotFoundMessage: "The event you're looking for doesn't exist or has been removed.",
       update: "Update",
       
       // Brand
