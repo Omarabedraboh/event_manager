@@ -604,7 +604,31 @@ export const translations = {
       ticketSoldOut: "نفدت التذاكر",
       myRegistrations: "تسجيلاتي",
       qrCode: "رمز QR",
-      downloadTicket: "تحميل التذكرة"
+      downloadTicket: "تحميل التذكرة",
+      
+      // New Arabic keys for RegistrationPage
+      selectTickets: "يرجى اختيار تذكرة واحدة على الأقل",
+      success: "تم التسجيل بنجاح!",
+      successMessage: "تم تسجيلك بنجاح في هذه الفعالية. تذاكرك جاهزة!",
+      when: "متى",
+      type: "النوع",
+      venue: "المكان",
+      joinLink: "رابط الانضمام",
+      joinEvent: "الانضمام للفعالية",
+      yourTicket: "تذكرتك",
+      qrCodeInfo: "اعرض رمز QR هذا في الفعالية للدخول",
+      backToDashboard: "العودة للوحة التحكم",
+      printTicket: "طباعة التذكرة",
+      registerFor: "التسجيل في",
+      eventDetails: "تفاصيل الفعالية",
+      maxAttendees: "الحد الأقصى للحضور",
+      available: "متاح",
+      noTicketsAvailable: "لا توجد تذاكر متاحة لهذه الفعالية",
+      summary: "ملخص التسجيل",
+      total: "المجموع:",
+      registering: "جاري التسجيل...",
+      registerNow: "سجل الآن",
+      selectTicketsToStart: "اختر التذاكر لبدء التسجيل"
     },
     
     // Common
