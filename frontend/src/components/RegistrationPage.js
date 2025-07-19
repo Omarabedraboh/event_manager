@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../App';
 import { useLanguage } from '../contexts/LanguageContext';
 import axios from 'axios';
+import QRCode from 'qrcode';
 import Navigation from './Navigation';
 import Logo from './Logo';
 
