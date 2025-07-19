@@ -229,11 +229,19 @@ const RegistrationPage = () => {
                   </h3>
                   <div className="flex justify-center mb-4">
                     <div className="p-4 bg-gray-100 dark:bg-gray-700 rounded-lg transition-colors duration-200">
-                      <div className="w-32 h-32 bg-white dark:bg-gray-200 border-2 border-gray-300 dark:border-gray-600 rounded flex items-center justify-center transition-colors duration-200">
-                        <span className="text-xs text-gray-500 dark:text-gray-600 text-center p-2 transition-colors duration-200">
-                          QR Code<br/>{qrCode}
-                        </span>
-                      </div>
+                      {qrCode.startsWith('data:image') ? (
+                        <img 
+                          src={qrCode} 
+                          alt="Registration QR Code" 
+                          className="w-32 h-32 rounded"
+                        />
+                      ) : (
+                        <div className="w-32 h-32 bg-white dark:bg-gray-200 border-2 border-gray-300 dark:border-gray-600 rounded flex items-center justify-center transition-colors duration-200">
+                          <span className="text-xs text-gray-500 dark:text-gray-600 text-center p-2 transition-colors duration-200">
+                            QR Code<br/>{qrCode}
+                          </span>
+                        </div>
+                      )}
                     </div>
                   </div>
                   <p className="text-sm text-gray-600 dark:text-gray-400 transition-colors duration-200">
