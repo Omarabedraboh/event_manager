@@ -15,6 +15,7 @@ const RegistrationPage = () => {
   const { t, isRTL } = useLanguage();
   const navigate = useNavigate();
   const [event, setEvent] = useState(null);
+  const [venue, setVenue] = useState(null);
   const [tickets, setTickets] = useState([]);
   const [selectedTickets, setSelectedTickets] = useState({});
   const [loading, setLoading] = useState(true);
