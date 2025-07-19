@@ -318,10 +318,10 @@ const RegistrationPage = () => {
                     </p>
                   </div>
 
-                  {event.venue_id && (
+                  {event.venue_id && venue && (
                     <div>
                       <span className="font-medium text-gray-700 dark:text-gray-300 transition-colors duration-200">{t('registration.venue')}:</span>
-                      <p className="text-gray-900 dark:text-gray-100 transition-colors duration-200">{event.venue_id}</p>
+                      <p className="text-gray-900 dark:text-gray-100 transition-colors duration-200">{venue.name}</p>
                     </div>
                   )}
 
