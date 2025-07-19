@@ -39,6 +39,18 @@ const RegistrationPage = () => {
 
       setEvent(eventRes.data);
       setTickets(ticketsRes.data);
+
+      // Fetch venue details if event has a venue
+      if (eventRes.data.venue_id) {
+        try {
+          const venueRes = await axios.get(`${API}/venues/${eventRes.data.venue_id}`);
+          setVenue(venueRes.data);
+        } catch (venueError) {
+          console.error('Failed to fetch venue details:', venueError);
+          // Set a fallback if venue fetch fails
+          setVenue({ name: 'Venue details unavailable' });
+        }
+      }
     } catch (error) {
       setError('Failed to fetch event data');
       console.error(error);
