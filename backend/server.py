@@ -313,6 +313,13 @@ async def get_venues(current_user: User = Depends(get_current_user)):
         venues = await db.venues.find().to_list(1000)
     return [Venue(**venue) for venue in venues]
 
+@api_router.get("/venues/{venue_id}", response_model=Venue)
+async def get_venue(venue_id: str, current_user: User = Depends(get_current_user)):
+    venue = await db.venues.find_one({"id": venue_id})
+    if not venue:
+        raise HTTPException(status_code=404, detail="Venue not found")
+    return Venue(**venue)
+
 @api_router.get("/venues/{venue_id}/availability")
 async def check_venue_availability(venue_id: str, start_date: str, end_date: str, current_user: User = Depends(get_current_user)):
     # Check for conflicting bookings
