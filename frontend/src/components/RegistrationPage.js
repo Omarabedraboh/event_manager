@@ -115,8 +115,21 @@ const RegistrationPage = () => {
           attendee_email: user.email
         };
         
-        // Simple QR code simulation (in real app, use a QR library)
-        setQrCode(`QR_${registrations[0].id}_${eventId}`);
+        // Generate actual QR code with registration data
+        try {
+          const qrCodeDataURL = await QRCode.toDataURL(JSON.stringify(qrData), {
+            width: 256,
+            margin: 2,
+            color: {
+              dark: '#000000',
+              light: '#FFFFFF'
+            }
+          });
+          setQrCode(qrCodeDataURL);
+        } catch (qrError) {
+          console.error('Failed to generate QR code:', qrError);
+          setQrCode(`QR_${registrations[0].id}_${eventId}`); // Fallback to text
+        }
       }
 
       setSuccess(true);
