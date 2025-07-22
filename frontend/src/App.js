@@ -201,6 +201,12 @@ function App() {
                 </ProtectedRoute>
               } />
               
+              <Route path="/speakers" element={
+                <ProtectedRoute>
+                  <SpeakerDashboard />
+                </ProtectedRoute>
+              } />
+              
               <Route path="/marketing" element={
                 <ProtectedRoute>
                   <Phase2Banner feature="Marketing Center" description="Email campaigns and social media automation" />
@@ -209,7 +215,7 @@ function App() {
               
               <Route path="/sponsors" element={
                 <ProtectedRoute>
-                  <Phase2Banner feature="Sponsor Dashboard" description="Sponsor management and lead tracking" />
+                  <SponsorDashboard />
                 </ProtectedRoute>
               } />
               
