@@ -39,9 +39,7 @@ const SponsorDashboard = () => {
 
   const fetchProfile = async () => {
     try {
-      const response = await axios.get(`${API}/api/sponsors/profile`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const response = await axios.get(`${API}/api/sponsors/profile`);
       setProfile(response.data);
     } catch (error) {
       console.error('Error fetching profile:', error);
@@ -50,9 +48,7 @@ const SponsorDashboard = () => {
 
   const fetchSponsorships = async () => {
     try {
-      const response = await axios.get(`${API}/api/sponsors/sponsorships`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const response = await axios.get(`${API}/api/sponsors/sponsorships`);
       setSponsorships(response.data);
     } catch (error) {
       console.error('Error fetching sponsorships:', error);
@@ -61,9 +57,7 @@ const SponsorDashboard = () => {
 
   const fetchAvailableEvents = async () => {
     try {
-      const response = await axios.get(`${API}/api/sponsors/events`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const response = await axios.get(`${API}/api/sponsors/events`);
       setAvailableEvents(response.data);
     } catch (error) {
       console.error('Error fetching events:', error);
@@ -74,9 +68,7 @@ const SponsorDashboard = () => {
     e.preventDefault();
     setLoading(true);
     try {
-      await axios.post(`${API}/api/sponsors/profile`, profile, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      await axios.post(`${API}/api/sponsors/profile`, profile);
       alert('Profile updated successfully!');
     } catch (error) {
       console.error('Error updating profile:', error);
@@ -89,9 +81,7 @@ const SponsorDashboard = () => {
     e.preventDefault();
     setLoading(true);
     try {
-      await axios.post(`${API}/api/sponsors/sponsorships`, newSponsorship, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      await axios.post(`${API}/api/sponsors/sponsorships`, newSponsorship);
       alert('Sponsorship application submitted successfully!');
       setNewSponsorship({
         event_id: '',
