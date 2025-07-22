@@ -111,7 +111,7 @@ const LoginPage = () => {
           {/* Demo Users Section */}
           <div className="mb-6">
             <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-3 transition-colors duration-200">Quick Demo Access</h3>
-            <div className="grid grid-cols-2 gap-2">
+            <div className="grid grid-cols-3 gap-2">{/* Changed from grid-cols-2 to grid-cols-3 */}
               {demoUsers.map((demoUser) => (
                 <button
                   key={demoUser.role}
