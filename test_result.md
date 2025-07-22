@@ -129,6 +129,29 @@
 user_problem_statement: "Event Manager Bug Fixes: 1) Failed to create ticket when trying to create tickets, 2) Can't open registration page, 3) In attendee profile: when trying to register on some event: 'Event Not Found - The event you're looking for doesn't exist or has been removed.'"
 
 backend:
+  - task: "Speaker System Backend API"
+    implemented: true
+    working: true
+    file: "backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: true
+        agent: "main"
+        comment: "Implemented comprehensive speaker system backend with SpeakerProfile and SpeakerContent models. Added API endpoints: GET/POST /api/speakers/profile for profile management, GET/POST /api/speakers/content for content management, DELETE /api/speakers/content/{id} for content deletion. Supports profile image upload (base64), social links, expertise areas, and multi-type content upload (presentations, research papers, videos, documents)."
+
+  - task: "Sponsor System Backend API"
+    implemented: true
+    working: true
+    file: "backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: true
+        agent: "main"
+        comment: "Implemented comprehensive sponsor system backend with SponsorProfile and Sponsorship models. Added API endpoints: GET/POST /api/sponsors/profile for company profile management, GET /api/sponsors/sponsorships for sponsorship history, GET /api/sponsors/events for available events, POST /api/sponsors/sponsorships for sponsorship applications. Supports company logo upload (base64), sponsorship levels (bronze, silver, gold, presenting, title), and event funding workflow."
   - task: "Fix Event Access Control"
     implemented: true
     working: true
