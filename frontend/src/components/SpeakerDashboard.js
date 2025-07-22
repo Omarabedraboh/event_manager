@@ -140,9 +140,7 @@ const SpeakerDashboard = () => {
   const deleteContent = async (contentId) => {
     if (window.confirm('Are you sure you want to delete this content?')) {
       try {
-        await axios.delete(`${API}/api/speakers/content/${contentId}`, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
+        await axios.delete(`${API}/api/speakers/content/${contentId}`);
         fetchContent();
       } catch (error) {
         console.error('Error deleting content:', error);
