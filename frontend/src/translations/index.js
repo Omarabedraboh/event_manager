@@ -10,6 +10,7 @@ export const translations = {
       analytics: "Analytics",
       networking: "Networking",
       marketing: "Marketing",
+      speakerDashboard: "Speaker Dashboard",
       sponsorDashboard: "Sponsor Dashboard",
       profile: "Profile Settings",
       signOut: "Sign out"
