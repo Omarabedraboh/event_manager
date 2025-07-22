@@ -6,7 +6,7 @@ import axios from 'axios';
 const API = process.env.REACT_APP_BACKEND_URL || import.meta.env.REACT_APP_BACKEND_URL;
 
 const SpeakerDashboard = () => {
-  const { user, token } = useAuth();
+  const { user } = useAuth();
   const { t, isRTL } = useLanguage();
   const [activeTab, setActiveTab] = useState('profile');
   const [loading, setLoading] = useState(false);
