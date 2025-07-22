@@ -12,6 +12,8 @@ import EventManagement from './components/EventManagement';
 import VenueManager from './components/VenueManager';
 import RegistrationPage from './components/RegistrationPage';
 import Phase2Banner from './components/Phase2Banner';
+import SpeakerDashboard from './components/SpeakerDashboard';
+import SponsorDashboard from './components/SponsorDashboard';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
