@@ -2,7 +2,7 @@
 # EventSphere Registration Flow - Detailed CURL Commands
 # This script demonstrates the complete working registration flow
 
-API_URL="https://ec27b79c-49a2-4c78-9908-239079600bcd.preview.emergentagent.com/api"
+API_URL="https://9188a822-213b-4464-95ad-4107bf6d16dc.preview.emergentagent.com/api"
 TIMESTAMP=$(date +%H%M%S)
 
 echo "🎯 EVENTSPHERE REGISTRATION FLOW - CURL COMMANDS DEMONSTRATION"
