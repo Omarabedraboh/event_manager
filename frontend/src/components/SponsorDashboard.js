@@ -1,13 +1,13 @@
-import React, { useState, useEffect, useContext } from 'react';
-import { AuthContext } from '../contexts/AuthContext';
-import { LanguageContext } from '../contexts/LanguageContext';
+import React, { useState, useEffect } from 'react';
+import { useAuth } from '../App';
+import { useLanguage } from '../contexts/LanguageContext';
 import axios from 'axios';
 
 const API = process.env.REACT_APP_BACKEND_URL || import.meta.env.REACT_APP_BACKEND_URL;
 
 const SponsorDashboard = () => {
-  const { user, token } = useContext(AuthContext);
-  const { t, isRTL } = useContext(LanguageContext);
+  const { user, token } = useAuth();
+  const { t, isRTL } = useLanguage();
   const [activeTab, setActiveTab] = useState('profile');
   const [loading, setLoading] = useState(false);
   
