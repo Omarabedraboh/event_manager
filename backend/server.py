@@ -153,6 +153,84 @@ class RegistrationCreate(BaseModel):
     event_id: str
     ticket_id: str
 
+# Speaker Models
+class SpeakerProfile(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    user_id: str
+    bio: Optional[str] = None
+    profile_image: Optional[str] = None  # base64 encoded image
+    linkedin_url: Optional[str] = None
+    twitter_url: Optional[str] = None
+    website_url: Optional[str] = None
+    expertise_areas: List[str] = []
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+    updated_at: datetime = Field(default_factory=datetime.utcnow)
+
+class SpeakerProfileCreate(BaseModel):
+    bio: Optional[str] = None
+    profile_image: Optional[str] = None
+    linkedin_url: Optional[str] = None
+    twitter_url: Optional[str] = None
+    website_url: Optional[str] = None
+    expertise_areas: List[str] = []
+
+class SpeakerContent(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    speaker_id: str
+    event_id: Optional[str] = None  # Can be linked to specific event
+    title: str
+    content_type: str  # presentation, research_paper, video, etc.
+    file_data: Optional[str] = None  # base64 encoded file
+    file_name: Optional[str] = None
+    description: Optional[str] = None
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+
+class SpeakerContentCreate(BaseModel):
+    event_id: Optional[str] = None
+    title: str
+    content_type: str
+    file_data: Optional[str] = None
+    file_name: Optional[str] = None
+    description: Optional[str] = None
+
+# Sponsor Models
+class SponsorProfile(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    user_id: str
+    company_name: str
+    company_logo: Optional[str] = None  # base64 encoded image
+    company_description: Optional[str] = None
+    website_url: Optional[str] = None
+    industry: Optional[str] = None
+    contact_person: Optional[str] = None
+    contact_email: Optional[str] = None
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+    updated_at: datetime = Field(default_factory=datetime.utcnow)
+
+class SponsorProfileCreate(BaseModel):
+    company_name: str
+    company_logo: Optional[str] = None
+    company_description: Optional[str] = None
+    website_url: Optional[str] = None
+    industry: Optional[str] = None
+    contact_person: Optional[str] = None
+    contact_email: Optional[str] = None
+
+class Sponsorship(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    sponsor_id: str
+    event_id: str
+    sponsorship_type: str  # gold, silver, bronze, title, presenting
+    amount: float
+    status: str = "pending"  # pending, approved, paid, cancelled
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+    updated_at: datetime = Field(default_factory=datetime.utcnow)
+
+class SponsorshipCreate(BaseModel):
+    event_id: str
+    sponsorship_type: str
+    amount: float
+
 # Utility Functions
 def hash_password(password: str) -> str:
     return bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
