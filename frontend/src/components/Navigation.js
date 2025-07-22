@@ -46,6 +46,7 @@ const Navigation = () => {
         { path: '/marketing', label: t('nav.marketing') }
       ],
       speaker: [
+        { path: '/speakers', label: t('nav.speakerDashboard') },
         { path: '/networking', label: t('nav.networking') }
       ],
       sponsor: [
