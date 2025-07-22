@@ -362,6 +362,7 @@ export const translations = {
       analytics: "التحليلات",
       networking: "التواصل",
       marketing: "التسويق",
+      speakerDashboard: "لوحة المتحدث",
       sponsorDashboard: "لوحة الراعي",
       profile: "إعدادات الملف الشخصي",
       signOut: "تسجيل الخروج"
