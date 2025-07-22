@@ -41,9 +41,7 @@ const SpeakerDashboard = () => {
 
   const fetchProfile = async () => {
     try {
-      const response = await axios.get(`${API}/api/speakers/profile`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const response = await axios.get(`${API}/api/speakers/profile`);
       setProfile(response.data);
     } catch (error) {
       console.error('Error fetching profile:', error);
@@ -52,9 +50,7 @@ const SpeakerDashboard = () => {
 
   const fetchContent = async () => {
     try {
-      const response = await axios.get(`${API}/api/speakers/content`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const response = await axios.get(`${API}/api/speakers/content`);
       setContent(response.data);
     } catch (error) {
       console.error('Error fetching content:', error);
@@ -65,9 +61,7 @@ const SpeakerDashboard = () => {
     e.preventDefault();
     setLoading(true);
     try {
-      await axios.post(`${API}/api/speakers/profile`, profile, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      await axios.post(`${API}/api/speakers/profile`, profile);
       alert('Profile updated successfully!');
     } catch (error) {
       console.error('Error updating profile:', error);
@@ -80,9 +74,7 @@ const SpeakerDashboard = () => {
     e.preventDefault();
     setLoading(true);
     try {
-      await axios.post(`${API}/api/speakers/content`, newContent, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      await axios.post(`${API}/api/speakers/content`, newContent);
       alert('Content uploaded successfully!');
       setNewContent({
         title: '',
