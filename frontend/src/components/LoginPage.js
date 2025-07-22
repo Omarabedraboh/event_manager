@@ -58,6 +58,8 @@ const LoginPage = () => {
     { email: 'organizer@demo.com', password: 'demo123', role: 'organizer', name: 'Demo Organizer' },
     { email: 'attendee@demo.com', password: 'demo123', role: 'attendee', name: 'Demo Attendee' },
     { email: 'venue@demo.com', password: 'demo123', role: 'venue_owner', name: 'Demo Venue Owner' },
+    { email: 'speaker@demo.com', password: 'demo123', role: 'speaker', name: 'Demo Speaker' },
+    { email: 'sponsor@demo.com', password: 'demo123', role: 'sponsor', name: 'Demo Sponsor' },
     { email: 'admin@demo.com', password: 'demo123', role: 'admin', name: 'Demo Admin' }
   ];
 
