@@ -4,6 +4,7 @@ import { useAuth } from '../App';
 import { useLanguage } from '../contexts/LanguageContext';
 import axios from 'axios';
 import Navigation from './Navigation';
+import Logo from './Logo';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
@@ -13,36 +14,26 @@ const EventManagement = () => {
   const { user } = useAuth();
   const { t, isRTL } = useLanguage();
   const navigate = useNavigate();
-  
   const [event, setEvent] = useState(null);
   const [tickets, setTickets] = useState([]);
   const [registrations, setRegistrations] = useState([]);
-  const [venues, setVenues] = useState([]);
+  const [stats, setStats] = useState({});
+  const [activeTab, setActiveTab] = useState('overview');
   const [loading, setLoading] = useState(true);
-  const [showTicketForm, setShowTicketForm] = useState(false);
-  const [showEditForm, setShowEditForm] = useState(false);
   const [error, setError] = useState('');
 
   const [ticketForm, setTicketForm] = useState({
     ticket_type: 'regular',
     price: 0,
-    quantity_available: 50
+    quantity_available: 100
   });
 
-  const [editForm, setEditForm] = useState({
-    title: '',
-    description: '',
-    event_type: 'physical',
-    start_date: '',
-    end_date: '',
-    venue_id: '',
-    virtual_link: '',
-    max_attendees: 100
-  });
+  const [showTicketForm, setShowTicketForm] = useState(false);
 
   useEffect(() => {
-    fetchEventData();
-    fetchVenues();
+    if (id) {
+      fetchEventData();
+    }
   }, [id]);
 
   const fetchEventData = async () => {
@@ -57,18 +48,18 @@ const EventManagement = () => {
       setTickets(ticketsRes.data);
       setRegistrations(registrationsRes.data);
       
-      // Set edit form with current event data
-      const eventData = eventRes.data;
-      setEditForm({
-        title: eventData.title,
-        description: eventData.description,
-        event_type: eventData.event_type,
-        start_date: eventData.start_date.slice(0, 16), // Format for datetime-local
-        end_date: eventData.end_date.slice(0, 16),
-        venue_id: eventData.venue_id || '',
-        virtual_link: eventData.virtual_link || '',
-        max_attendees: eventData.max_attendees
+      // Calculate stats
+      const totalSales = ticketsRes.data.reduce((sum, ticket) => {
+        const soldTickets = registrationsRes.data.filter(reg => reg.ticket_id === ticket.id).length;
+        return sum + (ticket.price * soldTickets);
+      }, 0);
+
+      setStats({
+        totalRegistrations: registrationsRes.data.length,
+        totalSales,
+        totalTickets: ticketsRes.data.length
       });
+
     } catch (error) {
       setError('Failed to fetch event data');
       console.error(error);
@@ -76,56 +67,39 @@ const EventManagement = () => {
     setLoading(false);
   };
 
-  const fetchVenues = async () => {
-    try {
-      const response = await axios.get(`${API}/venues`);
-      setVenues(response.data);
-    } catch (error) {
-      console.error('Failed to fetch venues:', error);
-    }
-  };
-
   const handleTicketSubmit = async (e) => {
     e.preventDefault();
+    setError('');
+
     try {
-      const response = await axios.post(`${API}/tickets`, {
+      await axios.post(`${API}/tickets`, {
         ...ticketForm,
         event_id: id
       });
       
-      setTickets([...tickets, response.data]);
-      setTicketForm({ ticket_type: 'regular', price: 0, quantity_available: 50 });
       setShowTicketForm(false);
-      setError('');
+      setTicketForm({
+        ticket_type: 'regular',
+        price: 0,
+        quantity_available: 100
+      });
+      fetchEventData();
     } catch (error) {
-      setError(error.response?.data?.detail || 'Failed to create ticket');
+      setError('Failed to create ticket');
+      console.error(error);
     }
   };
 
-  const handleEventUpdate = async (e) => {
-    e.preventDefault();
-    try {
-      await axios.put(`${API}/events/${id}`, editForm);
-      await fetchEventData(); // Refresh data
-      setShowEditForm(false);
-      setError('');
-    } catch (error) {
-      setError(error.response?.data?.detail || 'Failed to update event');
-    }
-  };
-
-  const handlePublish = async () => {
-    try {
-      await axios.post(`${API}/events/${id}/publish`);
-      await fetchEventData();
-      setError('');
-    } catch (error) {
-      setError(error.response?.data?.detail || 'Failed to publish event');
-    }
+  const handleInputChange = (e) => {
+    const { name, value, type } = e.target;
+    setTicketForm(prev => ({
+      ...prev,
+      [name]: type === 'number' ? parseFloat(value) : value
+    }));
   };
 
   const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleString('en-US', {
+    return new Date(dateString).toLocaleDateString('en-US', {
       year: 'numeric',
       month: 'short',
       day: 'numeric',
@@ -134,36 +108,46 @@ const EventManagement = () => {
     });
   };
 
-  const getEventTypeClass = (type) => {
-    switch (type) {
-      case 'physical': return 'event-type-physical';
-      case 'virtual': return 'event-type-virtual';
-      case 'hybrid': return 'event-type-hybrid';
-      default: return 'badge-primary';
+  const getEventStatusBadge = (event) => {
+    if (!event) return null;
+    
+    const now = new Date();
+    const startDate = new Date(event.start_date);
+    const endDate = new Date(event.end_date);
+
+    if (now > endDate) {
+      return <span className="badge badge-danger">{t('events.status.ended')}</span>;
+    } else if (now >= startDate && now <= endDate) {
+      return <span className="badge badge-success">{t('events.status.live')}</span>;
+    } else if (event.is_published) {
+      return <span className="badge badge-primary">{t('events.status.published')}</span>;
+    } else {
+      return <span className="badge badge-warning">{t('events.status.draft')}</span>;
     }
   };
 
-  const totalRevenue = tickets.reduce((sum, ticket) => sum + (ticket.price * ticket.quantity_sold), 0);
-  const totalRegistrations = registrations.length;
+  const tabs = [
+    { id: 'overview', label: t('events.tabs.overview') },
+    { id: 'tickets', label: t('events.tabs.tickets') },
+    { id: 'registrations', label: t('events.tabs.registrations') }
+  ];
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-500"></div>
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 transition-colors duration-200">
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-500 dark:border-blue-400"></div>
       </div>
     );
   }
 
   if (!event) {
     return (
-      <div className={`min-h-screen bg-gray-50 ${isRTL ? 'font-arabic' : ''}`}>
+      <div className={`min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-200 ${isRTL ? 'font-arabic' : ''}`}>
         <Navigation />
-        <div className="max-w-4xl mx-auto py-6 px-4">
-          <div className={`text-center ${isRTL ? 'text-right' : ''}`}>
-            <h1 className="text-2xl font-bold text-red-600">{t('events.eventNotFound')}</h1>
-            <button onClick={() => navigate('/')} className="btn-primary mt-4">
-              {t('events.backToDashboard')}
-            </button>
+        <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+          <div className="text-center">
+            <h1 className="text-2xl font-bold text-red-600 dark:text-red-400 transition-colors duration-200">{t('common.eventNotFound')}</h1>
+            <p className="text-gray-600 dark:text-gray-400 transition-colors duration-200">{t('common.eventNotFoundMessage')}</p>
           </div>
         </div>
       </div>
@@ -171,61 +155,33 @@ const EventManagement = () => {
   }
 
   return (
-    <div className={`min-h-screen bg-gray-50 ${isRTL ? 'font-arabic' : ''}`}>
+    <div className={`min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-200 ${isRTL ? 'font-arabic' : ''}`}>
       <Navigation />
       
       <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-        {/* Breadcrumb */}
-        <div className={`breadcrumb ${isRTL ? 'flex-row-reverse' : ''}`}>
-          <span className="breadcrumb-item">{t('nav.dashboard')}</span>
-          <span className="breadcrumb-separator">/</span>
-          <span className="breadcrumb-item">{t('events.title')}</span>
-          <span className="breadcrumb-separator">/</span>
-          <span className="breadcrumb-item">{event.title}</span>
-        </div>
-
         {/* Header */}
         <div className="mb-8">
           <div className={`flex justify-between items-start ${isRTL ? 'flex-row-reverse' : ''}`}>
             <div>
-              <h1 className={`text-3xl font-bold text-gray-900 ${isRTL ? 'text-right' : ''}`}>
-                {event.title}
-              </h1>
-              <div className={`flex items-center space-x-4 rtl:space-x-reverse mt-2 ${isRTL ? 'flex-row-reverse' : ''}`}>
-                <span className={`badge ${getEventTypeClass(event.event_type)}`}>
-                  {t(`events.${event.event_type}`)}
-                </span>
-                <span className={`badge ${event.is_published ? 'badge-success' : 'badge-warning'}`}>
-                  {event.is_published ? t('events.published') : t('events.draft')}
-                </span>
+              <div className={`flex items-center space-x-3 ${isRTL ? 'flex-row-reverse space-x-reverse' : ''} mb-2`}>
+                <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100 transition-colors duration-200">
+                  {event.title}
+                </h1>
+                {getEventStatusBadge(event)}
               </div>
+              <p className="text-gray-600 dark:text-gray-400 transition-colors duration-200">
+                {event.description}
+              </p>
             </div>
-            <div className={`flex space-x-3 rtl:space-x-reverse ${isRTL ? 'flex-row-reverse' : ''}`}>
-              <button
-                onClick={() => setShowEditForm(true)}
-                className="btn-secondary"
-              >
-                {t('events.editEvent')}
-              </button>
-              {!event.is_published && (
-                <button
-                  onClick={handlePublish}
-                  className="btn-success"
-                >
-                  {t('events.publishEvent')}
-                </button>
-              )}
-              <button
-                onClick={() => navigate(`/register/${event.id}`)}
-                className="btn-primary"
-              >
-                {t('events.viewRegistrationPage')}
-              </button>
-            </div>
+            <button
+              onClick={() => navigate('/events/create')}
+              className="btn-primary"
+            >
+              {t('events.createAnother')}
+            </button>
           </div>
         </div>
 
-        {/* Error Alert */}
         {error && (
           <div className="alert alert-error mb-6">
             {error}
@@ -233,17 +189,17 @@ const EventManagement = () => {
         )}
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           <div className="card">
             <div className="card-body">
               <div className={`flex items-center ${isRTL ? 'flex-row-reverse' : ''}`}>
                 <div className={`flex-1 ${isRTL ? 'text-right' : ''}`}>
-                  <p className="text-sm font-medium text-gray-600">{t('events.totalRegistrationsStats')}</p>
-                  <p className="text-2xl font-bold text-gray-900">{totalRegistrations}</p>
+                  <p className="text-sm font-medium text-gray-600 dark:text-gray-400 transition-colors duration-200">{t('events.totalRegistrations')}</p>
+                  <p className="text-2xl font-bold text-gray-900 dark:text-gray-100 transition-colors duration-200">{stats.totalRegistrations || 0}</p>
                 </div>
-                <div className="p-3 bg-blue-100 rounded-full">
-                  <svg className="w-6 h-6 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
-                    <path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z" />
+                <div className="p-3 bg-blue-100 dark:bg-blue-900/30 rounded-full transition-colors duration-200">
+                  <svg className="w-6 h-6 text-blue-600 dark:text-blue-400" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
                   </svg>
                 </div>
               </div>
@@ -254,12 +210,13 @@ const EventManagement = () => {
             <div className="card-body">
               <div className={`flex items-center ${isRTL ? 'flex-row-reverse' : ''}`}>
                 <div className={`flex-1 ${isRTL ? 'text-right' : ''}`}>
-                  <p className="text-sm font-medium text-gray-600">{t('events.capacity')}</p>
-                  <p className="text-2xl font-bold text-gray-900">{event.max_attendees}</p>
+                  <p className="text-sm font-medium text-gray-600 dark:text-gray-400 transition-colors duration-200">{t('events.totalSales')}</p>
+                  <p className="text-2xl font-bold text-gray-900 dark:text-gray-100 transition-colors duration-200">${stats.totalSales || 0}</p>
                 </div>
-                <div className="p-3 bg-green-100 rounded-full">
-                  <svg className="w-6 h-6 text-green-600" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zm0 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V8zm0 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1v-2z" clipRule="evenodd" />
+                <div className="p-3 bg-green-100 dark:bg-green-900/30 rounded-full transition-colors duration-200">
+                  <svg className="w-6 h-6 text-green-600 dark:text-green-400" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M8.433 7.418c.155-.103.346-.196.567-.267v1.698a2.305 2.305 0 01-.567-.267C8.07 8.34 8 8.114 8 8c0-.114.07-.34.433-.582zM11 12.849v-1.698c.22.071.412.164.567.267.364.243.433.468.433.582 0 .114-.07.34-.433.582a2.305 2.305 0 01-.567.267z"/>
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-13a1 1 0 10-2 0v.092a4.535 4.535 0 00-1.676.662C6.602 6.234 6 7.009 6 8c0 .99.602 1.765 1.324 2.246.48.32 1.054.545 1.676.662v1.941c-.391-.127-.68-.317-.843-.504a1 1 0 10-1.51 1.31c.562.649 1.413 1.076 2.353 1.253V15a1 1 0 102 0v-.092a4.535 4.535 0 001.676-.662C13.398 13.766 14 12.991 14 12c0-.99-.602-1.765-1.324-2.246A4.535 4.535 0 0011 9.092V7.151c.391.127.68.317.843.504a1 1 0 101.51-1.31c-.562-.649-1.413-1.076-2.353-1.253V5z" clipRule="evenodd"/>
                   </svg>
                 </div>
               </div>
@@ -270,31 +227,13 @@ const EventManagement = () => {
             <div className="card-body">
               <div className={`flex items-center ${isRTL ? 'flex-row-reverse' : ''}`}>
                 <div className={`flex-1 ${isRTL ? 'text-right' : ''}`}>
-                  <p className="text-sm font-medium text-gray-600">{t('events.revenueStats')}</p>
-                  <p className="text-2xl font-bold text-gray-900">${totalRevenue.toFixed(2)}</p>
+                  <p className="text-sm font-medium text-gray-600 dark:text-gray-400 transition-colors duration-200">{t('events.totalTickets')}</p>
+                  <p className="text-2xl font-bold text-gray-900 dark:text-gray-100 transition-colors duration-200">{stats.totalTickets || 0}</p>
                 </div>
-                <div className="p-3 bg-yellow-100 rounded-full">
-                  <svg className="w-6 h-6 text-yellow-600" fill="currentColor" viewBox="0 0 20 20">
-                    <path d="M8.433 7.418c.155-.103.346-.196.567-.267v1.698a2.305 2.305 0 01-.567-.267C8.07 8.34 8 8.114 8 8c0-.114.07-.34.433-.582zM11 12.849v-1.698c.22.071.412.164.567.267.364.243.433.468.433.582 0 .114-.07.34-.433.582a2.305 2.305 0 01-.567.267z" />
-                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-13a1 1 0 10-2 0v.092a4.535 4.535 0 00-1.676.662C6.602 6.234 6 7.009 6 8c0 .99.602 1.765 1.324 2.246.48.32 1.054.545 1.676.662v1.941c-.391-.127-.68-.317-.843-.504a1 1 0 10-1.51 1.31c.562.649 1.413 1.076 2.353 1.253V15a1 1 0 102 0v-.092a4.535 4.535 0 001.676-.662C13.398 13.766 14 12.991 14 12c0-.99-.602-1.765-1.324-2.246A4.535 4.535 0 0011 9.092V7.151c.391.127.68.317.843.504a1 1 0 101.511-1.31c-.563-.649-1.413-1.076-2.354-1.253V5z" clipRule="evenodd" />
-                  </svg>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="card">
-            <div className="card-body">
-              <div className={`flex items-center ${isRTL ? 'flex-row-reverse' : ''}`}>
-                <div className={`flex-1 ${isRTL ? 'text-right' : ''}`}>
-                  <p className="text-sm font-medium text-gray-600">{t('events.attendanceRate')}</p>
-                  <p className="text-2xl font-bold text-gray-900">
-                    {event.max_attendees > 0 ? Math.round((totalRegistrations / event.max_attendees) * 100) : 0}%
-                  </p>
-                </div>
-                <div className="p-3 bg-purple-100 rounded-full">
-                  <svg className="w-6 h-6 text-purple-600" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M3 3a1 1 0 000 2v8a2 2 0 002 2h2.586l-1.293 1.293a1 1 0 101.414 1.414L10 15.414l2.293 2.293a1 1 0 001.414-1.414L12.414 15H15a2 2 0 002-2V5a1 1 0 100-2H3zm11.707 4.707a1 1 0 00-1.414-1.414L10 9.586 8.707 8.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                <div className="p-3 bg-purple-100 dark:bg-purple-900/30 rounded-full transition-colors duration-200">
+                  <svg className="w-6 h-6 text-purple-600 dark:text-purple-400" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M2 5a2 2 0 012-2h8a2 2 0 012 2v10a2 2 0 002 2H4a2 2 0 01-2-2V5zm3 1h6v4H5V6zm6 6H5v2h6v-2z" clipRule="evenodd"/>
+                    <path d="M15 7h1a2 2 0 012 2v5.5a1.5 1.5 0 01-3 0V9a1 1 0 00-1-1h-1v-1z"/>
                   </svg>
                 </div>
               </div>
@@ -302,373 +241,300 @@ const EventManagement = () => {
           </div>
         </div>
 
-        {/* Main Content Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Event Details */}
-          <div className="lg:col-span-2 space-y-6">
-            {/* Event Information */}
-            <div className="card">
-              <div className="card-header">
-                <h3 className={`text-lg font-medium text-gray-900 ${isRTL ? 'text-right' : ''}`}>
-                  {t('events.eventDetails')}
-                </h3>
-              </div>
-              <div className="card-body space-y-4">
-                <div>
-                  <h4 className={`font-medium text-gray-900 ${isRTL ? 'text-right' : ''}`}>
-                    {t('events.description')}
-                  </h4>
-                  <p className={`text-gray-600 ${isRTL ? 'text-right' : ''}`}>{event.description}</p>
+        {/* Tabs */}
+        <div className="card">
+          <div className="border-b border-gray-200 dark:border-gray-700">
+            <nav className={`flex space-x-8 ${isRTL ? 'flex-row-reverse space-x-reverse' : ''}`} aria-label="Tabs">
+              {tabs.map((tab) => (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id)}
+                  className={`py-4 px-1 border-b-2 font-medium text-sm transition-colors duration-200 ${
+                    activeTab === tab.id
+                      ? 'border-blue-500 text-blue-600 dark:text-blue-400'
+                      : 'border-transparent text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:border-gray-300 dark:hover:border-gray-600'
+                  }`}
+                >
+                  {tab.label}
+                </button>
+              ))}
+            </nav>
+          </div>
+
+          <div className="card-body">
+            {/* Overview Tab */}
+            {activeTab === 'overview' && (
+              <div className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-4 transition-colors duration-200">{t('events.eventDetails')}</h3>
+                    <div className="space-y-3">
+                      <div>
+                        <span className="font-medium text-gray-700 dark:text-gray-300 transition-colors duration-200">{t('events.type')}:</span>
+                        <span className="ml-2 text-gray-900 dark:text-gray-100 transition-colors duration-200">{t(`events.${event.event_type}`)}</span>
+                      </div>
+                      <div>
+                        <span className="font-medium text-gray-700 dark:text-gray-300 transition-colors duration-200">{t('events.startDate')}:</span>
+                        <span className="ml-2 text-gray-900 dark:text-gray-100 transition-colors duration-200">{formatDate(event.start_date)}</span>
+                      </div>
+                      <div>
+                        <span className="font-medium text-gray-700 dark:text-gray-300 transition-colors duration-200">{t('events.endDate')}:</span>
+                        <span className="ml-2 text-gray-900 dark:text-gray-100 transition-colors duration-200">{formatDate(event.end_date)}</span>
+                      </div>
+                      <div>
+                        <span className="font-medium text-gray-700 dark:text-gray-300 transition-colors duration-200">{t('events.maxAttendees')}:</span>
+                        <span className="ml-2 text-gray-900 dark:text-gray-100 transition-colors duration-200">{event.max_attendees}</span>
+                      </div>
+                      {event.venue_id && (
+                        <div>
+                          <span className="font-medium text-gray-700 dark:text-gray-300 transition-colors duration-200">{t('events.venue')}:</span>
+                          <span className="ml-2 text-gray-900 dark:text-gray-100 transition-colors duration-200">{event.venue_id}</span>
+                        </div>
+                      )}
+                      {event.virtual_link && (
+                        <div>
+                          <span className="font-medium text-gray-700 dark:text-gray-300 transition-colors duration-200">{t('events.virtualLink')}:</span>
+                          <a href={event.virtual_link} target="_blank" rel="noopener noreferrer" className="ml-2 text-blue-600 dark:text-blue-400 hover:underline transition-colors duration-200">
+                            {event.virtual_link}
+                          </a>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  <div>
+                    <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-4 transition-colors duration-200">{t('events.quickActions')}</h3>
+                    <div className="space-y-2">
+                      {!event.is_published && (
+                        <button
+                          onClick={async () => {
+                            try {
+                              await axios.post(`${API}/events/${id}/publish`);
+                              fetchEventData();
+                            } catch (error) {
+                              setError('Failed to publish event');
+                            }
+                          }}
+                          className="btn-success w-full"
+                        >
+                          {t('events.publishEvent')}
+                        </button>
+                      )}
+                      <button
+                        onClick={() => window.open(`/register/${id}`, '_blank')}
+                        className="btn-primary w-full"
+                      >
+                        {t('events.viewRegistrationPage')}
+                      </button>
+                      <button
+                        onClick={() => setActiveTab('tickets')}
+                        className="btn-secondary w-full"
+                      >
+                        {t('events.manageTickets')}
+                      </button>
+                    </div>
+                  </div>
                 </div>
-                
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <h4 className={`font-medium text-gray-900 ${isRTL ? 'text-right' : ''}`}>
-                      {t('events.startDateLabel')}
-                    </h4>
-                    <p className={`text-gray-600 ${isRTL ? 'text-right' : ''}`}>
-                      {formatDate(event.start_date)}
-                    </p>
-                  </div>
-                  <div>
-                    <h4 className={`font-medium text-gray-900 ${isRTL ? 'text-right' : ''}`}>
-                      {t('events.endDateLabel')}
-                    </h4>
-                    <p className={`text-gray-600 ${isRTL ? 'text-right' : ''}`}>
-                      {formatDate(event.end_date)}
-                    </p>
-                  </div>
-                </div>
-
-                {event.venue_id && (
-                  <div>
-                    <h4 className={`font-medium text-gray-900 ${isRTL ? 'text-right' : ''}`}>
-                      {t('events.venueLabel')}
-                    </h4>
-                    <p className={`text-gray-600 ${isRTL ? 'text-right' : ''}`}>
-                      {venues.find(v => v.id === event.venue_id)?.name || t('events.venueInfo')}
-                    </p>
-                  </div>
-                )}
-
-                {event.virtual_link && (
-                  <div>
-                    <h4 className={`font-medium text-gray-900 ${isRTL ? 'text-right' : ''}`}>
-                      {t('events.virtualLinkLabel')}
-                    </h4>
-                    <a href={event.virtual_link} target="_blank" rel="noopener noreferrer" className={`text-blue-600 hover:text-blue-800 break-all ${isRTL ? 'text-right' : ''}`}>
-                      {event.virtual_link}
-                    </a>
-                  </div>
-                )}
               </div>
-            </div>
+            )}
 
-            {/* Tickets Management */}
-            <div className="card">
-              <div className="card-header">
-                <div className={`flex justify-between items-center ${isRTL ? 'flex-row-reverse' : ''}`}>
-                  <h3 className={`text-lg font-medium text-gray-900 ${isRTL ? 'text-right' : ''}`}>
-                    {t('tickets.title')}
-                  </h3>
+            {/* Tickets Tab */}
+            {activeTab === 'tickets' && (
+              <div>
+                <div className={`flex justify-between items-center mb-6 ${isRTL ? 'flex-row-reverse' : ''}`}>
+                  <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 transition-colors duration-200">{t('events.eventTickets')}</h3>
                   <button
                     onClick={() => setShowTicketForm(true)}
                     className="btn-primary"
                   >
-                    {t('events.addTicketType')}
+                    {t('events.createTicket')}
                   </button>
                 </div>
-              </div>
-              <div className="card-body">
+
                 {tickets.length > 0 ? (
-                  <div className="space-y-3">
-                    {tickets.map(ticket => (
-                      <div key={ticket.id} className={`flex items-center justify-between p-4 bg-gray-50 rounded-lg ${isRTL ? 'flex-row-reverse' : ''}`}>
-                        <div className={isRTL ? 'text-right' : ''}>
-                          <h4 className="font-medium text-gray-900 capitalize">
-                            {t(`tickets.${ticket.ticket_type}`)}
-                          </h4>
-                          <p className="text-sm text-gray-600">
-                            ${ticket.price} • {ticket.quantity_sold} / {ticket.quantity_available} {t('events.sold')}
-                          </p>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {tickets.map((ticket) => {
+                      const soldCount = registrations.filter(reg => reg.ticket_id === ticket.id).length;
+                      const remainingCount = ticket.quantity - soldCount;
+                      
+                      return (
+                        <div key={ticket.id} className="card">
+                          <div className="card-body">
+                            <h4 className="font-medium text-gray-900 dark:text-gray-100 mb-2 transition-colors duration-200">{ticket.name}</h4>
+                            <p className="text-sm text-gray-600 dark:text-gray-400 mb-4 transition-colors duration-200">{ticket.description}</p>
+                            
+                            <div className="space-y-2 text-sm">
+                              <div className={`flex justify-between ${isRTL ? 'flex-row-reverse' : ''}`}>
+                                <span className="text-gray-600 dark:text-gray-400 transition-colors duration-200">{t('events.price')}:</span>
+                                <span className="font-medium text-gray-900 dark:text-gray-100 transition-colors duration-200">${ticket.price}</span>
+                              </div>
+                              <div className={`flex justify-between ${isRTL ? 'flex-row-reverse' : ''}`}>
+                                <span className="text-gray-600 dark:text-gray-400 transition-colors duration-200">{t('events.sold')}:</span>
+                                <span className="font-medium text-gray-900 dark:text-gray-100 transition-colors duration-200">{soldCount}</span>
+                              </div>
+                              <div className={`flex justify-between ${isRTL ? 'flex-row-reverse' : ''}`}>
+                                <span className="text-gray-600 dark:text-gray-400 transition-colors duration-200">{t('events.remaining')}:</span>
+                                <span className="font-medium text-gray-900 dark:text-gray-100 transition-colors duration-200">{remainingCount}</span>
+                              </div>
+                            </div>
+
+                            <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 mt-4 transition-colors duration-200">
+                              <div 
+                                className="bg-blue-600 dark:bg-blue-500 h-2 rounded-full transition-all duration-200" 
+                                style={{ width: `${(soldCount / ticket.quantity) * 100}%` }}
+                              ></div>
+                            </div>
+                          </div>
                         </div>
-                        <div className={`text-right ${isRTL ? 'text-left' : ''}`}>
-                          <p className="font-medium text-gray-900">
-                            ${(ticket.price * ticket.quantity_sold).toFixed(2)}
-                          </p>
-                          <p className="text-sm text-gray-500">{t('events.revenueStats')}</p>
-                        </div>
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
                 ) : (
-                  <p className={`text-gray-500 text-center py-4 ${isRTL ? 'text-right' : ''}`}>
-                    {t('events.noTicketsCreated')}
-                  </p>
+                  <div className="text-center py-8">
+                    <svg className="mx-auto h-12 w-12 text-gray-400 dark:text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z" />
+                    </svg>
+                    <h3 className="mt-2 text-sm font-medium text-gray-900 dark:text-gray-100 transition-colors duration-200">{t('events.noTickets')}</h3>
+                    <p className="mt-1 text-sm text-gray-500 dark:text-gray-400 transition-colors duration-200">{t('events.createFirstTicket')}</p>
+                  </div>
                 )}
               </div>
-            </div>
+            )}
 
-            {/* Registrations List */}
-            <div className="card">
-              <div className="card-header">
-                <h3 className={`text-lg font-medium text-gray-900 ${isRTL ? 'text-right' : ''}`}>
-                  {t('events.recentRegistrations')}
-                </h3>
-              </div>
-              <div className="card-body">
+            {/* Registrations Tab */}
+            {activeTab === 'registrations' && (
+              <div>
+                <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-6 transition-colors duration-200">{t('events.registrations')}</h3>
+                
                 {registrations.length > 0 ? (
-                  <div className="space-y-3 max-h-64 overflow-y-auto">
-                    {registrations.slice(0, 10).map(registration => (
-                      <div key={registration.id} className={`flex items-center justify-between p-3 bg-gray-50 rounded-lg ${isRTL ? 'flex-row-reverse' : ''}`}>
-                        <div className={isRTL ? 'text-right' : ''}>
-                          <h4 className="font-medium text-gray-900">{registration.attendee?.name}</h4>
-                          <p className="text-sm text-gray-600">{registration.attendee?.email}</p>
-                        </div>
-                        <div className={`text-right ${isRTL ? 'text-left' : ''}`}>
-                          <span className={`badge ${registration.payment_status === 'completed' ? 'badge-success' : 'badge-warning'}`}>
-                            {registration.payment_status}
-                          </span>
-                          <p className="text-sm text-gray-500 mt-1">
-                            {new Date(registration.registration_date).toLocaleDateString()}
-                          </p>
-                        </div>
-                      </div>
-                    ))}
+                  <div className="overflow-x-auto">
+                    <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                      <thead className="bg-gray-50 dark:bg-gray-700">
+                        <tr>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider transition-colors duration-200">
+                            {t('events.attendee')}
+                          </th>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider transition-colors duration-200">
+                            {t('events.ticket')}
+                          </th>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider transition-colors duration-200">
+                            {t('events.registrationDate')}
+                          </th>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider transition-colors duration-200">
+                            {t('events.status')}
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                        {registrations.map((registration) => {
+                          const ticket = tickets.find(t => t.id === registration.ticket_id);
+                          return (
+                            <tr key={registration.id}>
+                              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100 transition-colors duration-200">
+                                {registration.attendee_name}
+                              </td>
+                              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100 transition-colors duration-200">
+                                {ticket?.name || 'Unknown'}
+                              </td>
+                              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400 transition-colors duration-200">
+                                {formatDate(registration.created_at)}
+                              </td>
+                              <td className="px-6 py-4 whitespace-nowrap">
+                                <span className="badge badge-success">{t('events.status.confirmed')}</span>
+                              </td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
                   </div>
                 ) : (
-                  <p className={`text-gray-500 text-center py-4 ${isRTL ? 'text-right' : ''}`}>
-                    {t('events.noRegistrationsYet')}
-                  </p>
+                  <div className="text-center py-8">
+                    <svg className="mx-auto h-12 w-12 text-gray-400 dark:text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                    </svg>
+                    <h3 className="mt-2 text-sm font-medium text-gray-900 dark:text-gray-100 transition-colors duration-200">{t('events.noRegistrations')}</h3>
+                    <p className="mt-1 text-sm text-gray-500 dark:text-gray-400 transition-colors duration-200">{t('events.noRegistrationsMessage')}</p>
+                  </div>
                 )}
               </div>
-            </div>
-          </div>
-
-          {/* Sidebar */}
-          <div className="space-y-6">
-            {/* Quick Actions */}
-            <div className="card">
-              <div className="card-header">
-                <h3 className={`text-lg font-medium text-gray-900 ${isRTL ? 'text-right' : ''}`}>
-                  {t('dashboard.quickActions')}
-                </h3>
-              </div>
-              <div className="card-body space-y-3">
-                <button
-                  onClick={() => navigate(`/register/${event.id}`)}
-                  className="btn-primary w-full"
-                >
-                  {t('events.viewRegistrationPage')}
-                </button>
-                <button
-                  onClick={() => {
-                    const registrationsData = registrations.map(reg => ({
-                      name: reg.attendee?.name,
-                      email: reg.attendee?.email,
-                      ticket_type: reg.ticket?.ticket_type,
-                      registration_date: new Date(reg.registration_date).toLocaleDateString()
-                    }));
-                    
-                    const csvContent = "data:text/csv;charset=utf-8," + 
-                      "Name,Email,Ticket Type,Registration Date\n" +
-                      registrationsData.map(row => 
-                        `"${row.name}","${row.email}","${row.ticket_type}","${row.registration_date}"`
-                      ).join("\n");
-                    
-                    const link = document.createElement("a");
-                    link.setAttribute("href", encodeURI(csvContent));
-                    link.setAttribute("download", `${event.title}_registrations.csv`);
-                    document.body.appendChild(link);
-                    link.click();
-                    document.body.removeChild(link);
-                  }}
-                  className="btn-secondary w-full"
-                  disabled={registrations.length === 0}
-                >
-                  {t('events.exportAttendees')}
-                </button>
-                <button
-                  onClick={() => navigate('/analytics')}
-                  className="btn-secondary w-full"
-                >
-                  {t('events.viewAnalytics')}
-                </button>
-              </div>
-            </div>
-
-            {/* Event Status */}
-            <div className="card">
-              <div className="card-header">
-                <h3 className={`text-lg font-medium text-gray-900 ${isRTL ? 'text-right' : ''}`}>
-                  {t('events.eventStatus')}
-                </h3>
-              </div>
-              <div className="card-body">
-                <div className="space-y-3">
-                  <div className={`flex justify-between ${isRTL ? 'flex-row-reverse' : ''}`}>
-                    <span className="text-gray-600">{t('events.status')}:</span>
-                    <span className={`badge ${event.is_published ? 'badge-success' : 'badge-warning'}`}>
-                      {event.is_published ? t('events.published') : t('events.draft')}
-                    </span>
-                  </div>
-                  <div className={`flex justify-between ${isRTL ? 'flex-row-reverse' : ''}`}>
-                    <span className="text-gray-600">{t('events.type')}:</span>
-                    <span className={`badge ${getEventTypeClass(event.event_type)}`}>
-                      {t(`events.${event.event_type}`)}
-                    </span>
-                  </div>
-                  <div className={`flex justify-between ${isRTL ? 'flex-row-reverse' : ''}`}>
-                    <span className="text-gray-600">{t('events.created')}:</span>
-                    <span className="text-gray-900">
-                      {new Date(event.created_at).toLocaleDateString()}
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </div>
+            )}
           </div>
         </div>
 
-        {/* Add Ticket Modal */}
+        {/* Create Ticket Modal */}
         {showTicketForm && (
           <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
-            <div className="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+            <div className="relative top-20 mx-auto p-5 border w-11/12 md:w-1/2 shadow-lg rounded-md bg-white dark:bg-gray-800 transition-colors duration-200">
               <div className="mt-3">
-                <h3 className={`text-lg font-medium text-gray-900 mb-4 ${isRTL ? 'text-right' : ''}`}>
-                  {t('events.addTicketType')}
+                <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-4 transition-colors duration-200">
+                  {t('events.createTicket')}
                 </h3>
+                
                 <form onSubmit={handleTicketSubmit} className="space-y-4">
                   <div>
-                    <label className={`block text-sm font-medium text-gray-700 ${isRTL ? 'text-right' : ''}`}>
-                      {t('tickets.ticketType')}
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 transition-colors duration-200">
+                      {t('events.ticketType')}
                     </label>
                     <select
+                      name="ticket_type"
                       value={ticketForm.ticket_type}
-                      onChange={(e) => setTicketForm({...ticketForm, ticket_type: e.target.value})}
+                      onChange={handleInputChange}
                       className="form-select"
+                      required
                     >
-                      <option value="early_bird">{t('tickets.earlyBird')}</option>
-                      <option value="regular">{t('tickets.regular')}</option>
-                      <option value="vip">{t('tickets.vip')}</option>
+                      <option value="regular">{t('events.regular')}</option>
+                      <option value="early_bird">{t('events.earlyBird')}</option>
+                      <option value="vip">{t('events.vip')}</option>
                     </select>
                   </div>
-                  
-                  <div>
-                    <label className={`block text-sm font-medium text-gray-700 ${isRTL ? 'text-right' : ''}`}>
-                      {t('tickets.priceLabel')}
-                    </label>
-                    <input
-                      type="number"
-                      step="0.01"
-                      min="0"
-                      value={ticketForm.price}
-                      onChange={(e) => setTicketForm({...ticketForm, price: parseFloat(e.target.value)})}
-                      className="form-input"
-                    />
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 transition-colors duration-200">
+                        {t('events.price')}
+                      </label>
+                      <input
+                        type="number"
+                        name="price"
+                        value={ticketForm.price}
+                        onChange={handleInputChange}
+                        min="0"
+                        step="0.01"
+                        className="form-input"
+                        required
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 transition-colors duration-200">
+                        {t('events.quantity')}
+                      </label>
+                      <input
+                        type="number"
+                        name="quantity_available"
+                        value={ticketForm.quantity_available}
+                        onChange={handleInputChange}
+                        min="1"
+                        className="form-input"
+                        required
+                      />
+                    </div>
                   </div>
-                  
-                  <div>
-                    <label className={`block text-sm font-medium text-gray-700 ${isRTL ? 'text-right' : ''}`}>
-                      {t('tickets.quantityAvailable')}
-                    </label>
-                    <input
-                      type="number"
-                      min="1"
-                      value={ticketForm.quantity_available}
-                      onChange={(e) => setTicketForm({...ticketForm, quantity_available: parseInt(e.target.value)})}
-                      className="form-input"
-                    />
-                  </div>
-                  
-                  <div className={`flex space-x-3 ${isRTL ? 'space-x-reverse flex-row-reverse' : ''}`}>
-                    <button type="submit" className="btn-primary flex-1">
-                      {t('tickets.addTicket')}
-                    </button>
+
+                  <div className={`flex justify-end space-x-3 pt-4 ${isRTL ? 'flex-row-reverse space-x-reverse' : ''}`}>
                     <button
                       type="button"
                       onClick={() => setShowTicketForm(false)}
-                      className="btn-secondary flex-1"
+                      className="btn-secondary"
                     >
                       {t('common.cancel')}
-                    </button>
-                  </div>
-                </form>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Edit Event Modal */}
-        {showEditForm && (
-          <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
-            <div className="relative top-10 mx-auto p-5 border max-w-2xl shadow-lg rounded-md bg-white">
-              <div className="mt-3">
-                <h3 className={`text-lg font-medium text-gray-900 mb-4 ${isRTL ? 'text-right' : ''}`}>
-                  {t('events.editEvent')}
-                </h3>
-                <form onSubmit={handleEventUpdate} className="space-y-4">
-                  <div>
-                    <label className={`block text-sm font-medium text-gray-700 ${isRTL ? 'text-right' : ''}`}>
-                      {t('events.eventTitle')}
-                    </label>
-                    <input
-                      type="text"
-                      value={editForm.title}
-                      onChange={(e) => setEditForm({...editForm, title: e.target.value})}
-                      className="form-input"
-                      dir={isRTL ? 'rtl' : 'ltr'}
-                    />
-                  </div>
-                  
-                  <div>
-                    <label className={`block text-sm font-medium text-gray-700 ${isRTL ? 'text-right' : ''}`}>
-                      {t('events.description')}
-                    </label>
-                    <textarea
-                      value={editForm.description}
-                      onChange={(e) => setEditForm({...editForm, description: e.target.value})}
-                      rows="3"
-                      className="form-textarea"
-                      dir={isRTL ? 'rtl' : 'ltr'}
-                    />
-                  </div>
-                  
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <label className={`block text-sm font-medium text-gray-700 ${isRTL ? 'text-right' : ''}`}>
-                        {t('events.startDateLabel')}
-                      </label>
-                      <input
-                        type="datetime-local"
-                        value={editForm.start_date}
-                        onChange={(e) => setEditForm({...editForm, start_date: e.target.value})}
-                        className="form-input"
-                      />
-                    </div>
-                    <div>
-                      <label className={`block text-sm font-medium text-gray-700 ${isRTL ? 'text-right' : ''}`}>
-                        {t('events.endDateLabel')}
-                      </label>
-                      <input
-                        type="datetime-local"
-                        value={editForm.end_date}
-                        onChange={(e) => setEditForm({...editForm, end_date: e.target.value})}
-                        className="form-input"
-                      />
-                    </div>
-                  </div>
-                  
-                  <div className={`flex space-x-3 ${isRTL ? 'space-x-reverse flex-row-reverse' : ''}`}>
-                    <button type="submit" className="btn-primary flex-1">
-                      {t('common.update')} {t('events.title')}
                     </button>
                     <button
-                      type="button"
-                      onClick={() => setShowEditForm(false)}
-                      className="btn-secondary flex-1"
+                      type="submit"
+                      className="btn-primary"
                     >
-                      {t('common.cancel')}
+                      {t('events.createTicket')}
                     </button>
                   </div>
                 </form>

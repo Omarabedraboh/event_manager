@@ -2,7 +2,7 @@ export const translations = {
   en: {
     // Navigation
     nav: {
-      brand: "EventMS",
+      brand: "EventSphere",
       dashboard: "Dashboard",
       createEvent: "Create Event",
       venues: "Venues",
@@ -10,6 +10,7 @@ export const translations = {
       analytics: "Analytics",
       networking: "Networking",
       marketing: "Marketing",
+      speakerDashboard: "Speaker Dashboard",
       sponsorDashboard: "Sponsor Dashboard",
       profile: "Profile Settings",
       signOut: "Sign out"
@@ -69,6 +70,7 @@ export const translations = {
     events: {
       title: "Events",
       createEvent: "Create Event",
+      createEventDescription: "Set up your event with our step-by-step wizard",
       editEvent: "Edit Event",
       eventTitle: "Event Title",
       description: "Description",
@@ -95,6 +97,8 @@ export const translations = {
       eventSchedule: "Event Schedule",
       eventLocation: "Event Location",
       reviewPublish: "Review & Publish",
+      reviewEvent: "Review Your Event",
+      reviewEventDescription: "Review all event details before publishing",
       physicalEvent: "Physical Event",
       virtualEvent: "Virtual Event",
       hybridEvent: "Hybrid Event (Physical + Virtual)",
@@ -105,18 +109,24 @@ export const translations = {
       maximizeVenue: "• Maximize venue utilization",
       eventDuration: "Event duration",
       hours: "hours",
+      perHour: "per hour",
       selectVenue: "Select a venue",
+      selectVenuePlaceholder: "Choose a venue",
       noVenuesAvailable: "No venues available. Contact venue owners to add venues.",
       enterVirtualLink: "Enter the virtual meeting link (Zoom, Google Meet, Teams, etc.)",
       publishingOptions: "Publishing Options",
       saveAsDraft: "You can save as draft for later editing or publish immediately to make it visible to attendees.",
       saveAsDraftBtn: "Save as Draft",
+      saveDraft: "Save as Draft",
       saveAndPublish: "Save & Publish",
       saving: "Saving...",
       publishing: "Publishing...",
       eventNotFound: "Event Not Found",
+      eventNotFoundMessage: "The event you're looking for doesn't exist or has been removed.",
       backToDashboard: "Back to Dashboard",
-      totalRegistrationsStats: "Total Registrations",
+      totalRegistrations: "Total Registrations",
+      totalSales: "Total Sales",
+      totalTickets: "Total Tickets",
       capacity: "Capacity",
       revenueStats: "Revenue",
       attendanceRate: "Attendance Rate",
@@ -137,7 +147,38 @@ export const translations = {
       status: "Status",
       type: "Type",
       created: "Created",
-      fillRequiredFields: "Please fill in all required fields"
+      fillRequiredFields: "Please fill in all required fields",
+      createAnother: "Create Another Event",
+      quickActions: "Quick Actions",
+      manageTickets: "Manage Tickets",
+      eventTickets: "Event Tickets",
+      createTicket: "Create Ticket",
+      ticketName: "Ticket Name",
+      price: "Price",
+      quantity: "Quantity",
+      remaining: "Remaining",
+      saleStarts: "Sale Starts",
+      saleEnds: "Sale Ends",
+      noTickets: "No tickets yet",
+      createFirstTicket: "Create your first ticket",
+      registrations: "Registrations",
+      attendee: "Attendee",
+      ticket: "Ticket",
+      registrationDate: "Registration Date",
+      noRegistrations: "No registrations yet",
+      noRegistrationsMessage: "No one has registered for this event yet.",
+      tabs: {
+        overview: "Overview",
+        tickets: "Tickets",
+        registrations: "Registrations"
+      },
+      status: {
+        ended: "Ended",
+        live: "Live",
+        published: "Published",
+        draft: "Draft",
+        confirmed: "Confirmed"
+      }
     },
     
     // Event Wizard Steps
@@ -213,7 +254,31 @@ export const translations = {
       ticketSoldOut: "Ticket sold out",
       myRegistrations: "My Registrations",
       qrCode: "QR Code",
-      downloadTicket: "Download Ticket"
+      downloadTicket: "Download Ticket",
+      
+      // New keys for RegistrationPage
+      selectTickets: "Please select at least one ticket",
+      success: "Registration Complete!",
+      successMessage: "You have successfully registered for this event. Your tickets are ready!",
+      when: "When",
+      type: "Type",
+      venue: "Venue",
+      joinLink: "Join Link",
+      joinEvent: "Join Event",
+      yourTicket: "Your Ticket",
+      qrCodeInfo: "Show this QR code at the event for entry",
+      backToDashboard: "Back to Dashboard",
+      printTicket: "Print Ticket",
+      registerFor: "Register for",
+      eventDetails: "Event Details",
+      maxAttendees: "Maximum Attendees",
+      available: "available",
+      noTicketsAvailable: "No tickets available for this event",
+      summary: "Registration Summary",
+      total: "Total:",
+      registering: "Registering...",
+      registerNow: "Register Now",
+      selectTicketsToStart: "Select tickets to start registration"
     },
     
     // Common
@@ -227,6 +292,8 @@ export const translations = {
       next: "Next",
       previous: "Previous",
       loading: "Loading...",
+      saving: "Saving...",
+      publishing: "Publishing...",
       error: "Error",
       success: "Success",
       confirm: "Confirm",
@@ -244,11 +311,28 @@ export const translations = {
       settings: "Settings",
       profile: "Profile",
       logout: "Logout",
+      switchToDark: "Switch to dark mode",
+      switchToLight: "Switch to light mode",
       accessDenied: "Access Denied",
       accessDeniedMessage: "You don't have permission to access this page.",
       notFound: "Not Found",
       pageNotFound: "Page not found",
+      eventNotFound: "Event Not Found",
+      eventNotFoundMessage: "The event you're looking for doesn't exist or has been removed.",
       update: "Update",
+      
+      // Brand
+      brand: {
+        name: "EventSphere",
+        tagline: "Your Complete Event Universe",
+        description: "Where Ideas Become Experiences"
+      },
+      
+      // Banner
+      banner: {
+        phase2: "Phase 2",
+        moreFeatures: "More Features Coming Soon"
+      },
       manage: "Manage",
       close: "Close"
     },
@@ -270,15 +354,16 @@ export const translations = {
   ar: {
     // Navigation
     nav: {
-      brand: "نظام إدارة الفعاليات",
+      brand: "EventSphere",
       dashboard: "لوحة التحكم",
-      createEvent: "إنشاء فعالية",
+      createEvent: "إنشاء حدث",
       venues: "الأماكن",
       myVenues: "أماكني",
       analytics: "التحليلات",
       networking: "التواصل",
       marketing: "التسويق",
-      sponsorDashboard: "لوحة الرعاة",
+      speakerDashboard: "لوحة المتحدث",
+      sponsorDashboard: "لوحة الراعي",
       profile: "إعدادات الملف الشخصي",
       signOut: "تسجيل الخروج"
     },
@@ -337,6 +422,7 @@ export const translations = {
     events: {
       title: "الفعاليات",
       createEvent: "إنشاء فعالية",
+      createEventDescription: "قم بإعداد فعاليتك باستخدام المعالج خطوة بخطوة",
       editEvent: "تعديل الفعالية",
       eventTitle: "عنوان الفعالية",
       description: "الوصف",
@@ -363,6 +449,8 @@ export const translations = {
       eventSchedule: "جدولة الفعالية",
       eventLocation: "موقع الفعالية",
       reviewPublish: "مراجعة ونشر",
+      reviewEvent: "مراجعة فعاليتك",
+      reviewEventDescription: "راجع جميع تفاصيل الفعالية قبل النشر",
       physicalEvent: "فعالية حضورية",
       virtualEvent: "فعالية افتراضية",
       hybridEvent: "فعالية مختلطة (حضورية + افتراضية)",
@@ -373,18 +461,24 @@ export const translations = {
       maximizeVenue: "• تعظيم استخدام المكان",
       eventDuration: "مدة الفعالية",
       hours: "ساعات",
+      perHour: "لكل ساعة",
       selectVenue: "اختر مكان",
+      selectVenuePlaceholder: "اختر مكان",
       noVenuesAvailable: "لا توجد أماكن متاحة. تواصل مع ملاك الأماكن لإضافة أماكن.",
       enterVirtualLink: "أدخل رابط الاجتماع الافتراضي (Zoom، Google Meet، Teams، إلخ)",
       publishingOptions: "خيارات النشر",
       saveAsDraft: "يمكنك الحفظ كمسودة للتعديل لاحقاً أو النشر فوراً لجعلها مرئية للحضور.",
       saveAsDraftBtn: "حفظ كمسودة",
+      saveDraft: "حفظ كمسودة",
       saveAndPublish: "حفظ ونشر",
       saving: "جاري الحفظ...",
       publishing: "جاري النشر...",
       eventNotFound: "الفعالية غير موجودة",
+      eventNotFoundMessage: "الفعالية التي تبحث عنها غير موجودة أو تم حذفها.",
       backToDashboard: "العودة للوحة التحكم",
-      totalRegistrationsStats: "إجمالي التسجيلات",
+      totalRegistrations: "إجمالي التسجيلات",
+      totalSales: "إجمالي المبيعات",
+      totalTickets: "إجمالي التذاكر",
       capacity: "السعة",
       revenueStats: "الإيرادات",
       attendanceRate: "معدل الحضور",
@@ -405,7 +499,38 @@ export const translations = {
       status: "الحالة",
       type: "النوع",
       created: "تاريخ الإنشاء",
-      fillRequiredFields: "يرجى ملء جميع الحقول المطلوبة"
+      fillRequiredFields: "يرجى ملء جميع الحقول المطلوبة",
+      createAnother: "إنشاء فعالية أخرى",
+      quickActions: "إجراءات سريعة",
+      manageTickets: "إدارة التذاكر",
+      eventTickets: "تذاكر الفعالية",
+      createTicket: "إنشاء تذكرة",
+      ticketName: "اسم التذكرة",
+      price: "السعر",
+      quantity: "الكمية",
+      remaining: "المتبقي",
+      saleStarts: "بداية البيع",
+      saleEnds: "نهاية البيع",
+      noTickets: "لا توجد تذاكر بعد",
+      createFirstTicket: "أنشئ تذكرتك الأولى",
+      registrations: "التسجيلات",
+      attendee: "الحاضر",
+      ticket: "التذكرة",
+      registrationDate: "تاريخ التسجيل",
+      noRegistrations: "لا توجد تسجيلات بعد",
+      noRegistrationsMessage: "لم يسجل أحد في هذه الفعالية بعد.",
+      tabs: {
+        overview: "نظرة عامة",
+        tickets: "التذاكر",
+        registrations: "التسجيلات"
+      },
+      status: {
+        ended: "انتهت",
+        live: "مباشرة",
+        published: "منشورة",
+        draft: "مسودة",
+        confirmed: "مؤكد"
+      }
     },
     
     // Event Wizard Steps
@@ -481,7 +606,31 @@ export const translations = {
       ticketSoldOut: "نفدت التذاكر",
       myRegistrations: "تسجيلاتي",
       qrCode: "رمز QR",
-      downloadTicket: "تحميل التذكرة"
+      downloadTicket: "تحميل التذكرة",
+      
+      // New Arabic keys for RegistrationPage
+      selectTickets: "يرجى اختيار تذكرة واحدة على الأقل",
+      success: "تم التسجيل بنجاح!",
+      successMessage: "تم تسجيلك بنجاح في هذه الفعالية. تذاكرك جاهزة!",
+      when: "متى",
+      type: "النوع",
+      venue: "المكان",
+      joinLink: "رابط الانضمام",
+      joinEvent: "الانضمام للفعالية",
+      yourTicket: "تذكرتك",
+      qrCodeInfo: "اعرض رمز QR هذا في الفعالية للدخول",
+      backToDashboard: "العودة للوحة التحكم",
+      printTicket: "طباعة التذكرة",
+      registerFor: "التسجيل في",
+      eventDetails: "تفاصيل الفعالية",
+      maxAttendees: "الحد الأقصى للحضور",
+      available: "متاح",
+      noTicketsAvailable: "لا توجد تذاكر متاحة لهذه الفعالية",
+      summary: "ملخص التسجيل",
+      total: "المجموع:",
+      registering: "جاري التسجيل...",
+      registerNow: "سجل الآن",
+      selectTicketsToStart: "اختر التذاكر لبدء التسجيل"
     },
     
     // Common
@@ -495,6 +644,8 @@ export const translations = {
       next: "التالي",
       previous: "السابق",
       loading: "جاري التحميل...",
+      saving: "جاري الحفظ...",
+      publishing: "جاري النشر...",
       error: "خطأ",
       success: "نجح",
       confirm: "تأكيد",
@@ -512,11 +663,28 @@ export const translations = {
       settings: "الإعدادات",
       profile: "الملف الشخصي",
       logout: "تسجيل الخروج",
+      switchToDark: "التبديل إلى الوضع المظلم",
+      switchToLight: "التبديل إلى الوضع المضيء",
       accessDenied: "تم رفض الوصول",
       accessDeniedMessage: "ليس لديك صلاحية للوصول إلى هذه الصفحة.",
       notFound: "غير موجود",
       pageNotFound: "الصفحة غير موجودة",
+      eventNotFound: "الفعالية غير موجودة",
+      eventNotFoundMessage: "الفعالية التي تبحث عنها غير موجودة أو تم حذفها.",
       update: "تحديث",
+      
+      // Brand Arabic
+      brand: {
+        name: "EventSphere",
+        tagline: "عالم الفعاليات الكامل",
+        description: "حيث تصبح الأفكار تجارب"
+      },
+      
+      // Banner Arabic
+      banner: {
+        phase2: "المرحلة الثانية",
+        moreFeatures: "المزيد من الميزات قريباً"
+      },
       manage: "إدارة",
       close: "إغلاق"
     },

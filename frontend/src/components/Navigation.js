@@ -3,6 +3,8 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../App';
 import { useLanguage } from '../contexts/LanguageContext';
 import LanguageSwitcher from './LanguageSwitcher';
+import ThemeToggle from './ThemeToggle';
+import Logo from './Logo';
 
 const Navigation = () => {
   const { user, logout } = useAuth();
@@ -28,7 +30,8 @@ const Navigation = () => {
       organizer: [
         { path: '/events/create', label: t('nav.createEvent') },
         { path: '/venues', label: t('nav.venues') },
-        { path: '/analytics', label: t('nav.analytics') }
+        { path: '/analytics', label: t('nav.analytics') },
+        { path: '/marketing', label: t('nav.marketing') }
       ],
       attendee: [
         { path: '/networking', label: t('nav.networking') }
@@ -43,6 +46,7 @@ const Navigation = () => {
         { path: '/marketing', label: t('nav.marketing') }
       ],
       speaker: [
+        { path: '/speakers', label: t('nav.speakerDashboard') },
         { path: '/networking', label: t('nav.networking') }
       ],
       sponsor: [
@@ -66,8 +70,8 @@ const Navigation = () => {
         <div className="flex justify-between h-16">
           {/* Logo and brand */}
           <div className="flex items-center">
-            <Link to="/" className={`navbar-brand text-xl font-bold text-blue-600 ${isRTL ? 'font-arabic' : ''}`}>
-              {t('nav.brand')}
+            <Link to="/" className={`flex items-center ${isRTL ? 'font-arabic' : ''}`}>
+              <Logo size="md" showText={true} />
             </Link>
           </div>
 
@@ -77,10 +81,10 @@ const Navigation = () => {
               <Link
                 key={item.path}
                 to={item.path}
-                className={`nav-link px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                className={`nav-link px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 ${
                   isActiveLink(item.path) 
-                    ? 'text-blue-600 bg-blue-50' 
-                    : 'text-gray-700 hover:text-gray-900 hover:bg-gray-50'
+                    ? 'text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20' 
+                    : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-900'
                 }`}
               >
                 {item.label}
@@ -88,14 +92,15 @@ const Navigation = () => {
             ))}
           </div>
 
-          {/* User menu and language switcher */}
+          {/* User menu, theme toggle and language switcher */}
           <div className="flex items-center space-x-4 rtl:space-x-reverse">
+            <ThemeToggle />
             <LanguageSwitcher />
             
             <div className="relative">
               <button
                 onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                className="flex items-center space-x-2 rtl:space-x-reverse text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium"
+                className="flex items-center space-x-2 rtl:space-x-reverse text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200"
               >
                 <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white text-sm font-bold">
                   {user?.name?.charAt(0).toUpperCase()}
@@ -107,17 +112,17 @@ const Navigation = () => {
               </button>
 
               {isDropdownOpen && (
-                <div className={`absolute mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-10 border ${
+                <div className={`absolute mt-2 w-48 bg-white dark:bg-gray-800 rounded-md shadow-lg py-1 z-10 border border-gray-200 dark:border-gray-700 transition-colors duration-200 ${
                   isRTL ? 'left-0' : 'right-0'
                 }`}>
-                  <div className="px-4 py-2 border-b border-gray-200">
-                    <p className="text-sm font-medium text-gray-900">{user?.name}</p>
-                    <p className="text-sm text-gray-500 capitalize">{t(`roles.${user?.role}`)}</p>
+                  <div className="px-4 py-2 border-b border-gray-200 dark:border-gray-700">
+                    <p className="text-sm font-medium text-gray-900 dark:text-gray-100">{user?.name}</p>
+                    <p className="text-sm text-gray-600 dark:text-gray-400 capitalize">{t(`roles.${user?.role}`)}</p>
                   </div>
                   
                   <Link
                     to="/profile"
-                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                    className="block px-4 py-2 text-sm text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-900 transition-colors duration-200"
                     onClick={() => setIsDropdownOpen(false)}
                   >
                     {t('nav.profile')}
@@ -125,7 +130,7 @@ const Navigation = () => {
                   
                   <button
                     onClick={handleLogout}
-                    className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rtl:text-right"
+                    className="block w-full text-left px-4 py-2 text-sm text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-900 rtl:text-right transition-colors duration-200"
                   >
                     {t('nav.signOut')}
                   </button>
@@ -136,7 +141,7 @@ const Navigation = () => {
             {/* Mobile menu button */}
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="md:hidden ml-2 rtl:ml-0 rtl:mr-2 p-2 rounded-md text-gray-700 hover:text-gray-900"
+              className="md:hidden ml-2 rtl:ml-0 rtl:mr-2 p-2 rounded-md text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 transition-colors duration-200"
             >
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" />
@@ -148,15 +153,15 @@ const Navigation = () => {
         {/* Mobile navigation menu */}
         {isMobileMenuOpen && (
           <div className="md:hidden">
-            <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-white border-t border-gray-200">
+            <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 transition-colors duration-200">
               {getNavItems().map((item) => (
                 <Link
                   key={item.path}
                   to={item.path}
-                  className={`block px-3 py-2 rounded-md text-base font-medium ${
+                  className={`block px-3 py-2 rounded-md text-base font-medium transition-colors duration-200 ${
                     isActiveLink(item.path)
-                      ? 'text-blue-600 bg-blue-50'
-                      : 'text-gray-700 hover:text-gray-900 hover:bg-gray-50'
+                      ? 'text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20'
+                      : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-900'
                   }`}
                   onClick={() => setIsMobileMenuOpen(false)}
                 >

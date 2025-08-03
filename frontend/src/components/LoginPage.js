@@ -3,6 +3,8 @@ import { Navigate } from 'react-router-dom';
 import { useAuth } from '../App';
 import { useLanguage } from '../contexts/LanguageContext';
 import LanguageSwitcher from './LanguageSwitcher';
+import ThemeToggle from './ThemeToggle';
+import Logo from './Logo';
 
 const LoginPage = () => {
   const { user, login, register } = useAuth();
@@ -56,6 +58,8 @@ const LoginPage = () => {
     { email: 'organizer@demo.com', password: 'demo123', role: 'organizer', name: 'Demo Organizer' },
     { email: 'attendee@demo.com', password: 'demo123', role: 'attendee', name: 'Demo Attendee' },
     { email: 'venue@demo.com', password: 'demo123', role: 'venue_owner', name: 'Demo Venue Owner' },
+    { email: 'speaker@demo.com', password: 'demo123', role: 'speaker', name: 'Demo Speaker' },
+    { email: 'sponsor@demo.com', password: 'demo123', role: 'sponsor', name: 'Demo Sponsor' },
     { email: 'admin@demo.com', password: 'demo123', role: 'admin', name: 'Demo Admin' }
   ];
 
@@ -78,27 +82,36 @@ const LoginPage = () => {
   };
 
   return (
-    <div className={`min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 ${isRTL ? 'font-arabic' : ''}`}>
+    <div className={`min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 transition-colors duration-200 ${isRTL ? 'font-arabic' : ''}`}>
       <div className="max-w-md w-full space-y-8 p-8">
-        {/* Language Switcher */}
-        <div className={`flex ${isRTL ? 'justify-start' : 'justify-end'} mb-4`}>
+        {/* Language Switcher and Theme Toggle */}
+        <div className={`flex items-center gap-4 ${isRTL ? 'justify-start' : 'justify-end'} mb-4`}>
+          <ThemeToggle />
           <LanguageSwitcher />
         </div>
         
         <div className="text-center">
-          <h2 className="text-3xl font-bold text-gray-900">
-            {t('nav.brand')}
-          </h2>
-          <p className="mt-2 text-gray-600">
+          <div className="mb-6">
+            <div className="flex justify-center mb-4">
+              <Logo size="xl" showText={false} />
+            </div>
+            <h2 className="text-4xl font-bold text-gray-900 dark:text-gray-100 transition-colors duration-200">
+              {t('common.brand.name')}
+            </h2>
+            <p className="text-lg text-blue-600 dark:text-blue-400 font-medium mt-2 transition-colors duration-200">
+              {t('common.brand.tagline')}
+            </p>
+          </div>
+          <p className="mt-2 text-gray-600 dark:text-gray-400 transition-colors duration-200">
             {isLogin ? t('auth.loginSubtitle') : t('auth.registerSubtitle')}
           </p>
         </div>
 
-        <div className="bg-white rounded-lg shadow-lg p-6">
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 transition-colors duration-200">
           {/* Demo Users Section */}
           <div className="mb-6">
-            <h3 className="text-lg font-medium text-gray-900 mb-3">Quick Demo Access</h3>
-            <div className="grid grid-cols-2 gap-2">
+            <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-3 transition-colors duration-200">Quick Demo Access</h3>
+            <div className="grid grid-cols-3 gap-2">{/* Changed from grid-cols-2 to grid-cols-3 */}
               {demoUsers.map((demoUser) => (
                 <button
                   key={demoUser.role}
@@ -110,8 +123,8 @@ const LoginPage = () => {
                 </button>
               ))}
             </div>
-            <div className="mt-2 border-t pt-4">
-              <p className="text-xs text-gray-500">
+            <div className="mt-2 border-t border-gray-200 dark:border-gray-600 pt-4 transition-colors duration-200">
+              <p className="text-xs text-gray-600 dark:text-gray-400 transition-colors duration-200">
                 Click any role above to login instantly with demo credentials
               </p>
             </div>
@@ -119,7 +132,7 @@ const LoginPage = () => {
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className={`block text-sm font-medium text-gray-700 ${isRTL ? 'text-right' : 'text-left'}`}>
+              <label className={`block text-sm font-medium text-gray-900 dark:text-gray-100 transition-colors duration-200 ${isRTL ? 'text-right' : 'text-left'}`}>
                 {t('auth.email')}
               </label>
               <input
@@ -135,7 +148,7 @@ const LoginPage = () => {
             </div>
 
             <div>
-              <label className={`block text-sm font-medium text-gray-700 ${isRTL ? 'text-right' : 'text-left'}`}>
+              <label className={`block text-sm font-medium text-gray-900 dark:text-gray-100 transition-colors duration-200 ${isRTL ? 'text-right' : 'text-left'}`}>
                 {t('auth.password')}
               </label>
               <input
@@ -153,7 +166,7 @@ const LoginPage = () => {
             {!isLogin && (
               <>
                 <div>
-                  <label className={`block text-sm font-medium text-gray-700 ${isRTL ? 'text-right' : 'text-left'}`}>
+                  <label className={`block text-sm font-medium text-gray-900 dark:text-gray-100 transition-colors duration-200 ${isRTL ? 'text-right' : 'text-left'}`}>
                     {t('auth.name')}
                   </label>
                   <input
@@ -169,7 +182,7 @@ const LoginPage = () => {
                 </div>
 
                 <div>
-                  <label className={`block text-sm font-medium text-gray-700 ${isRTL ? 'text-right' : 'text-left'}`}>
+                  <label className={`block text-sm font-medium text-gray-900 dark:text-gray-100 transition-colors duration-200 ${isRTL ? 'text-right' : 'text-left'}`}>
                     {t('auth.role')}
                   </label>
                   <select
@@ -214,7 +227,7 @@ const LoginPage = () => {
           <div className="mt-4 text-center">
             <button
               onClick={() => setIsLogin(!isLogin)}
-              className="text-blue-600 hover:text-blue-800 text-sm"
+              className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 text-sm transition-colors duration-200"
             >
               {isLogin 
                 ? t('auth.noAccount') + ' ' + t('auth.registerHere')

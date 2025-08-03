@@ -153,6 +153,84 @@ class RegistrationCreate(BaseModel):
     event_id: str
     ticket_id: str
 
+# Speaker Models
+class SpeakerProfile(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    user_id: str
+    bio: Optional[str] = None
+    profile_image: Optional[str] = None  # base64 encoded image
+    linkedin_url: Optional[str] = None
+    twitter_url: Optional[str] = None
+    website_url: Optional[str] = None
+    expertise_areas: List[str] = []
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+    updated_at: datetime = Field(default_factory=datetime.utcnow)
+
+class SpeakerProfileCreate(BaseModel):
+    bio: Optional[str] = None
+    profile_image: Optional[str] = None
+    linkedin_url: Optional[str] = None
+    twitter_url: Optional[str] = None
+    website_url: Optional[str] = None
+    expertise_areas: List[str] = []
+
+class SpeakerContent(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    speaker_id: str
+    event_id: Optional[str] = None  # Can be linked to specific event
+    title: str
+    content_type: str  # presentation, research_paper, video, etc.
+    file_data: Optional[str] = None  # base64 encoded file
+    file_name: Optional[str] = None
+    description: Optional[str] = None
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+
+class SpeakerContentCreate(BaseModel):
+    event_id: Optional[str] = None
+    title: str
+    content_type: str
+    file_data: Optional[str] = None
+    file_name: Optional[str] = None
+    description: Optional[str] = None
+
+# Sponsor Models
+class SponsorProfile(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    user_id: str
+    company_name: str
+    company_logo: Optional[str] = None  # base64 encoded image
+    company_description: Optional[str] = None
+    website_url: Optional[str] = None
+    industry: Optional[str] = None
+    contact_person: Optional[str] = None
+    contact_email: Optional[str] = None
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+    updated_at: datetime = Field(default_factory=datetime.utcnow)
+
+class SponsorProfileCreate(BaseModel):
+    company_name: str
+    company_logo: Optional[str] = None
+    company_description: Optional[str] = None
+    website_url: Optional[str] = None
+    industry: Optional[str] = None
+    contact_person: Optional[str] = None
+    contact_email: Optional[str] = None
+
+class Sponsorship(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    sponsor_id: str
+    event_id: str
+    sponsorship_type: str  # gold, silver, bronze, title, presenting
+    amount: float
+    status: str = "pending"  # pending, approved, paid, cancelled
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+    updated_at: datetime = Field(default_factory=datetime.utcnow)
+
+class SponsorshipCreate(BaseModel):
+    event_id: str
+    sponsorship_type: str
+    amount: float
+
 # Utility Functions
 def hash_password(password: str) -> str:
     return bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
@@ -254,6 +332,20 @@ async def get_event(event_id: str, current_user: User = Depends(get_current_user
     event = await db.events.find_one({"id": event_id})
     if not event:
         raise HTTPException(status_code=404, detail="Event not found")
+    
+    # Check if user can access this event
+    if current_user.role == UserRole.ORGANIZER:
+        # Organizers can only see their own events
+        if event["organizer_id"] != current_user.id:
+            raise HTTPException(status_code=404, detail="Event not found")
+    elif current_user.role == UserRole.ADMIN:
+        # Admins can see all events
+        pass
+    else:
+        # Other users can only see published events
+        if not event.get("is_published", False):
+            raise HTTPException(status_code=404, detail="Event not found")
+    
     return Event(**event)
 
 @api_router.put("/events/{event_id}")
@@ -298,6 +390,13 @@ async def get_venues(current_user: User = Depends(get_current_user)):
     else:
         venues = await db.venues.find().to_list(1000)
     return [Venue(**venue) for venue in venues]
+
+@api_router.get("/venues/{venue_id}", response_model=Venue)
+async def get_venue(venue_id: str, current_user: User = Depends(get_current_user)):
+    venue = await db.venues.find_one({"id": venue_id})
+    if not venue:
+        raise HTTPException(status_code=404, detail="Venue not found")
+    return Venue(**venue)
 
 @api_router.get("/venues/{venue_id}/availability")
 async def check_venue_availability(venue_id: str, start_date: str, end_date: str, current_user: User = Depends(get_current_user)):
@@ -531,6 +630,223 @@ async def get_dashboard_stats(current_user: User = Depends(get_current_user)):
         }
     
     return stats
+
+# Speaker Routes
+@api_router.get("/speakers/profile")
+async def get_speaker_profile(current_user: User = Depends(get_current_user)):
+    if current_user.role != UserRole.SPEAKER and current_user.role != UserRole.ADMIN:
+        raise HTTPException(status_code=403, detail="Access denied")
+    
+    profile = await db.speaker_profiles.find_one({"user_id": current_user.id})
+    if not profile:
+        # Return default empty profile
+        return {
+            "user_id": current_user.id,
+            "bio": "",
+            "profile_image": None,
+            "linkedin_url": "",
+            "twitter_url": "",
+            "website_url": "",
+            "expertise_areas": []
+        }
+    
+    return profile
+
+@api_router.post("/speakers/profile")
+async def create_or_update_speaker_profile(
+    profile_data: SpeakerProfileCreate,
+    current_user: User = Depends(get_current_user)
+):
+    if current_user.role != UserRole.SPEAKER and current_user.role != UserRole.ADMIN:
+        raise HTTPException(status_code=403, detail="Access denied")
+    
+    existing_profile = await db.speaker_profiles.find_one({"user_id": current_user.id})
+    
+    profile_dict = {
+        "user_id": current_user.id,
+        **profile_data.dict(),
+        "updated_at": datetime.utcnow()
+    }
+    
+    if existing_profile:
+        await db.speaker_profiles.update_one(
+            {"user_id": current_user.id},
+            {"$set": profile_dict}
+        )
+    else:
+        profile_dict["id"] = str(uuid.uuid4())
+        profile_dict["created_at"] = datetime.utcnow()
+        await db.speaker_profiles.insert_one(profile_dict)
+    
+    return {"message": "Speaker profile updated successfully"}
+
+@api_router.get("/speakers/content")
+async def get_speaker_content(current_user: User = Depends(get_current_user)):
+    if current_user.role != UserRole.SPEAKER and current_user.role != UserRole.ADMIN:
+        raise HTTPException(status_code=403, detail="Access denied")
+    
+    # Get speaker profile first
+    profile = await db.speaker_profiles.find_one({"user_id": current_user.id})
+    if not profile:
+        return []
+    
+    content = await db.speaker_content.find({"speaker_id": profile["id"]}).to_list(1000)
+    return content
+
+@api_router.post("/speakers/content")
+async def upload_speaker_content(
+    content_data: SpeakerContentCreate,
+    current_user: User = Depends(get_current_user)
+):
+    if current_user.role != UserRole.SPEAKER and current_user.role != UserRole.ADMIN:
+        raise HTTPException(status_code=403, detail="Access denied")
+    
+    # Get speaker profile
+    profile = await db.speaker_profiles.find_one({"user_id": current_user.id})
+    if not profile:
+        raise HTTPException(status_code=404, detail="Speaker profile not found. Please create profile first.")
+    
+    content_dict = {
+        "id": str(uuid.uuid4()),
+        "speaker_id": profile["id"],
+        **content_data.dict(),
+        "created_at": datetime.utcnow()
+    }
+    
+    await db.speaker_content.insert_one(content_dict)
+    return {"message": "Content uploaded successfully"}
+
+@api_router.delete("/speakers/content/{content_id}")
+async def delete_speaker_content(content_id: str, current_user: User = Depends(get_current_user)):
+    if current_user.role != UserRole.SPEAKER and current_user.role != UserRole.ADMIN:
+        raise HTTPException(status_code=403, detail="Access denied")
+    
+    # Get speaker profile
+    profile = await db.speaker_profiles.find_one({"user_id": current_user.id})
+    if not profile:
+        raise HTTPException(status_code=403, detail="Access denied")
+    
+    # Verify content belongs to speaker
+    content = await db.speaker_content.find_one({"id": content_id, "speaker_id": profile["id"]})
+    if not content:
+        raise HTTPException(status_code=404, detail="Content not found")
+    
+    await db.speaker_content.delete_one({"id": content_id})
+    return {"message": "Content deleted successfully"}
+
+# Sponsor Routes
+@api_router.get("/sponsors/profile")
+async def get_sponsor_profile(current_user: User = Depends(get_current_user)):
+    if current_user.role != UserRole.SPONSOR and current_user.role != UserRole.ADMIN:
+        raise HTTPException(status_code=403, detail="Access denied")
+    
+    profile = await db.sponsor_profiles.find_one({"user_id": current_user.id})
+    if not profile:
+        # Return default empty profile
+        return {
+            "user_id": current_user.id,
+            "company_name": "",
+            "company_logo": None,
+            "company_description": "",
+            "website_url": "",
+            "industry": "",
+            "contact_person": "",
+            "contact_email": ""
+        }
+    
+    return profile
+
+@api_router.post("/sponsors/profile")
+async def create_or_update_sponsor_profile(
+    profile_data: SponsorProfileCreate,
+    current_user: User = Depends(get_current_user)
+):
+    if current_user.role != UserRole.SPONSOR and current_user.role != UserRole.ADMIN:
+        raise HTTPException(status_code=403, detail="Access denied")
+    
+    existing_profile = await db.sponsor_profiles.find_one({"user_id": current_user.id})
+    
+    profile_dict = {
+        "user_id": current_user.id,
+        **profile_data.dict(),
+        "updated_at": datetime.utcnow()
+    }
+    
+    if existing_profile:
+        await db.sponsor_profiles.update_one(
+            {"user_id": current_user.id},
+            {"$set": profile_dict}
+        )
+    else:
+        profile_dict["id"] = str(uuid.uuid4())
+        profile_dict["created_at"] = datetime.utcnow()
+        await db.sponsor_profiles.insert_one(profile_dict)
+    
+    return {"message": "Sponsor profile updated successfully"}
+
+@api_router.get("/sponsors/sponsorships")
+async def get_sponsor_sponsorships(current_user: User = Depends(get_current_user)):
+    if current_user.role != UserRole.SPONSOR and current_user.role != UserRole.ADMIN:
+        raise HTTPException(status_code=403, detail="Access denied")
+    
+    # Get sponsor profile first
+    profile = await db.sponsor_profiles.find_one({"user_id": current_user.id})
+    if not profile:
+        return []
+    
+    sponsorships = await db.sponsorships.find({"sponsor_id": profile["id"]}).to_list(1000)
+    
+    # Enrich with event details
+    result = []
+    for sponsorship in sponsorships:
+        event = await db.events.find_one({"id": sponsorship["event_id"]})
+        sponsorship_with_event = {
+            **sponsorship,
+            "event_title": event["title"] if event else "Event not found",
+            "event_start_date": event["start_date"] if event else None
+        }
+        result.append(sponsorship_with_event)
+    
+    return result
+
+@api_router.get("/sponsors/events")
+async def get_available_events_for_sponsorship(current_user: User = Depends(get_current_user)):
+    if current_user.role != UserRole.SPONSOR and current_user.role != UserRole.ADMIN:
+        raise HTTPException(status_code=403, detail="Access denied")
+    
+    # Get published events only
+    events = await db.events.find({"is_published": True}).to_list(1000)
+    return events
+
+@api_router.post("/sponsors/sponsorships")
+async def create_sponsorship(
+    sponsorship_data: SponsorshipCreate,
+    current_user: User = Depends(get_current_user)
+):
+    if current_user.role != UserRole.SPONSOR and current_user.role != UserRole.ADMIN:
+        raise HTTPException(status_code=403, detail="Access denied")
+    
+    # Get sponsor profile
+    profile = await db.sponsor_profiles.find_one({"user_id": current_user.id})
+    if not profile:
+        raise HTTPException(status_code=404, detail="Sponsor profile not found. Please create profile first.")
+    
+    # Verify event exists
+    event = await db.events.find_one({"id": sponsorship_data.event_id, "is_published": True})
+    if not event:
+        raise HTTPException(status_code=404, detail="Event not found or not published")
+    
+    sponsorship_dict = {
+        "id": str(uuid.uuid4()),
+        "sponsor_id": profile["id"],
+        **sponsorship_data.dict(),
+        "status": "pending",
+        "created_at": datetime.utcnow(),
+        "updated_at": datetime.utcnow()
+    }
+    
+    await db.sponsorships.insert_one(sponsorship_dict)
+    return {"message": "Sponsorship application submitted successfully"}
 
 # Include the router in the main app
 app.include_router(api_router)

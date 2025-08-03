@@ -4,6 +4,7 @@ import axios from 'axios';
 import {jwtDecode} from 'jwt-decode';
 import './App.css';
 import { LanguageProvider } from './contexts/LanguageContext';
+import { ThemeProvider } from './contexts/ThemeContext';
 import LoginPage from './components/LoginPage';
 import Dashboard from './components/Dashboard';
 import EventWizard from './components/EventWizard';
@@ -11,6 +12,8 @@ import EventManagement from './components/EventManagement';
 import VenueManager from './components/VenueManager';
 import RegistrationPage from './components/RegistrationPage';
 import Phase2Banner from './components/Phase2Banner';
+import SpeakerDashboard from './components/SpeakerDashboard';
+import SponsorDashboard from './components/SponsorDashboard';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
@@ -101,6 +104,7 @@ const AuthProvider = ({ children }) => {
 
   const value = {
     user,
+    token: localStorage.getItem('token'),
     login,
     register,
     logout,
@@ -144,10 +148,11 @@ const ProtectedRoute = ({ children, requiredRoles = [] }) => {
 function App() {
   return (
     <LanguageProvider>
-      <AuthProvider>
-        <BrowserRouter>
-          <div className="App min-h-screen bg-gray-50">
-            <Routes>
+      <ThemeProvider>
+        <AuthProvider>
+          <BrowserRouter>
+            <div className="App min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-200">
+              <Routes>
               <Route path="/login" element={<LoginPage />} />
               
               {/* Dashboard Routes */}
@@ -172,7 +177,7 @@ function App() {
               
               {/* Venue Management */}
               <Route path="/venues" element={
-                <ProtectedRoute requiredRoles={['venue_owner', 'admin']}>
+                <ProtectedRoute requiredRoles={['organizer', 'venue_owner', 'admin']}>
                   <VenueManager />
                 </ProtectedRoute>
               } />
@@ -197,6 +202,12 @@ function App() {
                 </ProtectedRoute>
               } />
               
+              <Route path="/speakers" element={
+                <ProtectedRoute>
+                  <SpeakerDashboard />
+                </ProtectedRoute>
+              } />
+              
               <Route path="/marketing" element={
                 <ProtectedRoute>
                   <Phase2Banner feature="Marketing Center" description="Email campaigns and social media automation" />
@@ -205,7 +216,7 @@ function App() {
               
               <Route path="/sponsors" element={
                 <ProtectedRoute>
-                  <Phase2Banner feature="Sponsor Dashboard" description="Sponsor management and lead tracking" />
+                  <SponsorDashboard />
                 </ProtectedRoute>
               } />
               
@@ -215,7 +226,8 @@ function App() {
           </div>
         </BrowserRouter>
       </AuthProvider>
-    </LanguageProvider>
+    </ThemeProvider>
+  </LanguageProvider>
   );
 }
 

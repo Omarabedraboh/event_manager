@@ -1,0 +1,25 @@
+<svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="logoGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#60A5FA;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#3B82F6;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#8B5CF6;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  <g transform="translate(20,20)">
+    <!-- Outer swirl -->
+    <path d="M-15,-10 Q-10,-15 0,-15 Q15,-15 15,0 Q15,15 0,15 Q-15,15 -15,0 Q-15,-10 -5,-10 Q10,-10 10,0 Q10,10 0,10 Q-10,10 -10,0 Q-10,-5 -2,-5 Q5,-5 5,0 Q5,5 0,5 Q-5,5 -5,0 Q-5,-2 -1,-2 Q2,-2 2,0" 
+          stroke="url(#logoGradient)" 
+          stroke-width="2.5" 
+          fill="none" 
+          stroke-linecap="round"/>
+    
+    <!-- Inner swirl detail -->
+    <path d="M-1,0 Q1,-1 2,0 Q1,1 0,0" 
+          fill="url(#logoGradient)" 
+          opacity="0.8"/>
+    
+    <!-- Center dot -->
+    <circle cx="0" cy="0" r="1.5" fill="url(#logoGradient)"/>
+  </g>
+</svg>
